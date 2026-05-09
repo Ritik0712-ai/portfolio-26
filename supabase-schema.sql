@@ -1,0 +1,75 @@
+-- Supabase Database Schema for Portfolio
+-- Run this in your Supabase SQL Editor
+
+-- Create blogs table
+CREATE TABLE IF NOT EXISTS blogs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  excerpt TEXT,
+  content TEXT NOT NULL,
+  cover_image TEXT,
+  tags TEXT[] DEFAULT '{}',
+  reading_time TEXT,
+  featured BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create projects table
+CREATE TABLE IF NOT EXISTS projects (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  full_description TEXT,
+  image TEXT,
+  demo_url TEXT,
+  repo_url TEXT,
+  technologies TEXT[] DEFAULT '{}',
+  featured BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create comments table
+CREATE TABLE IF NOT EXISTS comments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT,
+  message TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  approved BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for better query performance
+CREATE INDEX IF NOT EXISTS idx_blogs_slug ON blogs(slug);
+CREATE INDEX IF NOT EXISTS idx_blogs_created_at ON blogs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_projects_created_at ON projects(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_comments_slug ON comments(slug);
+CREATE INDEX IF NOT EXISTS idx_comments_approved ON comments(approved);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE blogs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access
+CREATE POLICY "Allow public read blogs" ON blogs FOR SELECT USING (true);
+CREATE POLICY "Allow public read projects" ON projects FOR SELECT USING (true);
+CREATE POLICY "Allow public read comments" ON comments FOR SELECT USING (approved = true);
+
+-- Allow authenticated inserts (for admin)
+CREATE POLICY "Allow authenticated insert blogs" ON blogs FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Allow authenticated insert projects" ON projects FOR INSERT TO authenticated WITH CHECK (true);
+
+-- Allow public insert for comments (non-authenticated users)
+CREATE POLICY "Allow public insert comments" ON comments FOR INSERT TO anon WITH CHECK (true);
+
+-- Allow authenticated updates/deletes
+CREATE POLICY "Allow authenticated update blogs" ON blogs FOR UPDATE TO authenticated USING (true);
+CREATE POLICY "Allow authenticated delete blogs" ON blogs FOR DELETE TO authenticated USING (true);
+CREATE POLICY "Allow authenticated update projects" ON projects FOR UPDATE TO authenticated USING (true);
+CREATE POLICY "Allow authenticated delete projects" ON projects FOR DELETE TO authenticated USING (true);
+CREATE POLICY "Allow authenticated update comments" ON comments FOR UPDATE TO authenticated USING (true);
+CREATE POLICY "Allow authenticated delete comments" ON comments FOR DELETE TO authenticated USING (true);
