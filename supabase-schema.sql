@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS blogs (
 CREATE TABLE IF NOT EXISTS projects (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
   description TEXT,
   full_description TEXT,
   image TEXT,
@@ -57,36 +58,34 @@ ALTER TABLE blogs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies if they exist (for clean re-run)
+-- Drop existing policies if they exist
 DROP POLICY IF EXISTS "Allow public read blogs" ON blogs;
 DROP POLICY IF EXISTS "Allow public read projects" ON projects;
 DROP POLICY IF EXISTS "Allow public read comments" ON comments;
-DROP POLICY IF EXISTS "Allow authenticated insert blogs" ON blogs;
-DROP POLICY IF EXISTS "Allow authenticated insert projects" ON projects;
+DROP POLICY IF EXISTS "Allow public insert blogs" ON blogs;
+DROP POLICY IF EXISTS "Allow public insert projects" ON projects;
 DROP POLICY IF EXISTS "Allow public insert comments" ON comments;
-DROP POLICY IF EXISTS "Allow authenticated update blogs" ON blogs;
-DROP POLICY IF EXISTS "Allow authenticated delete blogs" ON blogs;
-DROP POLICY IF EXISTS "Allow authenticated update projects" ON projects;
-DROP POLICY IF EXISTS "Allow authenticated delete projects" ON projects;
-DROP POLICY IF EXISTS "Allow authenticated update comments" ON comments;
-DROP POLICY IF EXISTS "Allow authenticated delete comments" ON comments;
+DROP POLICY IF EXISTS "Allow public update blogs" ON blogs;
+DROP POLICY IF EXISTS "Allow public delete blogs" ON blogs;
+DROP POLICY IF EXISTS "Allow public update projects" ON projects;
+DROP POLICY IF EXISTS "Allow public delete projects" ON projects;
+DROP POLICY IF EXISTS "Allow public update comments" ON comments;
+DROP POLICY IF EXISTS "Allow public delete comments" ON comments;
 
 -- Allow public read access
 CREATE POLICY "Allow public read blogs" ON blogs FOR SELECT USING (true);
 CREATE POLICY "Allow public read projects" ON projects FOR SELECT USING (true);
 CREATE POLICY "Allow public read comments" ON comments FOR SELECT USING (approved = true);
 
--- Allow authenticated inserts (for admin)
-CREATE POLICY "Allow authenticated insert blogs" ON blogs FOR INSERT TO authenticated WITH CHECK (true);
-CREATE POLICY "Allow authenticated insert projects" ON projects FOR INSERT TO authenticated WITH CHECK (true);
-
--- Allow public insert for comments (non-authenticated users)
+-- Allow public insert (for admin panel - anon role)
+CREATE POLICY "Allow public insert blogs" ON blogs FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY "Allow public insert projects" ON projects FOR INSERT TO anon WITH CHECK (true);
 CREATE POLICY "Allow public insert comments" ON comments FOR INSERT TO anon WITH CHECK (true);
 
--- Allow authenticated updates/deletes
-CREATE POLICY "Allow authenticated update blogs" ON blogs FOR UPDATE TO authenticated USING (true);
-CREATE POLICY "Allow authenticated delete blogs" ON blogs FOR DELETE TO authenticated USING (true);
-CREATE POLICY "Allow authenticated update projects" ON projects FOR UPDATE TO authenticated USING (true);
-CREATE POLICY "Allow authenticated delete projects" ON projects FOR DELETE TO authenticated USING (true);
-CREATE POLICY "Allow authenticated update comments" ON comments FOR UPDATE TO authenticated USING (true);
-CREATE POLICY "Allow authenticated delete comments" ON comments FOR DELETE TO authenticated USING (true);
+-- Allow public update/delete
+CREATE POLICY "Allow public update blogs" ON blogs FOR UPDATE TO anon USING (true);
+CREATE POLICY "Allow public delete blogs" ON blogs FOR DELETE TO anon USING (true);
+CREATE POLICY "Allow public update projects" ON projects FOR UPDATE TO anon USING (true);
+CREATE POLICY "Allow public delete projects" ON projects FOR DELETE TO anon USING (true);
+CREATE POLICY "Allow public update comments" ON comments FOR UPDATE TO anon USING (true);
+CREATE POLICY "Allow public delete comments" ON comments FOR DELETE TO anon USING (true);
