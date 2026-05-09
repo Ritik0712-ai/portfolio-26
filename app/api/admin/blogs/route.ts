@@ -1,8 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const slug = searchParams.get('slug')
+    
+    if (slug) {
+      // Fetch single blog by slug
+      const { data: blog, error } = await supabase
+        .from('blogs')
+        .select('*')
+        .eq('slug', slug)
+        .single()
+      
+      if (error) throw error
+      return NextResponse.json({ blog })
+    }
+    
+    // Fetch all blogs
     const { data: blogs, error } = await supabase
       .from('blogs')
       .select('*')

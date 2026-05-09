@@ -1,44 +1,74 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Clock, Calendar, ArrowRight, Search } from 'lucide-react'
 import Link from 'next/link'
 
-const blogPosts = [
-  {
-    slug: 'how-i-built-mindspace',
-    title: 'How I Built MindSpace — And What Nearly Broke Me',
-    excerpt: 'Building a mental health app taught me that technology alone isn\'t enough. Here\'s the story of MindSpace, the challenges I faced, and the lessons I learned about engineering empathy into products.',
-    date: '2024-01-15',
-    readingTime: '8 min read',
-    tags: ['Build Log', 'AI', 'Product'],
-    category: 'Tech',
-  },
-  {
-    slug: 'dsa-grind-first-month',
-    title: 'My First Month Grinding DSA: What Nobody Tells You',
-    excerpt: 'Everyone says "just grind LeetCode" but nobody talks about the mental toll. Here\'s my honest account of the first month of DSA preparation — the frustration, breakthroughs, and everything in between.',
-    date: '2024-02-01',
-    readingTime: '6 min read',
-    tags: ['DSA', 'Reflections', 'Life'],
-    category: 'DSA',
-  },
-]
+interface BlogPost {
+  id: number
+  slug: string
+  title: string
+  excerpt: string
+  content: string
+  date: string
+  reading_time: string
+  tags: string[]
+  category: string
+  published: boolean
+}
 
 const categories = ['All', 'Tech', 'DSA', 'Life', 'Reflections']
 
 export default function BlogPage() {
+  const [posts, setPosts] = useState<BlogPost[]>([])
+  const [loading, setLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
 
-  const filteredPosts = blogPosts.filter((post) => {
+  useEffect(() => {
+    fetchBlogs()
+  }, [])
+
+  const fetchBlogs = async () => {
+    try {
+      const res = await fetch('/api/admin/blogs')
+      const data = await res.json()
+      if (data.blogs) {
+        setPosts(data.blogs.filter((b: BlogPost) => b.published))
+      }
+    } catch (error) {
+      console.error('Failed to fetch blogs:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const filteredPosts = posts.filter((post) => {
     const matchesCategory = activeFilter === 'All' || post.category === activeFilter
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      (post.tags && post.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase())))
     return matchesCategory && matchesSearch
   })
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 pb-12 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="animate-pulse space-y-8">
+            <div className="h-12 bg-gray-700 rounded w-1/4"></div>
+            <div className="h-6 bg-gray-700 rounded w-2/3"></div>
+            <div className="grid md:grid-cols-2 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-64 bg-gray-700 rounded-xl"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-4">
@@ -101,7 +131,7 @@ export default function BlogPage() {
             >
               {/* Tags */}
               <div className="flex flex-wrap gap-2 mb-4">
-                {post.tags.map((tag) => (
+                {post.tags && post.tags.map((tag) => (
                   <span
                     key={tag}
                     className="px-2 py-1 text-xs bg-primary/10 text-primary rounded"
@@ -135,7 +165,7 @@ export default function BlogPage() {
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  {post.readingTime}
+                  {post.reading_time || '5 min read'}
                 </span>
               </div>
 
