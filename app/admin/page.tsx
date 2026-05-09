@@ -18,11 +18,11 @@ export default function AdminPage() {
   const [showProjectForm, setShowProjectForm] = useState(false)
 
   const [newBlog, setNewBlog] = useState({
-    title: '', excerpt: '', content: '', tags: '', category: 'Tech', readingTime: '5 min read',
+    title: '', excerpt: '', content: '', tags: '', category: 'Tech', reading_time: '5 min read',
   })
 
   const [newProject, setNewProject] = useState({
-    title: '', description: '', longDescription: '', tags: '', github: '', demo: '', featured: false,
+    title: '', description: '', full_description: '', technologies: '', demo_url: '', repo_url: '', featured: false,
   })
 
   useEffect(() => {
@@ -59,8 +59,10 @@ export default function AdminPage() {
         fetch('/api/admin/blogs'),
         fetch('/api/admin/projects'),
       ])
-      setBlogs((await blogsRes.json()).blogs || [])
-      setProjects((await projectsRes.json()).projects || [])
+      const blogsData = await blogsRes.json()
+      const projectsData = await projectsRes.json()
+      setBlogs(blogsData.blogs || [])
+      setProjects(projectsData.projects || [])
     } catch (error) {
       console.error('Failed to fetch data:', error)
     }
@@ -72,42 +74,77 @@ export default function AdminPage() {
   const handleCreateBlog = async (e: React.FormEvent) => {
     e.preventDefault()
     const blog = {
-      id: Date.now().toString(),
+      title: newBlog.title,
       slug: createSlug(newBlog.title),
-      ...newBlog,
-      tags: newBlog.tags.split(',').map(t => t.trim()),
-      date: new Date().toISOString().split('T')[0],
+      excerpt: newBlog.excerpt,
+      content: newBlog.content,
+      tags: newBlog.tags.split(',').map(t => t.trim()).filter(t => t),
+      category: newBlog.category,
+      reading_time: newBlog.reading_time,
+      published: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     }
-    await fetch('/api/admin/blogs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(blog) })
-    setBlogs([blog, ...blogs])
-    setShowBlogForm(false)
-    setNewBlog({ title: '', excerpt: '', content: '', tags: '', category: 'Tech', readingTime: '5 min read' })
+    
+    const res = await fetch('/api/admin/blogs', { 
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify(blog) 
+    })
+    
+    if (res.ok) {
+      await fetchData() // Refresh data from server
+      setShowBlogForm(false)
+      setNewBlog({ title: '', excerpt: '', content: '', tags: '', category: 'Tech', reading_time: '5 min read' })
+    } else {
+      alert('Failed to create blog')
+    }
   }
 
   const handleDeleteBlog = async (id: string) => {
     if (!confirm('Delete this blog?')) return
-    await fetch(`/api/admin/blogs?id=${id}`, { method: 'DELETE' })
-    setBlogs(blogs.filter(b => b.id !== id))
+    const res = await fetch(`/api/admin/blogs?id=${id}`, { method: 'DELETE' })
+    if (res.ok) {
+      await fetchData()
+    }
   }
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault()
     const project = {
-      id: Date.now().toString(),
+      title: newProject.title,
       slug: createSlug(newProject.title),
-      ...newProject,
-      tags: newProject.tags.split(',').map(t => t.trim()),
+      description: newProject.description,
+      full_description: newProject.full_description,
+      technologies: newProject.technologies.split(',').map(t => t.trim()).filter(t => t),
+      demo_url: newProject.demo_url,
+      repo_url: newProject.repo_url,
+      featured: newProject.featured,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     }
-    await fetch('/api/admin/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(project) })
-    setProjects([project, ...projects])
-    setShowProjectForm(false)
-    setNewProject({ title: '', description: '', longDescription: '', tags: '', github: '', demo: '', featured: false })
+    
+    const res = await fetch('/api/admin/projects', { 
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify(project) 
+    })
+    
+    if (res.ok) {
+      await fetchData() // Refresh data from server
+      setShowProjectForm(false)
+      setNewProject({ title: '', description: '', full_description: '', technologies: '', demo_url: '', repo_url: '', featured: false })
+    } else {
+      alert('Failed to create project')
+    }
   }
 
   const handleDeleteProject = async (id: string) => {
     if (!confirm('Delete this project?')) return
-    await fetch(`/api/admin/projects?id=${id}`, { method: 'DELETE' })
-    setProjects(projects.filter(p => p.id !== id))
+    const res = await fetch(`/api/admin/projects?id=${id}`, { method: 'DELETE' })
+    if (res.ok) {
+      await fetchData()
+    }
   }
 
   if (!isAuthenticated) {
@@ -203,7 +240,7 @@ export default function AdminPage() {
                   <select value={newBlog.category} onChange={(e) => setNewBlog({...newBlog, category: e.target.value})} className={inputClass}>
                     <option value="Tech">Tech</option><option value="DSA">DSA</option><option value="Life">Life</option><option value="Reflections">Reflections</option>
                   </select>
-                  <input type="text" value={newBlog.readingTime} onChange={(e) => setNewBlog({...newBlog, readingTime: e.target.value})} placeholder="Reading time" className={inputClass} />
+                  <input type="text" value={newBlog.reading_time} onChange={(e) => setNewBlog({...newBlog, reading_time: e.target.value})} placeholder="Reading time" className={inputClass} />
                 </div>
                 <div className="flex gap-4">
                   <button type="submit" className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90">Create Blog</button>
@@ -221,7 +258,7 @@ export default function AdminPage() {
                     <div className="flex gap-2 mt-2">{blog.tags?.map((tag: string) => <span key={tag} className="px-2 py-1 text-xs bg-primary/10 text-primary rounded">{tag}</span>)}</div>
                   </div>
                   <div className="flex gap-2 ml-4">
-                    <Link href={`/blog/${blog.slug}`} className="p-2 text-text-muted hover:text-primary"><Eye className="w-5 h-5" /></Link>
+                    <Link href={`/blog/${blog.slug}`} target="_blank" className="p-2 text-text-muted hover:text-primary"><Eye className="w-5 h-5" /></Link>
                     <button onClick={() => handleDeleteBlog(blog.id)} className="p-2 text-text-muted hover:text-red-500"><Trash2 className="w-5 h-5" /></button>
                   </div>
                 </div>
@@ -245,12 +282,12 @@ export default function AdminPage() {
                 <h3 className="text-lg font-semibold text-text-primary">Create New Project</h3>
                 <input type="text" value={newProject.title} onChange={(e) => setNewProject({...newProject, title: e.target.value})} placeholder="Project Title" required className={inputClass} />
                 <input type="text" value={newProject.description} onChange={(e) => setNewProject({...newProject, description: e.target.value})} placeholder="Short description" required className={inputClass} />
-                <textarea value={newProject.longDescription} onChange={(e) => setNewProject({...newProject, longDescription: e.target.value})} placeholder="Long description" required rows={4} className={`${inputClass} resize-none`} />
+                <textarea value={newProject.full_description} onChange={(e) => setNewProject({...newProject, full_description: e.target.value})} placeholder="Full description" required rows={4} className={`${inputClass} resize-none`} />
                 <div className="grid md:grid-cols-2 gap-4">
-                  <input type="text" value={newProject.tags} onChange={(e) => setNewProject({...newProject, tags: e.target.value})} placeholder="Tags (comma separated)" className={inputClass} />
-                  <input type="text" value={newProject.github} onChange={(e) => setNewProject({...newProject, github: e.target.value})} placeholder="GitHub URL" className={inputClass} />
+                  <input type="text" value={newProject.technologies} onChange={(e) => setNewProject({...newProject, technologies: e.target.value})} placeholder="Technologies (comma separated)" className={inputClass} />
+                  <input type="text" value={newProject.repo_url} onChange={(e) => setNewProject({...newProject, repo_url: e.target.value})} placeholder="GitHub URL" className={inputClass} />
                 </div>
-                <input type="text" value={newProject.demo} onChange={(e) => setNewProject({...newProject, demo: e.target.value})} placeholder="Demo URL (optional)" className={inputClass} />
+                <input type="text" value={newProject.demo_url} onChange={(e) => setNewProject({...newProject, demo_url: e.target.value})} placeholder="Demo URL (optional)" className={inputClass} />
                 <div className="flex items-center gap-2">
                   <input type="checkbox" id="featured" checked={newProject.featured} onChange={(e) => setNewProject({...newProject, featured: e.target.checked})} className="w-4 h-4" />
                   <label htmlFor="featured" className="text-text-primary">Featured project</label>
@@ -271,10 +308,10 @@ export default function AdminPage() {
                       {project.featured && <span className="px-2 py-1 text-xs bg-accent/20 text-accent rounded">Featured</span>}
                     </div>
                     <p className="text-sm text-text-muted mt-1">{project.description}</p>
-                    <div className="flex gap-2 mt-2">{project.tags?.map((tag: string) => <span key={tag} className="px-2 py-1 text-xs bg-accent/10 text-accent rounded">{tag}</span>)}</div>
+                    <div className="flex gap-2 mt-2">{project.technologies?.map((tag: string) => <span key={tag} className="px-2 py-1 text-xs bg-accent/10 text-accent rounded">{tag}</span>)}</div>
                   </div>
                   <div className="flex gap-2 ml-4">
-                    <Link href={`/projects/${project.slug}`} className="p-2 text-text-muted hover:text-primary"><Eye className="w-5 h-5" /></Link>
+                    <Link href={`/projects/${project.slug}`} target="_blank" className="p-2 text-text-muted hover:text-primary"><Eye className="w-5 h-5" /></Link>
                     <button onClick={() => handleDeleteProject(project.id)} className="p-2 text-text-muted hover:text-red-500"><Trash2 className="w-5 h-5" /></button>
                   </div>
                 </div>
