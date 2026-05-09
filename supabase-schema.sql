@@ -1,5 +1,6 @@
 -- Supabase Database Schema for Portfolio
 -- Run this in your Supabase SQL Editor
+-- Safe to run multiple times (idempotent)
 
 -- Create blogs table
 CREATE TABLE IF NOT EXISTS blogs (
@@ -12,6 +13,8 @@ CREATE TABLE IF NOT EXISTS blogs (
   tags TEXT[] DEFAULT '{}',
   reading_time TEXT,
   featured BOOLEAN DEFAULT false,
+  published BOOLEAN DEFAULT true,
+  category TEXT DEFAULT 'Tech',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -53,6 +56,20 @@ CREATE INDEX IF NOT EXISTS idx_comments_approved ON comments(approved);
 ALTER TABLE blogs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist (for clean re-run)
+DROP POLICY IF EXISTS "Allow public read blogs" ON blogs;
+DROP POLICY IF EXISTS "Allow public read projects" ON projects;
+DROP POLICY IF EXISTS "Allow public read comments" ON comments;
+DROP POLICY IF EXISTS "Allow authenticated insert blogs" ON blogs;
+DROP POLICY IF EXISTS "Allow authenticated insert projects" ON projects;
+DROP POLICY IF EXISTS "Allow public insert comments" ON comments;
+DROP POLICY IF EXISTS "Allow authenticated update blogs" ON blogs;
+DROP POLICY IF EXISTS "Allow authenticated delete blogs" ON blogs;
+DROP POLICY IF EXISTS "Allow authenticated update projects" ON projects;
+DROP POLICY IF EXISTS "Allow authenticated delete projects" ON projects;
+DROP POLICY IF EXISTS "Allow authenticated update comments" ON comments;
+DROP POLICY IF EXISTS "Allow authenticated delete comments" ON comments;
 
 -- Allow public read access
 CREATE POLICY "Allow public read blogs" ON blogs FOR SELECT USING (true);
