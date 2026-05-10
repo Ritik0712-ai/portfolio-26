@@ -15,6 +15,28 @@ interface BlogPost {
   tags: string[]
 }
 
+// Fallback data for when Supabase is empty
+const fallbackPosts: BlogPost[] = [
+  {
+    id: '1',
+    slug: 'how-i-built-mindspace',
+    title: 'How I Built MindSpace — And What Nearly Broke Me',
+    excerpt: 'Building a mental health app taught me that technology alone isn\'t enough. Here\'s the story of MindSpace, the challenges I faced, and the lessons I learned about engineering empathy into products.',
+    date: '2024-01-15',
+    reading_time: '8 min read',
+    tags: ['Build Log', 'AI', 'Product'],
+  },
+  {
+    id: '2',
+    slug: 'dsa-grind-first-month',
+    title: 'My First Month Grinding DSA: What Nobody Tells You',
+    excerpt: 'Everyone says "just grind LeetCode" but nobody talks about the mental toll. Here\'s my honest account of the first month of DSA preparation — the frustration, breakthroughs, and everything in between.',
+    date: '2024-02-01',
+    reading_time: '6 min read',
+    tags: ['DSA', 'Reflections', 'Life'],
+  },
+]
+
 export default function BlogPreview() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -27,13 +49,25 @@ export default function BlogPreview() {
     try {
       const res = await fetch('/api/admin/blogs')
       const data = await res.json()
-      if (data.blogs) {
-        // Get only published blogs, take first 2
-        const published = data.blogs.filter((b: any) => b.published).slice(0, 2)
-        setPosts(published)
+      if (data.blogs && data.blogs.length > 0) {
+        // Use Supabase data if available
+        const mapped = data.blogs.filter((b: any) => b.published).slice(0, 2).map((b: any) => ({
+          id: b.id,
+          slug: b.slug,
+          title: b.title,
+          excerpt: b.excerpt,
+          date: b.created_at,
+          reading_time: b.reading_time,
+          tags: b.tags || [],
+        }))
+        setPosts(mapped.length > 0 ? mapped : fallbackPosts)
+      } else {
+        // Use fallback data
+        setPosts(fallbackPosts)
       }
     } catch (error) {
       console.error('Failed to fetch blogs:', error)
+      setPosts(fallbackPosts)
     } finally {
       setLoading(false)
     }

@@ -16,6 +16,43 @@ interface Project {
   image: string
 }
 
+// Fallback data for when Supabase is empty
+const fallbackProjects: Project[] = [
+  {
+    id: 'mindspace',
+    slug: 'mindspace',
+    title: 'MindSpace',
+    description: 'Mental health support platform built for the Indian context — addressing therapy costs, accessibility, and stigma with ₹99/month pricing and AI-powered empathetic journaling.',
+    demo_url: '#',
+    repo_url: '#',
+    technologies: ['React Native', 'Node.js', 'PostgreSQL', 'Redis', 'OpenAI GPT-4', 'Socket.io'],
+    featured: true,
+    image: '',
+  },
+  {
+    id: 'stockschool',
+    slug: 'stockschool',
+    title: 'StockSchool',
+    description: 'Stock market education platform that demystifies investing with simple lessons and a ₹10L virtual cash simulator.',
+    demo_url: 'https://stockschool-one.vercel.app',
+    repo_url: '#',
+    technologies: ['Next.js 14', 'Prisma', 'NextAuth.js', 'Google Gemini', 'Finnhub API', 'Tailwind CSS'],
+    featured: true,
+    image: '',
+  },
+  {
+    id: 'portfolio-tracker',
+    slug: 'portfolio-tracker',
+    title: 'Portfolio Tracker',
+    description: 'Coming soon — a unified dashboard to track all your investments in one place.',
+    demo_url: '#',
+    repo_url: '#',
+    technologies: ['React', 'Node.js', 'MongoDB', 'REST APIs'],
+    featured: false,
+    image: '',
+  },
+]
+
 const categories = ['All', 'Web', 'DSA', 'AI', 'Tools']
 
 export default function Projects() {
@@ -31,11 +68,15 @@ export default function Projects() {
     try {
       const res = await fetch('/api/admin/projects')
       const data = await res.json()
-      if (data.projects) {
+      if (data.projects && data.projects.length > 0) {
         setProjects(data.projects)
+      } else {
+        // Use fallback data
+        setProjects(fallbackProjects)
       }
     } catch (error) {
       console.error('Failed to fetch projects:', error)
+      setProjects(fallbackProjects)
     } finally {
       setLoading(false)
     }
