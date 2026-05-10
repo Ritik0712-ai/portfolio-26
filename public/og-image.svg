@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f0f"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="text" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7c3aed"/>
+      <stop offset="100%" style="stop-color:#ec4899"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="200" cy="150" r="100" fill="#7c3aed" opacity="0.3"/>
+  <circle cx="1000" cy="500" r="150" fill="#ec4899" opacity="0.2"/>
+  <text x="600" y="250" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="url(#text)" text-anchor="middle">Ritik Agarwal</text>
+  <text x="600" y="340" font-family="Arial, sans-serif" font-size="36" fill="#9ca3af" text-anchor="middle">Developer & Builder</text>
+  <text x="600" y="420" font-family="Arial, sans-serif" font-size="24" fill="#6b7280" text-anchor="middle">Building products that solve problems I actually have</text>
+  <rect x="450" y="470" width="300" height="60" rx="30" fill="url(#text)"/>
+  <text x="600" y="510" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">ritikagarwal.dev</text>
+</svg>
