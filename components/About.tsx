@@ -13,17 +13,17 @@ const personalityTraits = [
 
 const timeline = [
   {
-    year: '2024',
+    year: '2025',
     title: 'Started at VIT Bhopal',
     description: 'Joined Computer Science & Engineering (4-year program). First encounter with "real" programming.',
   },
   {
-    year: '2024',
+    year: '2025',
     title: 'Built First Project',
     description: 'Shipped MindSpace — a mental health app for the Indian context.',
   },
   {
-    year: '2024',
+    year: '2025',
     title: 'StockSchool Launch',
     description: 'Jargon-free stock education platform with paper trading simulator.',
   },
