@@ -12,10 +12,10 @@ interface StatItem {
 }
 
 const stats: StatItem[] = [
-  { icon: <Code className="w-6 h-6" />, value: 15, suffix: '+', label: 'Projects Shipped' },
-  { icon: <Users className="w-6 h-6" />, value: 1000, suffix: '+', label: 'Users Reached' },
-  { icon: <Globe className="w-6 h-6" />, value: 5, suffix: '', label: 'Countries Served' },
-  { icon: <Coffee className="w-6 h-6" />, value: 500, suffix: '+', label: 'Cups of Coffee' },
+  { icon: <Code className="w-6 h-6" />, value: 3, suffix: '+', label: 'Projects Shipped' },
+  { icon: <Users className="w-6 h-6" />, value: 500, suffix: '+', label: 'Users Reached' },
+  { icon: <Globe className="w-6 h-6" />, value: 1, suffix: '', label: 'Country' },
+  { icon: <Coffee className="w-6 h-6" />, value: 100, suffix: '+', label: 'Cups of Coffee' },
 ]
 
 function Counter({ value, suffix, isInView }: { value: number; suffix: string; isInView: boolean }) {
