@@ -29,7 +29,7 @@ export default function BlogPreview() {
       const data = await res.json()
       if (data.blogs) {
         // Get only published blogs, take first 2
-        const published = data.blogs.filter((b: BlogPost) => b.published).slice(0, 2)
+        const published = data.blogs.filter((b: any) => b.published).slice(0, 2)
         setPosts(published)
       }
     } catch (error) {
