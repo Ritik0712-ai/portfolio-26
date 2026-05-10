@@ -1,4 +1,5 @@
 {
   "name": "ritik-portfolio",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "excludeFolders": ["project-context-tracker"]
 }
