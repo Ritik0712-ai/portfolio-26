@@ -1,8 +1,9 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Mail, Send, MapPin, Clock } from 'lucide-react'
+import { Mail, Send, MapPin, Clock, MessageSquare } from 'lucide-react'
 
 export default function Contact() {
   const [formState, setFormState] = useState({
@@ -253,6 +254,18 @@ export default function Contact() {
                   Message sent successfully! I&apos;ll get back to you soon.
                 </motion.div>
               )}
+
+              {/* Leave Feedback Link */}
+              <div className="text-center pt-4">
+                <p className="text-text-muted text-sm mb-2">Worked with me?</p>
+                <Link
+                  href="/feedback"
+                  className="inline-flex items-center gap-2 text-primary hover:text-accent transition-colors text-sm font-medium"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  Leave a testimonial
+                </Link>
+              </div>
 
               {/* Error Message */}
               {error && (
