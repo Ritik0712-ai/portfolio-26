@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Star, Quote } from 'lucide-react'
+import Link from 'next/link'
+import { Star, Quote, MessageSquare } from 'lucide-react'
 
 interface Testimonial {
   id: string
@@ -89,6 +90,18 @@ export default function Testimonials() {
             No testimonials yet. Connect with me to get your first review!
           </div>
         )}
+
+        {/* CTA to leave feedback */}
+        <div className="text-center mt-12">
+          <p className="text-text-muted mb-4">Worked with me? Share your experience!</p>
+          <Link
+            href="/feedback"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all"
+          >
+            <MessageSquare className="w-5 h-5" />
+            Leave a Testimonial
+          </Link>
+        </div>
       </div>
     </section>
   )
