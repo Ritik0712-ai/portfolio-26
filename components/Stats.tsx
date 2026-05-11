@@ -5,18 +5,20 @@ import { motion, useInView } from 'framer-motion'
 import { Code, Users, Globe, Coffee } from 'lucide-react'
 
 interface StatItem {
-  icon: React.ReactNode
+  id: string
+  icon: string
   value: number
   suffix: string
   label: string
+  display_order: number
 }
 
-const stats: StatItem[] = [
-  { icon: <Code className="w-6 h-6" />, value: 3, suffix: '+', label: 'Projects Shipped' },
-  { icon: <Users className="w-6 h-6" />, value: 500, suffix: '+', label: 'Users Reached' },
-  { icon: <Globe className="w-6 h-6" />, value: 1, suffix: '', label: 'Country' },
-  { icon: <Coffee className="w-6 h-6" />, value: 100, suffix: '+', label: 'Cups of Coffee' },
-]
+const iconMap: Record<string, React.ReactNode> = {
+  Code: <Code className="w-6 h-6" />,
+  Users: <Users className="w-6 h-6" />,
+  Globe: <Globe className="w-6 h-6" />,
+  Coffee: <Coffee className="w-6 h-6" />,
+}
 
 function Counter({ value, suffix, isInView }: { value: number; suffix: string; isInView: boolean }) {
   const [count, setCount] = useState(0)
@@ -56,7 +58,7 @@ function StatCard({ stat, index, isInView }: { stat: StatItem; index: number; is
       
       <div className="relative bg-card/50 backdrop-blur-sm border border-primary/20 rounded-2xl p-8 text-center hover:border-primary/40 transition-all duration-300">
         <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white">
-          {stat.icon}
+          {iconMap[stat.icon] || <Code className="w-6 h-6" />}
         </div>
         
         <div className="text-4xl md:text-5xl font-bold gradient-text mb-2">
@@ -72,6 +74,16 @@ function StatCard({ stat, index, isInView }: { stat: StatItem; index: number; is
 export default function Stats() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+  const [stats, setStats] = useState<StatItem[]>([])
+
+  useEffect(() => {
+    fetch('/api/public/stats')
+      .then(res => res.json())
+      .then(data => {
+        if (data.stats) setStats(data.stats)
+      })
+      .catch(console.error)
+  }, [])
 
   return (
     <section ref={ref} className="py-20 px-4 relative overflow-hidden">
@@ -98,7 +110,7 @@ export default function Stats() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
-            <StatCard key={stat.label} stat={stat} index={index} isInView={isInView} />
+            <StatCard key={stat.id} stat={stat} index={index} isInView={isInView} />
           ))}
         </div>
       </div>

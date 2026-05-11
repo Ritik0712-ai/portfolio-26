@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Coffee, Moon, Bug, Sparkles } from 'lucide-react'
 import Image from 'next/image'
@@ -11,30 +12,33 @@ const personalityTraits = [
   { icon: Sparkles, text: "Learns in public — sharing the journey, not just the destination" },
 ]
 
-const timeline = [
-  {
-    year: '2025',
-    title: 'Started at VIT Bhopal',
-    description: 'Joined Computer Science & Engineering (4-year program). First encounter with "real" programming.',
-  },
-  {
-    year: '2025',
-    title: 'Built First Project',
-    description: 'Shipped MindSpace — a mental health app for the Indian context.',
-  },
-  {
-    year: '2025',
-    title: 'StockSchool Launch',
-    description: 'Jargon-free stock education platform with paper trading simulator.',
-  },
-  {
-    year: 'Now',
-    title: 'Building & Learning',
-    description: 'Grinding DSA while shipping products. Looking for internship opportunities.',
-  },
-]
+interface TimelineItem {
+  id: string
+  year: string
+  title: string
+  description: string
+}
 
 export default function About() {
+  const [timeline, setTimeline] = useState<TimelineItem[]>([])
+
+  useEffect(() => {
+    fetch('/api/admin/timeline')
+      .then(res => res.json())
+      .then(data => {
+        if (data.events) {
+          const mapped = data.events.map((e: any) => ({
+            id: e.id,
+            year: e.event_date,
+            title: e.title,
+            description: e.description,
+          }))
+          setTimeline(mapped)
+        }
+      })
+      .catch(console.error)
+  }, [])
+
   return (
     <section id="about" className="py-24 px-4">
       <div className="max-w-6xl mx-auto">
@@ -122,7 +126,7 @@ export default function About() {
             <div className="space-y-8 pl-8">
               {timeline.map((item, index) => (
                 <motion.div
-                  key={index}
+                  key={item.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
