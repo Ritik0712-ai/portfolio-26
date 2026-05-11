@@ -77,7 +77,8 @@ export default function Stats() {
   const [stats, setStats] = useState<StatItem[]>([])
 
   useEffect(() => {
-    fetch('/api/public/stats')
+    // Add cache-busting timestamp
+    fetch(`/api/public/stats?t=${Date.now()}`)
       .then(res => res.json())
       .then(data => {
         if (data.stats) setStats(data.stats)
