@@ -109,11 +109,11 @@ CREATE TABLE feedback (
 );
 
 -- Insert default stats
-INSERT INTO stats (icon, value, suffix, label, display_order) VALUES
-  ('Code', 3, '+', 'Projects Shipped'),
-  ('Users', 500, '+', 'Users Reached'),
-  ('Globe', 1, '', 'Country'),
-  ('Coffee', 100, '+', 'Cups of Coffee');
+INSERT INTO stats (icon, value, suffix, label, display_order, updated_at) VALUES
+  ('Code', 3, '+', 'Projects Shipped', 1, NOW()),
+  ('Users', 500, '+', 'Users Reached', 2, NOW()),
+  ('Globe', 1, '', 'Country', 3, NOW()),
+  ('Coffee', 100, '+', 'Cups of Coffee', 4, NOW());
 
 -- Insert default testimonials
 INSERT INTO testimonials (name, role, company, content, rating, approved, display_order) VALUES
