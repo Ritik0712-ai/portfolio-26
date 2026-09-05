@@ -6,6 +6,18 @@
 
 BEGIN;
 
+-- 0. Create timeline table if it doesn't exist
+CREATE TABLE IF NOT EXISTS timeline (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  date TEXT NOT NULL,
+  category TEXT DEFAULT 'work',
+  order_index INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- 1. Create admin_users allowlist table
 CREATE TABLE IF NOT EXISTS admin_users (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,

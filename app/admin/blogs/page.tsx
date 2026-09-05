@@ -37,7 +37,7 @@ const initialFormData: BlogPost = {
   cover_image: '',
   category: 'Tech',
   tags: [],
-  reading_time: 0,
+  reading_time: '',
   featured: false,
   published: false,
 };

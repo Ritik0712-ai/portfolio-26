@@ -47,3 +47,13 @@ Thumbs.db
 # Documents
 *.docx
 *.pdf
+
+# Vercel CLI local env (contains VERCEL_OIDC_TOKEN)
+.env*.local
+.env.vercel.local
+
+# Supabase CLI scratch
+supabase/.temp/
+
+# Claude Code local settings
+.claude/
