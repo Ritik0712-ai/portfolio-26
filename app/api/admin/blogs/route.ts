@@ -60,8 +60,16 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from('blogs')
       .insert([{
-        ...parsed,
+        title: parsed.title,
+        slug: parsed.slug,
+        excerpt: parsed.excerpt || '',
+        content: parsed.content,
+        cover_image: parsed.cover_image || '',
         tags: parsed.tags || [],
+        reading_time: String(parsed.reading_time || 0),
+        featured: parsed.featured || false,
+        published: parsed.published !== undefined ? parsed.published : true,
+        category: parsed.category || 'Tech',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }])
