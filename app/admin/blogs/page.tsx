@@ -19,7 +19,7 @@ interface BlogPost {
   cover_image: string;
   category: string;
   tags: string[];
-  reading_time: number;
+  reading_time: string;
   featured: boolean;
   published: boolean;
   created_at?: string;
@@ -263,7 +263,7 @@ export default function BlogsPage() {
     try {
       // Calculate reading time from content
       const readingTime = calculateReadingTime(formData.content);
-      const blogData = { ...formData, reading_time: readingTime };
+      const blogData = { ...formData, reading_time: String(readingTime) };
 
       const isEditing = !!editingPost?.id;
       const url = isEditing
