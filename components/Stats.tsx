@@ -1,120 +1,69 @@
-'use client'
+'use client';
 
-import { useEffect, useRef, useState } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { Code, Users, Globe, Coffee } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react';
+import { useInView } from 'framer-motion';
+import { Code, Users, Globe, Coffee } from 'lucide-react';
 
 interface StatItem {
-  id: string
-  icon: string
-  value: number
-  suffix: string
-  label: string
-  display_order: number
+  id: string;
+  icon: string;
+  value: number;
+  suffix: string;
+  label: string;
 }
 
 const iconMap: Record<string, React.ReactNode> = {
-  Code: <Code className="w-6 h-6" />,
-  Users: <Users className="w-6 h-6" />,
-  Globe: <Globe className="w-6 h-6" />,
-  Coffee: <Coffee className="w-6 h-6" />,
-}
+  Code: <Code className="w-5 h-5" />,
+  Users: <Users className="w-5 h-5" />,
+  Globe: <Globe className="w-5 h-5" />,
+  Coffee: <Coffee className="w-5 h-5" />,
+};
 
 function Counter({ value, suffix, isInView }: { value: number; suffix: string; isInView: boolean }) {
-  const [count, setCount] = useState(0)
-
+  const [count, setCount] = useState(0);
   useEffect(() => {
-    if (!isInView) return
-    
-    let start = 0
-    const duration = 2000
-    const increment = value / (duration / 16)
-    
+    if (!isInView) return;
+    let start = 0;
+    const duration = 2000;
+    const increment = value / (duration / 16);
     const timer = setInterval(() => {
-      start += increment
-      if (start >= value) {
-        setCount(value)
-        clearInterval(timer)
-      } else {
-        setCount(Math.floor(start))
-      }
-    }, 16)
-
-    return () => clearInterval(timer)
-  }, [isInView, value])
-
-  return <span>{count}{suffix}</span>
-}
-
-function StatCard({ stat, index, isInView }: { stat: StatItem; index: number; isInView: boolean }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="relative group"
-    >
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      
-      <div className="relative bg-card/50 backdrop-blur-sm border border-primary/20 rounded-2xl p-8 text-center hover:border-primary/40 transition-all duration-300">
-        <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white">
-          {iconMap[stat.icon] || <Code className="w-6 h-6" />}
-        </div>
-        
-        <div className="text-4xl md:text-5xl font-bold gradient-text mb-2">
-          <Counter value={stat.value} suffix={stat.suffix} isInView={isInView} />
-        </div>
-        
-        <p className="text-text-muted text-sm uppercase tracking-wider">{stat.label}</p>
-      </div>
-    </motion.div>
-  )
+      start += increment;
+      if (start >= value) { setCount(value); clearInterval(timer); }
+      else setCount(Math.floor(start));
+    }, 16);
+    return () => clearInterval(timer);
+  }, [isInView, value]);
+  return <span>{count}{suffix}</span>;
 }
 
 export default function Stats() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
-  const [stats, setStats] = useState<StatItem[]>([])
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const [stats, setStats] = useState<StatItem[]>([]);
 
   useEffect(() => {
-    // Add cache-busting timestamp
-    fetch(`/api/public/stats?t=${Date.now()}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.stats) setStats(data.stats)
-      })
-      .catch(console.error)
-  }, [])
+    fetch('/api/stats').then(r => r.json()).then(d => setStats(d.stats || [])).catch(() => {});
+  }, []);
+
+  if (stats.length === 0) return null;
 
   return (
-    <section ref={ref} className="py-20 px-4 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-accent/20 rounded-full blur-3xl" />
-      </div>
-      
-      <div className="max-w-6xl mx-auto relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="gradient-text">Numbers Don't Lie</span>
-          </h2>
-          <p className="text-text-muted max-w-2xl mx-auto">
-            Well, maybe they do, but these look impressive on a portfolio.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
-            <StatCard key={stat.id} stat={stat} index={index} isInView={isInView} />
+    <section ref={ref} className="py-20 border-y border-border bg-bg-secondary">
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {stats.map((stat, i) => (
+            <div key={stat.id} className="text-center">
+              <div className="flex justify-center mb-2 text-text-muted">
+                {iconMap[stat.icon] || <Code className="w-5 h-5" />}
+              </div>
+              <p className="text-3xl md:text-4xl font-display font-semibold text-text-primary">
+                {isInView ? <Counter value={stat.value} suffix={stat.suffix} isInView={isInView} /> : `0${stat.suffix}`}
+              </p>
+              <p className="text-sm text-text-muted font-body mt-1">{stat.label}</p>
+            </div>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,138 +1,98 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { ChevronDown, ArrowRight, BookOpen } from 'lucide-react'
-import Link from 'next/link'
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowRight, BookOpen, Download } from 'lucide-react';
 
-const roles = ['Developer', 'Builder', 'CS Student', 'Problem Solver']
+const roles = ['Product Engineer', 'Full-Stack Developer', 'Builder'];
 
 export default function Hero() {
-  const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
-  const [isVisible, setIsVisible] = useState(true)
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIsVisible(false)
-      setTimeout(() => {
-        setCurrentRoleIndex((prev) => (prev + 1) % roles.length)
-        setIsVisible(true)
-      }, 300)
-    }, 2500)
-    return () => clearInterval(interval)
-  }, [])
-
-  const scrollToProjects = () => {
-    document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })
-  }
+      setCurrentRoleIndex((prev) => (prev + 1) % roles.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Gradient orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl" />
-        
-        {/* Grid pattern */}
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: `linear-gradient(rgba(124, 58, 237, 0.1) 1px, transparent 1px),
-                           linear-gradient(90deg, rgba(124, 58, 237, 0.1) 1px, transparent 1px)`,
-          backgroundSize: '50px 50px'
-        }} />
-      </div>
+    <section className="min-h-[90vh] flex items-center pt-16 px-4">
+      <div className="max-w-5xl mx-auto w-full">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          {/* Left: Text */}
+          <div>
+            {/* Monogram */}
+            <div className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-6">
+              RA — Portfolio
+            </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-        {/* Greeting */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-accent font-medium mb-4"
-        >
-          Hey there, I'm
-        </motion.p>
+            {/* Headline */}
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-semibold text-text-primary leading-[1.05] mb-4">
+              Ritik<br />Agarwal
+            </h1>
 
-        {/* Name */}
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight"
-        >
-          <span className="gradient-text">Ritik Agarwal</span>
-        </motion.h1>
+            {/* Role */}
+            <div className="mb-6 overflow-hidden">
+              <p className="text-lg text-accent font-body font-medium">
+                {roles[currentRoleIndex]}
+              </p>
+            </div>
 
-        {/* Role Switcher */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="h-12 md:h-16 mb-6"
-        >
-          <span className="text-2xl md:text-4xl font-semibold text-text-muted">
-            <span className="text-text-primary">A </span>
-            <span
-              className={`inline-block text-primary font-bold transition-all duration-300 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-              }`}
-            >
-              {roles[currentRoleIndex]}
-            </span>
-          </span>
-        </motion.div>
+            {/* Positioning */}
+            <p className="text-base text-text-secondary font-body leading-relaxed max-w-sm mb-8">
+              I build dependable products from idea to production. Focused on clean architecture, thoughtful UX, and code that teams can actually maintain.
+            </p>
 
-        {/* Tagline */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto mb-10"
-        >
-          Building products that solve problems I actually have.
-        </motion.p>
+            {/* Availability badge */}
+            <div className="flex items-center gap-2 mb-8">
+              <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+              <span className="text-sm text-text-muted font-body">Open to opportunities</span>
+            </div>
 
-        {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
-          <button
-            onClick={scrollToProjects}
-            className="group px-8 py-4 bg-gradient-to-r from-primary to-accent rounded-full font-semibold text-white hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 flex items-center gap-2"
-          >
-            View My Work
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-          <Link
-            href="/blog"
-            className="px-8 py-4 border border-primary/50 rounded-full font-semibold text-text-muted hover:text-primary hover:border-primary transition-all duration-300 flex items-center gap-2"
-          >
-            Read the Blog
-            <BookOpen className="w-4 h-4" />
-          </Link>
-        </motion.div>
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/#projects"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-text-primary text-bg font-body font-medium text-sm rounded hover:opacity-90 transition-opacity"
+              >
+                View Work
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-border text-text-primary font-body font-medium text-sm rounded hover:bg-surface-hover transition-colors"
+              >
+                <BookOpen className="w-4 h-4" />
+                Read the Blog
+              </Link>
+            </div>
+          </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <button
-            onClick={scrollToProjects}
-            className="animate-bounce text-text-muted hover:text-primary transition-colors"
-            aria-label="Scroll to projects"
-          >
-            <ChevronDown className="w-8 h-8" />
-          </button>
-        </motion.div>
+          {/* Right: Portrait */}
+          <div className="relative flex justify-center md:justify-end">
+            <div className="relative w-72 h-72 md:w-80 md:h-80">
+              <div className="absolute inset-0 border border-border rounded transform rotate-3" />
+              <div className="absolute inset-0 border border-border rounded transform -rotate-2" />
+              <div className="relative w-full h-full rounded overflow-hidden bg-bg-secondary">
+                <Image
+                  src="/profile.jpg"
+                  alt="Ritik Agarwal"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="mt-16 md:mt-24 text-center">
+          <div className="w-px h-12 bg-border mx-auto" />
+        </div>
       </div>
     </section>
-  )
+  );
 }

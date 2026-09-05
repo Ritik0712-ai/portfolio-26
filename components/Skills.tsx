@@ -1,149 +1,108 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Code, Palette, Server, Brain, Wrench } from 'lucide-react'
+import { motion } from 'framer-motion';
+import { Code, Palette, Server, Brain } from 'lucide-react';
 
 const skillCategories = [
   {
     title: 'Languages',
     icon: Code,
     skills: [
-      { name: 'Java', level: 90, context: 'Primary language, used in 3 major projects' },
-      { name: 'JavaScript', level: 85, context: 'Full-stack development' },
-      { name: 'TypeScript', level: 80, context: 'Next.js projects' },
-      { name: 'SQL', level: 75, context: 'Database queries & optimization' },
-      { name: 'Python', level: 70, context: 'Data analysis & scripting' },
+      { name: 'JavaScript', level: 90, context: 'Full-stack development, 4+ years' },
+      { name: 'TypeScript', level: 85, context: 'Next.js, React, 3+ years' },
+      { name: 'Python', level: 70, context: 'Data analysis, scripting, automation' },
+      { name: 'SQL', level: 75, context: 'PostgreSQL, query optimization' },
+      { name: 'Java', level: 65, context: 'Spring Boot, DSA practice' },
     ],
   },
   {
     title: 'Frontend',
     icon: Palette,
     skills: [
-      { name: 'React', level: 90, context: 'Used in 4 projects' },
-      { name: 'Next.js', level: 85, context: 'Primary framework for web apps' },
+      { name: 'React', level: 90, context: '4+ years, component architecture' },
+      { name: 'Next.js', level: 85, context: 'App Router, SSR, SSG, API routes' },
       { name: 'Tailwind CSS', level: 90, context: 'All recent projects' },
-      { name: 'React Native', level: 65, context: 'MindSpace mobile app' },
+      { name: 'React Native', level: 60, context: 'MindSpace mobile app' },
     ],
   },
   {
     title: 'Backend',
     icon: Server,
     skills: [
-      { name: 'Node.js', level: 80, context: 'MindSpace backend' },
-      { name: 'Express', level: 75, context: 'API development' },
-      { name: 'PostgreSQL', level: 70, context: 'StockSchool database' },
-      { name: 'Redis', level: 60, context: 'Caching & real-time features' },
+      { name: 'Node.js', level: 80, context: 'Express, REST APIs, Socket.io' },
+      { name: 'PostgreSQL', level: 75, context: 'Database design, optimization' },
+      { name: 'Redis', level: 65, context: 'Caching, real-time features' },
+      { name: 'Supabase', level: 80, context: 'Auth, real-time, storage, edge functions' },
     ],
   },
   {
-    title: 'DSA & CS',
+    title: 'AI & Tools',
     icon: Brain,
     skills: [
-      { name: 'Graphs', level: 85, context: 'Pathfinding, social networks' },
-      { name: 'Trees', level: 80, context: 'Binary trees, tries' },
-      { name: 'Dynamic Programming', level: 75, context: 'Optimization problems' },
-      { name: 'Recursion', level: 85, context: 'Tree traversal, backtracking' },
+      { name: 'OpenAI API', level: 75, context: 'GPT-4, embeddings, prompt engineering' },
+      { name: 'Git', level: 85, context: 'Version control, branching strategies' },
+      { name: 'Docker', level: 60, context: 'Containerization, basic deployments' },
+      { name: 'Vercel', level: 85, context: 'Primary deployment platform' },
     ],
   },
-  {
-    title: 'Tools',
-    icon: Wrench,
-    skills: [
-      { name: 'Git', level: 90, context: 'Version control' },
-      { name: 'Vercel', level: 85, context: 'Deployment platform' },
-      { name: 'Docker', level: 60, context: 'Containerization' },
-      { name: 'AWS', level: 50, context: 'Cloud services' },
-    ],
-  },
-]
+];
 
 function SkillBar({ name, level, context }: { name: string; level: number; context: string }) {
-  const [width, setWidth] = useState(0)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setWidth(level), 100)
-    return () => clearTimeout(timer)
-  }, [level])
-
   return (
     <div className="group mb-4 last:mb-0">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-text-primary group-hover:text-primary transition-colors">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-sm font-body text-text-secondary group-hover:text-text-primary transition-colors">
           {name}
         </span>
-        <span className="text-xs text-text-muted">{level}%</span>
+        <span className="text-xs font-mono text-text-faint">{level}%</span>
       </div>
-      <div className="h-2 bg-primary/10 rounded-full overflow-hidden">
+      <div className="h-1 bg-bg-secondary rounded-full overflow-hidden">
         <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${width}%` }}
+          className="h-full bg-accent rounded-full origin-left"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: level / 100 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="h-full bg-gradient-to-r from-primary to-accent rounded-full"
+          title={context}
         />
       </div>
-      <span className="text-xs text-text-muted mt-1 block">{context}</span>
+      <p className="text-xs text-text-faint font-body mt-0.5">{context}</p>
     </div>
-  )
+  );
 }
 
 export default function Skills() {
   return (
-    <section className="py-24 px-4 bg-card/30">
-      <div className="max-w-6xl mx-auto">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-16 text-center"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="gradient-text">Skills & Technologies</span>
-          </h2>
-          <p className="text-text-muted max-w-2xl mx-auto">
-            My technical toolkit — constantly growing and improving.
-          </p>
-          <div className="w-20 h-1 bg-gradient-to-r from-primary to-accent rounded-full mx-auto mt-4" />
-        </motion.div>
+    <section id="skills" className="py-20 bg-bg-secondary">
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="mb-12">
+          <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2">Expertise</p>
+          <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary">Skills</h2>
+        </div>
 
-        {/* Skills Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {skillCategories.map((category, categoryIndex) => (
+        <div className="grid md:grid-cols-2 gap-8">
+          {skillCategories.map((category) => (
             <motion.div
               key={category.title}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: categoryIndex * 0.1 }}
-              className="bg-card/50 rounded-xl p-6 border border-primary/10 hover:border-primary/30 transition-colors"
+              transition={{ duration: 0.4 }}
+              className="bg-surface border border-border rounded-lg p-6"
             >
-              {/* Category Header */}
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                  <category.icon className="w-5 h-5 text-primary" />
+              <div className="flex items-center gap-3 mb-5 pb-4 border-b border-border">
+                <div className="w-8 h-8 rounded bg-bg-secondary flex items-center justify-center">
+                  <category.icon className="w-4 h-4 text-accent" />
                 </div>
-                <h3 className="text-lg font-semibold text-text-primary">
-                  {category.title}
-                </h3>
+                <h3 className="font-display font-semibold text-text-primary">{category.title}</h3>
               </div>
-
-              {/* Skills List */}
-              <div>
-                {category.skills.map((skill) => (
-                  <SkillBar
-                    key={skill.name}
-                    name={skill.name}
-                    level={skill.level}
-                    context={skill.context}
-                  />
-                ))}
-              </div>
+              {category.skills.map((skill) => (
+                <SkillBar key={skill.name} {...skill} />
+              ))}
             </motion.div>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

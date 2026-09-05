@@ -1,161 +1,89 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Coffee, Moon, Bug, Sparkles } from 'lucide-react'
-import Image from 'next/image'
+import Image from 'next/image';
+import { Coffee, Moon, Bug, Sparkles } from 'lucide-react';
 
 const personalityTraits = [
-  { icon: Coffee, text: "Coffee enthusiast — code doesn't compile without it" },
-  { icon: Moon, text: "Sleep lover — debugs better after a night of rest" },
-  { icon: Bug, text: "Bug hunter — every error is just a puzzle waiting to be solved" },
-  { icon: Sparkles, text: "Learns in public — sharing the journey, not just the destination" },
-]
-
-interface TimelineItem {
-  id: string
-  year: string
-  title: string
-  description: string
-}
+  { icon: Coffee, text: 'Coffee enthusiast — code doesn\'t compile without it' },
+  { icon: Moon, text: 'Sleep lover — debugs better after a night of rest' },
+  { icon: Bug, text: 'Bug hunter — every error is just a puzzle waiting to be solved' },
+  { icon: Sparkles, text: 'Learns in public — sharing the journey, not just the destination' },
+];
 
 export default function About() {
-  const [timeline, setTimeline] = useState<TimelineItem[]>([])
-
-  useEffect(() => {
-    fetch('/api/admin/timeline')
-      .then(res => res.json())
-      .then(data => {
-        if (data.events) {
-          const mapped = data.events.map((e: any) => ({
-            id: e.id,
-            year: e.event_date,
-            title: e.title,
-            description: e.description,
-          }))
-          setTimeline(mapped)
-        }
-      })
-      .catch(console.error)
-  }, [])
-
   return (
-    <section id="about" className="py-24 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="gradient-text">About Me</span>
-          </h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-primary to-accent rounded-full" />
-        </motion.div>
-
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Left Column - Bio & Photo */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="space-y-6"
-          >
-            {/* Photo */}
-            <div className="relative w-48 h-48 mx-auto lg:mx-0 rounded-2xl overflow-hidden border-2 border-primary/20">
-              <Image 
-                src="/profile.jpg" 
-                alt="Ritik Agarwal" 
-                fill 
-                className="object-cover"
-              />
+    <section id="about" className="py-20 bg-bg-secondary">
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="grid md:grid-cols-2 gap-16 items-start">
+          {/* Left: Profile */}
+          <div>
+            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-4">About</p>
+            <div className="relative">
+              <div className="aspect-[3/4] rounded-lg overflow-hidden bg-bg-tertiary">
+                <Image
+                  src="/profile.jpg"
+                  alt="Ritik Agarwal"
+                  width={400}
+                  height={533}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <div className="absolute -bottom-4 -right-4 bg-surface border border-border rounded-lg px-4 py-3 shadow-md">
+                <p className="text-xs text-text-faint font-body">Available for</p>
+                <p className="text-sm font-medium text-text-primary">Internships & Projects</p>
+              </div>
             </div>
 
-            {/* Currently badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-sm text-green-400">Open to internships</span>
+            {/* Personality */}
+            <div className="mt-8 space-y-3">
+              {personalityTraits.map(({ icon: Icon, text }) => (
+                <div key={text} className="flex items-center gap-3 text-sm text-text-secondary font-body">
+                  <Icon className="w-4 h-4 text-accent shrink-0" />
+                  <span>{text}</span>
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* Bio */}
-            <div className="space-y-4 text-text-muted">
+          {/* Right: Bio */}
+          <div className="pt-8 md:pt-20">
+            <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary mb-6 leading-tight">
+              CS student building products that matter
+            </h2>
+            <div className="space-y-4 text-base text-text-secondary font-body leading-relaxed">
               <p>
-                I'm a CS student at VIT Bhopal who believes in building products that solve
-                real problems — starting with my own. From a mental health app for Indians
-                to a stock trading simulator, I turn coffee into code and bugs into features.
+                I'm a Computer Science student in India who got tired of tutorials and decided to build real things instead. My first project, MindSpace, tried to make mental health support actually accessible in a country where therapy costs more than most people's rent.
               </p>
               <p>
-                My journey started with curiosity and has evolved into a passion for
-                full-stack development. I don't just learn technologies — I ship them.
-                Every project is a chance to learn something new and share it with others.
+                That project didn't become a unicorn, but it taught me more about product design, user empathy, and shipping under pressure than any course ever could.
+              </p>
+              <p>
+                Now I work on projects that blend technology with real human needs — fintech for financial literacy, developer tools, and whatever interesting problem lands on my desk.
+              </p>
+              <p>
+                When I'm not building, I'm either grinding LeetCode (I know, I know), reading about system design, or trying to explain to my parents why "just making an app" takes longer than "just writing a document."
               </p>
             </div>
 
-            {/* Personality Traits */}
-            <div className="space-y-3 pt-4">
-              {personalityTraits.map((trait, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="flex items-start gap-3"
-                >
-                  <trait.icon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-text-muted">{trait.text}</span>
-                </motion.div>
-              ))}
+            <div className="mt-8 pt-8 border-t border-border">
+              <p className="text-xs font-mono text-text-faint uppercase tracking-widest mb-4">Quick Facts</p>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: 'Based in', value: 'India' },
+                  { label: 'Education', value: 'CS Student' },
+                  { label: 'Languages', value: 'Java, TS, Python' },
+                  { label: 'Focus', value: 'Product Engineering' },
+                ].map(f => (
+                  <div key={f.label}>
+                    <p className="text-xs text-text-faint font-body">{f.label}</p>
+                    <p className="text-sm font-medium text-text-primary font-body">{f.value}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </motion.div>
-
-          {/* Right Column - Timeline */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="relative"
-          >
-            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-accent to-transparent" />
-            
-            <div className="space-y-8 pl-8">
-              {timeline.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="relative"
-                >
-                  {/* Timeline dot */}
-                  <div className="absolute -left-[2.125rem] top-1 w-4 h-4 rounded-full bg-card border-2 border-primary" />
-                  
-                  {/* Year */}
-                  <span className="text-xs font-semibold text-accent uppercase tracking-wider">
-                    {item.year}
-                  </span>
-                  
-                  {/* Title */}
-                  <h3 className="text-lg font-semibold text-text-primary mt-1">
-                    {item.title}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-sm text-text-muted mt-1">
-                    {item.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

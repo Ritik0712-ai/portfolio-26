@@ -1,199 +1,155 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { ExternalLink, Github, ArrowRight, Search } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { ExternalLink, Github, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
 
-const projects = [
-  {
-    id: 'mindspace',
-    name: 'MindSpace',
-    tagline: 'Anonymous peer support + AI journaling for mental wellness',
-    description: 'Mental health support platform built for the Indian context — addressing therapy costs, accessibility, and stigma with ₹99/month pricing and AI-powered empathetic journaling.',
-    problem: 'Mental health support in India is broken — therapy costs ₹1,500–3,000/session, therapists don\'t exist in tier-2/3 cities, and stigma stops people from seeking help.',
-    tech: ['React Native', 'Node.js', 'PostgreSQL', 'Redis', 'OpenAI GPT-4', 'Socket.io'],
-    category: 'AI',
-    demo: '#',
-    github: '#',
-    learning: 'Technology alone isn\'t enough — empathy has to be engineered into every decision, from UI copy to crisis detection logic.',
-  },
-  {
-    id: 'stockschool',
-    name: 'StockSchool',
-    tagline: 'Jargon-free stock education with paper trading simulator',
-    description: 'Stock market education platform that demystifies investing with simple lessons and a ₹10L virtual cash simulator — learn investing without losing real money.',
-    problem: 'Most Indians want to invest but don\'t know where to start — stock market education is full of jargon, and the fear of losing real money keeps beginners away.',
-    tech: ['Next.js 14', 'Prisma', 'NextAuth.js', 'Google Gemini', 'Finnhub API', 'Tailwind CSS'],
-    category: 'Web',
-    demo: 'https://stockschool-one.vercel.app',
-    github: '#',
-    learning: 'Real-world APIs are unreliable — always engineer for failure, not just the happy path. Built a Simulated Data Engine as fallback.',
-  },
-  {
-    id: 'portfolio-tracker',
-    name: 'Portfolio Tracker',
-    tagline: 'Track your investments across multiple platforms',
-    description: 'Coming soon — a unified dashboard to track all your investments in one place.',
-    problem: 'Managing investments across multiple platforms is chaotic. Need one view to track everything.',
-    tech: ['React', 'Node.js', 'MongoDB', 'REST APIs'],
-    category: 'Web',
-    demo: '#',
-    github: '#',
-    learning: 'Under development — stay tuned!',
-  },
-]
-
-const categories = ['All', 'Web', 'DSA', 'AI', 'Tools']
+interface Project {
+  id: string;
+  slug: string;
+  title: string;
+  short_description: string | null;
+  cover_image: string | null;
+  technologies: string[];
+  demo_url: string | null;
+  repo_url: string | null;
+  featured: boolean;
+  created_at: string;
+}
 
 export default function ProjectsPage() {
-  const [activeFilter, setActiveFilter] = useState('All')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredProjects = projects.filter((project) => {
-    const matchesCategory = activeFilter === 'All' || project.category === activeFilter
-    const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const res = await fetch('/api/projects');
+      const data = await res.json();
+      if (data.projects) setProjects(data.projects);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filtered = projects.filter((p) =>
+    p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.short_description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen pt-24 pb-16 px-4">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="gradient-text">Projects</span>
+        <div className="mb-12">
+          <p className="text-sm font-body text-text-muted uppercase tracking-widest mb-2">Work</p>
+          <h1 className="text-4xl md:text-5xl font-display font-semibold text-text-primary">
+            Projects
           </h1>
-          <p className="text-text-muted max-w-2xl">
-            A collection of products I've built that solve real problems. Each one taught me something that textbooks couldn't.
+          <p className="text-text-secondary mt-3 max-w-xl">
+            Selected work in product engineering, full-stack development, and open source.
           </p>
-        </motion.div>
-
-        {/* Search & Filter */}
-        <div className="flex flex-col md:flex-row gap-4 mb-10">
-          {/* Search */}
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
-            <input
-              type="text"
-              placeholder="Search projects..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-card border border-primary/20 rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors"
-            />
-          </div>
-
-          {/* Filter Tabs */}
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveFilter(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  activeFilter === category
-                    ? 'bg-primary text-white'
-                    : 'bg-card text-text-muted hover:text-primary hover:bg-primary/10'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
         </div>
+
+        {/* Search */}
+        <input
+          type="search"
+          placeholder="Search projects…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-4 py-2.5 font-body text-sm bg-surface border border-border rounded text-text-primary placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-accent mb-8"
+        />
 
         {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="group bg-card rounded-xl overflow-hidden border border-primary/10 hover:border-primary/30 transition-all hover:shadow-xl hover:shadow-primary/5"
-            >
-              {/* Project Header */}
-              <div className="h-40 bg-gradient-to-br from-primary/20 to-accent/20 relative overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-4xl font-bold gradient-text opacity-50">
-                    {project.name.charAt(0)}
-                  </span>
-                </div>
-                <span className="absolute top-4 right-4 px-3 py-1 bg-background/80 rounded-full text-xs font-medium text-accent">
-                  {project.category}
-                </span>
-              </div>
-
-              {/* Project Content */}
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-text-primary mb-2 group-hover:text-primary transition-colors">
-                  {project.name}
-                </h3>
-                <p className="text-sm text-accent mb-3">{project.tagline}</p>
-                <p className="text-sm text-text-muted mb-4 line-clamp-2">
-                  {project.description}
-                </p>
-
-                {/* Tech Stack */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tech.slice(0, 4).map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-2 py-1 text-xs bg-primary/10 text-primary rounded"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                  {project.tech.length > 4 && (
-                    <span className="px-2 py-1 text-xs bg-card text-text-muted rounded">
-                      +{project.tech.length - 4}
-                    </span>
+        {loading ? (
+          <div className="grid md:grid-cols-2 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-surface border border-border rounded-lg h-64 animate-pulse" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16 text-text-muted">No projects found.</div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {filtered.map((project) => (
+              <article
+                key={project.id}
+                className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-rule transition-colors"
+              >
+                {project.cover_image && (
+                  <div className="relative h-44 w-full overflow-hidden">
+                    <Image
+                      src={project.cover_image}
+                      alt={project.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-slow"
+                    />
+                  </div>
+                )}
+                <div className="p-6">
+                  <h2 className="text-xl font-display font-semibold text-text-primary mb-2">
+                    {project.title}
+                  </h2>
+                  {project.short_description && (
+                    <p className="text-text-secondary text-sm mb-4 line-clamp-3">
+                      {project.short_description}
+                    </p>
                   )}
+                  {project.technologies?.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {project.technologies.slice(0, 5).map((tech) => (
+                        <span
+                          key={tech}
+                          className="text-xs px-2 py-0.5 bg-bg-secondary text-text-muted border border-border-subtle rounded-sm"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-3 pt-3 border-t border-border-subtle">
+                    {project.demo_url && (
+                      <a
+                        href={project.demo_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        Demo
+                      </a>
+                    )}
+                    {project.repo_url && (
+                      <a
+                        href={project.repo_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors"
+                      >
+                        <Github className="w-3.5 h-3.5" />
+                        Code
+                      </a>
+                    )}
+                    <Link
+                      href={`/projects/${project.slug}`}
+                      className="ml-auto inline-flex items-center gap-1 text-sm text-accent hover:text-accent-warm transition-colors"
+                    >
+                      Details <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
                 </div>
-
-                {/* Links */}
-                <div className="flex items-center gap-4 pt-4 border-t border-primary/10">
-                  <a
-                    href={project.demo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-sm text-text-muted hover:text-primary transition-colors"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Demo
-                  </a>
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-sm text-text-muted hover:text-primary transition-colors"
-                  >
-                    <Github className="w-4 h-4" />
-                    Code
-                  </a>
-                  <a
-                    href={`/projects/${project.id}`}
-                    className="ml-auto flex items-center gap-1 text-sm text-primary hover:text-accent transition-colors"
-                  >
-                    Details
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {filteredProjects.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-text-muted">No projects found matching your criteria.</p>
+              </article>
+            ))}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

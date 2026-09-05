@@ -1,94 +1,135 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth';
+import { z } from 'zod';
+
+const blogSchema = z.object({
+  title: z.string().min(1),
+  slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
+  excerpt: z.string().optional(),
+  content: z.string().min(1),
+  cover_image: z.string().url().optional().or(z.literal('')),
+  tags: z.array(z.string()).optional(),
+  reading_time: z.string().optional(),
+  featured: z.boolean().optional(),
+  published: z.boolean().optional(),
+  category: z.string().optional(),
+});
 
 export async function GET(request: NextRequest) {
+  const admin = await requireAdmin();
+  if ('error' in admin) return admin.error;
+
   try {
-    const { searchParams } = new URL(request.url)
-    const slug = searchParams.get('slug')
-    
+    const { searchParams } = new URL(request.url);
+    const slug = searchParams.get('slug');
+    const supabase = await createClient();
+
     if (slug) {
-      // Fetch single blog by slug
-      const { data: blog, error } = await supabase
+      const { data, error } = await supabase
         .from('blogs')
         .select('*')
         .eq('slug', slug)
-        .single()
-      
-      if (error) throw error
-      return NextResponse.json({ blog })
+        .single();
+      if (error) throw error;
+      return NextResponse.json({ blog: data });
     }
-    
-    // Fetch all blogs
+
     const { data: blogs, error } = await supabase
       .from('blogs')
       .select('*')
-      .order('created_at', { ascending: false })
-    
-    if (error) throw error
-    return NextResponse.json({ blogs })
-  } catch (error) {
-    console.error('Error fetching blogs:', error)
-    return NextResponse.json({ error: 'Failed to read blogs' }, { status: 500 })
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return NextResponse.json({ blogs });
+  } catch (err) {
+    console.error('Error fetching blogs:', err);
+    return NextResponse.json({ error: 'Failed to read blogs' }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
+  const admin = await requireAdmin();
+  if ('error' in admin) return admin.error;
+
   try {
-    const blog = await request.json()
+    const body = await request.json();
+    const parsed = blogSchema.parse(body);
+    const supabase = await createClient();
+
     const { data, error } = await supabase
       .from('blogs')
       .insert([{
-        ...blog,
+        ...parsed,
+        tags: parsed.tags || [],
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       }])
       .select()
-      .single()
-    
-    if (error) throw error
-    return NextResponse.json({ success: true, blog: data })
-  } catch (error) {
-    console.error('Error creating blog:', error)
-    return NextResponse.json({ error: 'Failed to create blog' }, { status: 500 })
+      .single();
+
+    if (error) {
+      if (error.code === '23505') {
+        return NextResponse.json({ error: 'A post with this slug already exists' }, { status: 409 });
+      }
+      throw error;
+    }
+    return NextResponse.json({ success: true, blog: data });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+    }
+    console.error('Error creating blog:', err);
+    return NextResponse.json({ error: 'Failed to create blog' }, { status: 500 });
   }
 }
 
 export async function PUT(request: NextRequest) {
+  const admin = await requireAdmin();
+  if ('error' in admin) return admin.error;
+
   try {
-    const blog = await request.json()
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'Blog ID required' }, { status: 400 });
+
+    const body = await request.json();
+    const parsed = blogSchema.partial().parse(body);
+    const supabase = await createClient();
+
     const { data, error } = await supabase
       .from('blogs')
-      .update({ ...blog, updated_at: new Date().toISOString() })
-      .eq('id', blog.id)
+      .update({ ...parsed, updated_at: new Date().toISOString() })
+      .eq('id', id)
       .select()
-      .single()
-    
-    if (error) throw error
-    return NextResponse.json({ success: true, blog: data })
-  } catch (error) {
-    console.error('Error updating blog:', error)
-    return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 })
+      .single();
+
+    if (error) throw error;
+    return NextResponse.json({ success: true, blog: data });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+    }
+    console.error('Error updating blog:', err);
+    return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 });
   }
 }
 
 export async function DELETE(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id')
-    
-    if (!id) {
-      return NextResponse.json({ error: 'Blog ID required' }, { status: 400 })
-    }
+  const admin = await requireAdmin();
+  if ('error' in admin) return admin.error;
 
-    const { error } = await supabase
-      .from('blogs')
-      .delete()
-      .eq('id', id)
-    
-    if (error) throw error
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('Error deleting blog:', error)
-    return NextResponse.json({ error: 'Failed to delete blog' }, { status: 500 })
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'Blog ID required' }, { status: 400 });
+
+    const supabase = await createClient();
+    const { error } = await supabase.from('blogs').delete().eq('id', id);
+    if (error) throw error;
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('Error deleting blog:', err);
+    return NextResponse.json({ error: 'Failed to delete blog' }, { status: 500 });
   }
 }

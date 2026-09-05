@@ -1,78 +1,137 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth';
+import { z } from 'zod';
 
-export async function GET() {
+const projectSchema = z.object({
+  title: z.string().min(1),
+  slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
+  short_description: z.string().optional(),
+  description: z.string().optional(),
+  role: z.string().optional(),
+  problem: z.string().optional(),
+  approach: z.string().optional(),
+  technical_decisions: z.array(z.object({
+    decision: z.string(),
+    rationale: z.string(),
+    trade_off: z.string(),
+  })).optional(),
+  outcomes: z.array(z.object({
+    outcome: z.string(),
+    result: z.string(),
+  })).optional(),
+  technologies: z.array(z.string()).optional(),
+  demo_url: z.string().url().optional().or(z.literal('')),
+  repo_url: z.string().url().optional().or(z.literal('')),
+  cover_image: z.string().url().optional().or(z.literal('')),
+  gallery: z.array(z.string()).optional(),
+  featured: z.boolean().optional(),
+  published: z.boolean().optional(),
+  display_order: z.number().optional(),
+});
+
+export async function GET(request: NextRequest) {
+  const admin = await requireAdmin();
+  if ('error' in admin) return admin.error;
+
   try {
+    const supabase = await createClient();
     const { data: projects, error } = await supabase
       .from('projects')
       .select('*')
-      .order('created_at', { ascending: false })
-    
-    if (error) throw error
-    return NextResponse.json({ projects })
-  } catch (error) {
-    console.error('Error fetching projects:', error)
-    return NextResponse.json({ error: 'Failed to read projects' }, { status: 500 })
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return NextResponse.json({ projects });
+  } catch (err) {
+    console.error('Error fetching projects:', err);
+    return NextResponse.json({ error: 'Failed to read projects' }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
+  const admin = await requireAdmin();
+  if ('error' in admin) return admin.error;
+
   try {
-    const project = await request.json()
+    const body = await request.json();
+    const parsed = projectSchema.parse(body);
+    const supabase = await createClient();
+
     const { data, error } = await supabase
       .from('projects')
       .insert([{
-        ...project,
+        ...parsed,
+        technologies: parsed.technologies || [],
+        gallery: parsed.gallery || [],
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       }])
       .select()
-      .single()
-    
-    if (error) throw error
-    return NextResponse.json({ success: true, project: data })
-  } catch (error) {
-    console.error('Error creating project:', error)
-    return NextResponse.json({ error: 'Failed to create project' }, { status: 500 })
+      .single();
+
+    if (error) {
+      if (error.code === '23505') {
+        return NextResponse.json({ error: 'A project with this slug already exists' }, { status: 409 });
+      }
+      throw error;
+    }
+    return NextResponse.json({ success: true, project: data });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+    }
+    console.error('Error creating project:', err);
+    return NextResponse.json({ error: 'Failed to create project' }, { status: 500 });
   }
 }
 
 export async function PUT(request: NextRequest) {
+  const admin = await requireAdmin();
+  if ('error' in admin) return admin.error;
+
   try {
-    const project = await request.json()
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'Project ID required' }, { status: 400 });
+
+    const body = await request.json();
+    const parsed = projectSchema.partial().parse(body);
+    const supabase = await createClient();
+
     const { data, error } = await supabase
       .from('projects')
-      .update({ ...project, updated_at: new Date().toISOString() })
-      .eq('id', project.id)
+      .update({ ...parsed, updated_at: new Date().toISOString() })
+      .eq('id', id)
       .select()
-      .single()
-    
-    if (error) throw error
-    return NextResponse.json({ success: true, project: data })
-  } catch (error) {
-    console.error('Error updating project:', error)
-    return NextResponse.json({ error: 'Failed to update project' }, { status: 500 })
+      .single();
+
+    if (error) throw error;
+    return NextResponse.json({ success: true, project: data });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+    }
+    console.error('Error updating project:', err);
+    return NextResponse.json({ error: 'Failed to update project' }, { status: 500 });
   }
 }
 
 export async function DELETE(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id')
-    
-    if (!id) {
-      return NextResponse.json({ error: 'Project ID required' }, { status: 400 })
-    }
+  const admin = await requireAdmin();
+  if ('error' in admin) return admin.error;
 
-    const { error } = await supabase
-      .from('projects')
-      .delete()
-      .eq('id', id)
-    
-    if (error) throw error
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('Error deleting project:', error)
-    return NextResponse.json({ error: 'Failed to delete project' }, { status: 500 })
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'Project ID required' }, { status: 400 });
+
+    const supabase = await createClient();
+    const { error } = await supabase.from('projects').delete().eq('id', id);
+    if (error) throw error;
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('Error deleting project:', err);
+    return NextResponse.json({ error: 'Failed to delete project' }, { status: 500 });
   }
 }

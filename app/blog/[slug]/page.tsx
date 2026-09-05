@@ -1,223 +1,211 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowLeft, Clock, Calendar, Share2, Twitter, Linkedin, Loader2 } from 'lucide-react'
-import BlogComments from '@/components/BlogComments'
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Clock, Calendar, Share2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import BlogComments from '@/components/BlogComments';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import Image from 'next/image';
+import type { Components } from 'react-markdown';
 
 interface BlogPost {
-  slug: string
-  title: string
-  excerpt: string
-  content: string
-  date: string
-  reading_time: string
-  tags: string[]
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  cover_image: string | null;
+  date: string;
+  reading_time: string;
+  tags: string[];
+  category: string;
+  created_at: string;
 }
 
 export default function BlogPostPage() {
-  const params = useParams()
-  const slug = params.slug as string
-  const [post, setPost] = useState<BlogPost | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
+  const params = useParams();
+  const slug = params.slug as string;
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetchBlogPost()
-  }, [slug])
+    fetchBlogPost();
+  }, [slug]);
 
   const fetchBlogPost = async () => {
     try {
-      const res = await fetch(`/api/admin/blogs?slug=${slug}`)
-      const data = await res.json()
+      const res = await fetch(`/api/blogs?slug=${encodeURIComponent(slug)}`);
+      const data = await res.json();
       if (data.blog) {
-        setPost(data.blog)
+        setPost(data.blog);
       } else {
-        setError(true)
+        setError(true);
       }
-    } catch (error) {
-      console.error('Failed to fetch blog:', error)
-      setError(true)
+    } catch {
+      setError(true);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-4 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen pt-24 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-border border-t-text-primary rounded-full animate-spin" />
       </div>
-    )
+    );
   }
 
   if (error || !post) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-2xl font-bold mb-4">Blog post not found</h1>
-          <Link href="/blog" className="text-primary hover:underline">
-            Back to Blog
-          </Link>
-        </div>
+      <div className="min-h-screen pt-24 flex flex-col items-center justify-center px-4">
+        <h1 className="text-4xl font-display font-semibold text-text-primary mb-4">Post Not Found</h1>
+        <Link href="/blog" className="text-text-muted hover:text-text-primary transition-colors">
+          ← Back to Blog
+        </Link>
       </div>
-    )
+    );
   }
 
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
-  const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(shareUrl)}`
-  const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
+    } catch { return dateStr; }
+  };
+
+  const markdownComponents: Components = {
+    h1: ({ children }) => <h1 className="font-display text-3xl font-semibold text-text-primary mt-10 mb-4">{children}</h1>,
+    h2: ({ children }) => <h2 className="font-display text-2xl font-semibold text-text-primary mt-8 mb-3">{children}</h2>,
+    h3: ({ children }) => <h3 className="font-display text-xl font-semibold text-text-primary mt-6 mb-2">{children}</h3>,
+    p: ({ children }) => <p className="text-text-secondary leading-relaxed mb-4">{children}</p>,
+    a: ({ href, children }) => (
+      <a href={href} className="text-accent-warm hover:underline" target={href?.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer">
+        {children}
+      </a>
+    ),
+    ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-1 text-text-secondary">{children}</ul>,
+    ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-1 text-text-secondary">{children}</ol>,
+    li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+    blockquote: ({ children }) => (
+      <blockquote className="border-l-4 border-accent-warm pl-4 my-4 italic text-text-muted">{children}</blockquote>
+    ),
+    code: ({ className, children, ...props }) => {
+      const isInline = !className;
+      if (isInline) {
+        return <code className="font-mono text-sm bg-bg-secondary px-1.5 py-0.5 rounded text-accent-warm" {...props}>{children}</code>;
+      }
+      return (
+        <pre className="bg-bg-secondary border border-border rounded p-4 overflow-x-auto my-4">
+          <code className="font-mono text-sm text-text-primary">{children}</code>
+        </pre>
+      );
+    },
+    img: ({ src, alt }) => src ? (
+      <span className="block my-6">
+        <Image src={src} alt={alt || ''} width={800} height={450} className="rounded-lg w-full object-cover" />
+        {alt && <p className="text-xs text-text-faint mt-2 text-center">{alt}</p>}
+      </span>
+    ) : null,
+    table: ({ children }) => (
+      <div className="overflow-x-auto my-4">
+        <table className="w-full border-collapse text-sm text-text-secondary">{children}</table>
+      </div>
+    ),
+    th: ({ children }) => <th className="border border-border px-3 py-2 text-left bg-bg-secondary font-medium text-text-primary">{children}</th>,
+    td: ({ children }) => <td className="border border-border px-3 py-2">{children}</td>,
+    hr: () => <hr className="border-border my-8" />,
+  };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
-      <article className="max-w-3xl mx-auto">
-        {/* Back Button */}
-        <Link
-          href="/blog"
-          className="inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Blog
+    <div className="min-h-screen pt-24 pb-16 px-4">
+      <article className="max-w-prose mx-auto">
+        {/* Back link */}
+        <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors mb-8">
+          <ArrowLeft className="w-4 h-4" /> Back to Blog
         </Link>
 
+        {/* Cover Image */}
+        {post.cover_image && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-8 -mx-4 md:mx-0"
+          >
+            <Image
+              src={post.cover_image}
+              alt={post.title}
+              width={800}
+              height={450}
+              className="rounded-lg w-full object-cover"
+            />
+          </motion.div>
+        )}
+
         {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
-        >
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {post.tags && post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-3 py-1 text-sm bg-primary/10 text-primary rounded-full"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+        <motion.header initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          {/* Category */}
+          <span className="text-xs font-body font-medium uppercase tracking-widest text-accent-warm">
+            {post.category}
+          </span>
 
           {/* Title */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+          <h1 className="font-display text-4xl md:text-5xl font-semibold text-text-primary mt-2 mb-4 leading-tight">
             {post.title}
           </h1>
 
           {/* Meta */}
-          <div className="flex items-center gap-6 text-text-muted mb-6">
-            <span className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              {new Date(post.date).toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric'
-              })}
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              {post.reading_time || '5 min read'}
-            </span>
+          <div className="flex flex-wrap items-center gap-4 text-sm text-text-muted mb-6">
+            {post.created_at && (
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-4 h-4" />
+                {formatDate(post.created_at)}
+              </span>
+            )}
+            {post.reading_time && (
+              <span className="flex items-center gap-1.5">
+                <Clock className="w-4 h-4" />
+                {post.reading_time}
+              </span>
+            )}
           </div>
 
-          {/* Share */}
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-text-muted">Share:</span>
-            <a
-              href={twitterShareUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-card hover:bg-primary/10 text-text-muted hover:text-primary transition-colors"
-              aria-label="Share on Twitter"
-            >
-              <Twitter className="w-4 h-4" />
-            </a>
-            <a
-              href={linkedInShareUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-card hover:bg-primary/10 text-text-muted hover:text-primary transition-colors"
-              aria-label="Share on LinkedIn"
-            >
-              <Linkedin className="w-4 h-4" />
-            </a>
-          </div>
+          {/* Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {post.tags.map((tag) => (
+                <span key={tag} className="px-2 py-0.5 bg-bg-secondary border border-border rounded text-xs text-text-muted">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Rule */}
+          <div className="border-t border-border mb-8" />
         </motion.header>
 
         {/* Content */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="prose prose-invert prose-lg max-w-none"
         >
-          <div className="text-text-primary leading-relaxed space-y-6">
-            {post.content.split('\n').map((paragraph, index) => {
-              if (paragraph.startsWith('## ')) {
-                return (
-                  <h2 key={index} className="text-2xl font-bold mt-10 mb-4 gradient-text">
-                    {paragraph.replace('## ', '')}
-                  </h2>
-                )
-              }
-              if (paragraph.startsWith('### ')) {
-                return (
-                  <h3 key={index} className="text-xl font-semibold mt-8 mb-3 text-text-primary">
-                    {paragraph.replace('### ', '')}
-                  </h3>
-                )
-              }
-              if (paragraph.startsWith('1. ') || paragraph.startsWith('2. ') || paragraph.startsWith('3. ') || paragraph.startsWith('4. ') || paragraph.startsWith('5. ')) {
-                return (
-                  <p key={index} className="pl-6 border-l-2 border-primary/30 text-text-muted">
-                    {paragraph}
-                  </p>
-                )
-              }
-              if (paragraph.startsWith('- ')) {
-                return (
-                  <p key={index} className="pl-6 text-text-muted">
-                    • {paragraph.replace('- ', '')}
-                  </p>
-                )
-              }
-              if (paragraph.trim() === '---') {
-                return <hr key={index} className="border-primary/20 my-8" />
-              }
-              if (paragraph.trim() === '') {
-                return <div key={index} className="h-4" />
-              }
-              if (paragraph.startsWith('*') && paragraph.endsWith('*')) {
-                return (
-                  <p key={index} className="text-accent italic">
-                    {paragraph.replace(/\*/g, '')}
-                  </p>
-                )
-              }
-              return (
-                <p key={index} className="text-text-muted">
-                  {paragraph}
-                </p>
-              )
-            })}
-          </div>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+            {post.content}
+          </ReactMarkdown>
         </motion.div>
 
-        {/* Navigation */}
-        <div className="mt-16 pt-8 border-t border-primary/10">
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 text-primary hover:text-accent transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Blog
-          </Link>
-        </div>
+        {/* Footer rule */}
+        <div className="border-t border-border mt-12 mb-8" />
 
-        {/* Comments Section */}
-        <BlogComments slug={slug} />
+        {/* Comments */}
+        <BlogComments blogSlug={slug} />
       </article>
     </div>
-  )
+  );
 }

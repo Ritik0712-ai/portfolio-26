@@ -1,7 +1,4 @@
-'use client'
-
-import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
-
+// Analytics placeholder — replace with your analytics provider (e.g., Plausible, Fathom, Vercel Analytics)
 export default function Analytics() {
-  return <VercelAnalytics />
+  return null;
 }

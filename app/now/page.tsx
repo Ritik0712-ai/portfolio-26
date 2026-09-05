@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
-import { Code, Book, Lightbulb, Target, Calendar } from 'lucide-react'
+import { motion } from 'framer-motion';
+import { Code, Book, Lightbulb, Target, Calendar } from 'lucide-react';
 
 const nowData = {
   lastUpdated: 'January 2024',
@@ -25,146 +25,102 @@ const nowData = {
 
 export default function NowPage() {
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen pt-24 pb-16 px-4">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-              <Target className="w-5 h-5 text-green-500" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold">
-              <span className="gradient-text">/now</span>
-            </h1>
-          </div>
-          <p className="text-text-muted mb-2">
-            What I'm working on right now. Inspired by Derek Sivers'
-            <a
-              href="https://sivers.org/now"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-accent ml-1"
-            >
-              /now page movement
-            </a>.
-          </p>
-          <p className="text-sm text-text-muted flex items-center gap-2">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
+          <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2">/now</p>
+          <h1 className="text-4xl md:text-5xl font-display font-semibold text-text-primary mb-2">
+            What I&apos;m doing now
+          </h1>
+          <div className="flex items-center gap-2 text-sm text-text-muted font-body">
             <Calendar className="w-4 h-4" />
-            Last updated: {nowData.lastUpdated}
-          </p>
+            Last updated {nowData.lastUpdated}
+          </div>
         </motion.div>
 
-        {/* Content Grid */}
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Currently Building */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-card rounded-xl p-6 border border-primary/10"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                <Code className="w-5 h-5 text-primary" />
-              </div>
-              <h2 className="text-xl font-bold text-text-primary">Currently Building</h2>
+        {/* Focus */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="bg-surface border border-border rounded-lg p-6 mb-8">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 rounded bg-accent/10 flex items-center justify-center">
+              <Target className="w-4 h-4 text-accent" />
             </div>
-            <ul className="space-y-4">
-              {nowData.currentlyBuilding.map((item, index) => (
-                <li key={index} className="flex items-start gap-3">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                  <span className="text-text-muted">{item}</span>
+            <p className="text-xs font-mono text-text-faint uppercase tracking-wider">This Month&apos;s Focus</p>
+          </div>
+          <p className="text-lg font-body text-text-primary leading-relaxed">{nowData.thisMonthsFocus}</p>
+        </motion.div>
+
+        {/* Grid */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Building */}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+            className="bg-surface border border-border rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded bg-accent/10 flex items-center justify-center">
+                <Code className="w-4 h-4 text-accent" />
+              </div>
+              <p className="text-xs font-mono text-text-faint uppercase tracking-wider">Building</p>
+            </div>
+            <ul className="space-y-3">
+              {nowData.currentlyBuilding.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm font-body text-text-secondary">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0" />
+                  {item}
                 </li>
               ))}
             </ul>
           </motion.div>
 
-          {/* Currently Learning */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-card rounded-xl p-6 border border-primary/10"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
-                <Lightbulb className="w-5 h-5 text-accent" />
+          {/* Learning */}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="bg-surface border border-border rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded bg-accent/10 flex items-center justify-center">
+                <Lightbulb className="w-4 h-4 text-accent" />
               </div>
-              <h2 className="text-xl font-bold text-text-primary">Currently Learning</h2>
+              <p className="text-xs font-mono text-text-faint uppercase tracking-wider">Learning</p>
             </div>
-            <ul className="space-y-4">
-              {nowData.currentlyLearning.map((item, index) => (
-                <li key={index} className="flex items-start gap-3">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent mt-2 flex-shrink-0" />
-                  <span className="text-text-muted">{item}</span>
+            <ul className="space-y-3">
+              {nowData.currentlyLearning.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm font-body text-text-secondary">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0" />
+                  {item}
                 </li>
               ))}
             </ul>
           </motion.div>
 
-          {/* Currently Reading */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-card rounded-xl p-6 border border-primary/10"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                <Book className="w-5 h-5 text-yellow-500" />
+          {/* Reading */}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+            className="bg-surface border border-border rounded-lg p-6 md:col-span-2">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded bg-accent/10 flex items-center justify-center">
+                <Book className="w-4 h-4 text-accent" />
               </div>
-              <h2 className="text-xl font-bold text-text-primary">Currently Reading</h2>
+              <p className="text-xs font-mono text-text-faint uppercase tracking-wider">Reading</p>
             </div>
-            <ul className="space-y-4">
-              {nowData.currentlyReading.map((item, index) => (
-                <li key={index} className="flex items-start gap-3">
-                  <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 mt-2 flex-shrink-0" />
-                  <span className="text-text-muted">{item}</span>
+            <ul className="grid md:grid-cols-3 gap-3">
+              {nowData.currentlyReading.map((book) => (
+                <li key={book} className="flex items-start gap-3 text-sm font-body text-text-secondary">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0" />
+                  {book}
                 </li>
               ))}
             </ul>
-          </motion.div>
-
-          {/* This Month's Focus */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl p-6 border border-primary/20"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-                <Target className="w-5 h-5 text-green-500" />
-              </div>
-              <h2 className="text-xl font-bold text-text-primary">This Month's Focus</h2>
-            </div>
-            <p className="text-lg text-text-muted leading-relaxed">
-              {nowData.thisMonthsFocus}
-            </p>
           </motion.div>
         </div>
 
         {/* Note */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-12 p-6 bg-card/50 rounded-xl border border-primary/10"
-        >
-          <p className="text-text-muted text-sm text-center">
-            This page is updated monthly. I believe in transparency and showing the work in progress.
-            If you're interested in collaborating on any of these projects,{' '}
-            <a href="/contact" className="text-primary hover:text-accent">
-              let's talk
-            </a>
-            .
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+          className="mt-8 p-6 bg-surface border border-border rounded-lg">
+          <p className="text-sm text-text-muted font-body text-center leading-relaxed">
+            This page is inspired by Derek Sivers&apos; <a href="https://sivers.org/now" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">/now</a> page idea.
+            I believe in transparency and showing the work in progress.
+            If you&apos;re interested in collaborating, <a href="/contact" className="text-accent hover:underline">let&apos;s talk</a>.
           </p>
         </motion.div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,210 +1,167 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
-import { ExternalLink, Github, ArrowLeft, Lightbulb, AlertCircle, Wrench } from 'lucide-react'
-import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ExternalLink, Github, ArrowLeft } from 'lucide-react';
+import type { Project, TechnicalDecision, Outcome } from '@/types';
 
-const projectsData: Record<string, {
-  name: string
-  tagline: string
-  description: string
-  problem: string
-  tech: string[]
-  category: string
-  demo: string
-  github: string
-  learning: string
-}> = {
-  'mindspace': {
-    name: 'MindSpace',
-    tagline: 'Anonymous peer support + AI journaling for mental wellness',
-    description: 'Mental health support platform built for the Indian context — addressing therapy costs, accessibility, and stigma with ₹99/month pricing and AI-powered empathetic journaling.',
-    problem: 'Mental health support in India is broken — therapy costs ₹1,500–3,000/session, therapists don\'t exist in tier-2/3 cities, and stigma stops people from seeking help.',
-    tech: ['React Native', 'Node.js', 'PostgreSQL', 'Redis', 'OpenAI GPT-4', 'Socket.io', 'Perspective API'],
-    category: 'AI',
-    demo: '#',
-    github: '#',
-    learning: 'Technology alone isn\'t enough — empathy has to be engineered into every decision, from UI copy to crisis detection logic. The hardest part wasn\'t the code; it was making sure the AI never made a vulnerable person feel worse.',
-  },
-  'stockschool': {
-    name: 'StockSchool',
-    tagline: 'Jargon-free stock education with paper trading simulator',
-    description: 'Stock market education platform that demystifies investing with simple lessons and a ₹10L virtual cash simulator — learn investing without losing real money.',
-    problem: 'Most Indians want to invest but don\'t know where to start — stock market education is full of jargon, and the fear of losing real money keeps beginners away.',
-    tech: ['Next.js 14', 'Prisma', 'NextAuth.js', 'Google Gemini', 'Finnhub API', 'Tailwind CSS', 'Framer Motion'],
-    category: 'Web',
-    demo: 'https://stockschool-one.vercel.app',
-    github: '#',
-    learning: 'Real-world APIs are unreliable — Finnhub\'s free tier gets blocked on Vercel\'s IPs regularly. So I built a Simulated Data Engine as a fallback, ensuring users always get realistic stock data for practice. Always engineer for failure, not just the happy path.',
-  },
-  'portfolio-tracker': {
-    name: 'Portfolio Tracker',
-    tagline: 'Track your investments across multiple platforms',
-    description: 'Coming soon — a unified dashboard to track all your investments in one place.',
-    problem: 'Managing investments across multiple platforms is chaotic. Need one view to track everything.',
-    tech: ['React', 'Node.js', 'MongoDB', 'REST APIs'],
-    category: 'Web',
-    demo: '#',
-    github: '#',
-    learning: 'Under development — stay tuned!',
-  },
-}
+export default function ProjectDetailPage({ params }: { params: { slug: string } }) {
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-export default function ProjectPage({ params }: { params: { slug: string } }) {
-  const { slug } = params
-  const project = projectsData[slug]
+  useEffect(() => {
+    fetch(`/api/projects?slug=${encodeURIComponent(params.slug)}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.project) setProject(d.project);
+        else setError(true);
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, [params.slug]);
 
-  if (!project) {
-    notFound()
-  }
+  if (loading) return (
+    <div className="min-h-screen pt-24 flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-border border-t-text-primary rounded-full animate-spin" />
+    </div>
+  );
+
+  if (error || !project) return (
+    <div className="min-h-screen pt-24 flex flex-col items-center justify-center px-4">
+      <h1 className="text-4xl font-display font-semibold text-text-primary mb-4">Project Not Found</h1>
+      <Link href="/projects" className="text-text-muted hover:text-text-primary transition-colors">← Back to Projects</Link>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
-        <Link
-          href="/projects"
-          className="inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Projects
+    <div className="min-h-screen pt-24 pb-16 px-4">
+      <div className="max-w-3xl mx-auto">
+        {/* Back */}
+        <Link href="/projects" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors mb-8">
+          <ArrowLeft className="w-4 h-4" /> All Projects
         </Link>
 
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
-        >
-          {/* Category Badge */}
-          <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-            {project.category}
-          </span>
-
-          {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="gradient-text">{project.name}</span>
+        <div className="mb-8">
+          <h1 className="text-4xl md:text-5xl font-display font-semibold text-text-primary mb-3">
+            {project.title}
           </h1>
-
-          {/* Tagline */}
-          <p className="text-xl text-accent mb-6">{project.tagline}</p>
-
-          {/* Description */}
-          <p className="text-text-muted text-lg mb-8">{project.description}</p>
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-4">
-            <a
-              href={project.demo}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-accent rounded-lg font-semibold text-white hover:shadow-lg hover:shadow-primary/30 transition-all"
-            >
-              <ExternalLink className="w-5 h-5" />
-              View Demo
-            </a>
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-primary/50 rounded-lg font-semibold text-text-muted hover:text-primary hover:border-primary transition-all"
-            >
-              <Github className="w-5 h-5" />
-              View Code
-            </a>
-          </div>
-        </motion.div>
-
-        {/* Project Image Placeholder */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-12 rounded-xl overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 h-64 md:h-96 flex items-center justify-center"
-        >
-          <span className="text-8xl font-bold gradient-text opacity-30">
-            {project.name.charAt(0)}
-          </span>
-        </motion.div>
-
-        {/* Details Grid */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {/* Problem */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-card rounded-xl p-6 border border-primary/10"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
-                <AlertCircle className="w-5 h-5 text-red-500" />
-              </div>
-              <h2 className="text-xl font-bold text-text-primary">The Problem</h2>
-            </div>
-            <p className="text-text-muted">{project.problem}</p>
-          </motion.div>
-
-          {/* Tech Stack */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-card rounded-xl p-6 border border-primary/10"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
-                <Wrench className="w-5 h-5 text-accent" />
-              </div>
-              <h2 className="text-xl font-bold text-text-primary">Tech Stack</h2>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {project.tech.map((tech) => (
-                <span
-                  key={tech}
-                  className="px-3 py-1 text-sm bg-primary/10 text-primary rounded-full"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </motion.div>
+          {project.short_description && (
+            <p className="text-lg text-text-secondary leading-relaxed">{project.short_description}</p>
+          )}
         </div>
 
-        {/* Key Learning */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl p-8 border border-primary/10"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-              <Lightbulb className="w-5 h-5 text-yellow-500" />
-            </div>
-            <h2 className="text-xl font-bold text-text-primary">Key Learning</h2>
+        {/* Cover Image */}
+        {project.cover_image && (
+          <div className="relative w-full aspect-[16/9] mb-10 rounded-lg overflow-hidden border border-border">
+            <Image src={project.cover_image} alt={project.title} fill className="object-cover" />
           </div>
-          <p className="text-text-muted text-lg italic">"{project.learning}"</p>
-        </motion.div>
+        )}
 
-        {/* Navigation */}
-        <div className="flex justify-between items-center mt-12 pt-8 border-t border-primary/10">
-          <Link
-            href="/projects"
-            className="inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            All Projects
-          </Link>
-          <Link
-            href="/contact"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-accent rounded-lg font-semibold text-white hover:shadow-lg hover:shadow-primary/30 transition-all"
-          >
-            Let's Work Together
+        {/* Tech stack */}
+        {project.technologies && project.technologies.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-8">
+            {project.technologies.map((tech) => (
+              <span key={tech} className="px-3 py-1 text-xs font-body bg-bg-secondary text-text-secondary border border-border rounded-sm">
+                {tech}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Links */}
+        <div className="flex flex-wrap gap-3 mb-12 pb-12 border-b border-border">
+          {project.demo_url && (
+            <a href={project.demo_url} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-body font-medium bg-text-primary text-bg rounded-sm hover:opacity-90 transition-opacity">
+              <ExternalLink className="w-4 h-4" /> Live Demo
+            </a>
+          )}
+          {project.repo_url && (
+            <a href={project.repo_url} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-body font-medium border border-border text-text-primary rounded-sm hover:bg-bg-secondary transition-colors">
+              <Github className="w-4 h-4" /> Source Code
+            </a>
+          )}
+        </div>
+
+        {/* Case Study Sections */}
+        {project.problem && (
+          <section className="mb-10">
+            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-3">Problem</h2>
+            <p className="text-text-secondary leading-relaxed">{project.problem}</p>
+          </section>
+        )}
+
+        {project.approach && (
+          <section className="mb-10">
+            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-3">Approach</h2>
+            <p className="text-text-secondary leading-relaxed">{project.approach}</p>
+          </section>
+        )}
+
+        {project.role && (
+          <section className="mb-10">
+            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-3">Role</h2>
+            <p className="text-text-secondary leading-relaxed">{project.role}</p>
+          </section>
+        )}
+
+        {project.technical_decisions && project.technical_decisions.length > 0 && (
+          <section className="mb-10">
+            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-4">Technical Decisions</h2>
+            <div className="space-y-6">
+              {(project.technical_decisions as TechnicalDecision[]).map((td, i) => (
+                <div key={i} className="border-l-2 border-border pl-5">
+                  <h3 className="text-base font-body font-semibold text-text-primary mb-1.5">{td.decision}</h3>
+                  <p className="text-sm text-text-secondary mb-1.5"><span className="text-text-muted">Rationale: </span>{td.rationale}</p>
+                  <p className="text-sm text-text-muted"><span className="text-text-muted">Trade-off: </span>{td.trade_off}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {project.outcomes && project.outcomes.length > 0 && (
+          <section className="mb-10">
+            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-4">Outcomes</h2>
+            <div className="space-y-4">
+              {(project.outcomes as Outcome[]).map((o, i) => (
+                <div key={i} className="flex gap-4">
+                  <span className="text-xs font-body text-text-faint mt-0.5 min-w-[1.5rem]">{String(i + 1).padStart(2, '0')}</span>
+                  <div>
+                    <p className="text-text-secondary font-body">{o.outcome}</p>
+                    {o.result && <p className="text-sm text-text-muted mt-0.5">{o.result}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Gallery */}
+        {project.gallery && project.gallery.length > 0 && (
+          <section className="mb-10">
+            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-4">Screenshots</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {project.gallery.map((img, i) => (
+                <div key={i} className="relative aspect-video rounded-lg overflow-hidden border border-border">
+                  <Image src={img} alt={`${project.title} screenshot ${i + 1}`} fill className="object-cover" />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Footer nav */}
+        <div className="pt-8 border-t border-border">
+          <Link href="/projects" className="inline-flex items-center gap-2 text-text-muted hover:text-text-primary transition-colors text-sm">
+            <ArrowLeft className="w-4 h-4" /> Back to Projects
           </Link>
         </div>
       </div>
     </div>
-  )
+  );
 }
