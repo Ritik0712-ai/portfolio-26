@@ -27,7 +27,7 @@ const projectSchema = z.object({
   gallery: z.array(z.string()).optional(),
   featured: z.boolean().optional(),
   published: z.boolean().optional(),
-  display_order: z.number().optional(),
+  display_order: z.coerce.number().int().optional(),
 });
 
 export async function GET(request: NextRequest) {
@@ -79,7 +79,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, project: data });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+      const issue = err.issues[0];
+      const field = issue.path.join('.') || 'request';
+      return NextResponse.json({ error: `${field}: ${issue.message}` }, { status: 400 });
     }
     console.error('Error creating project:', err);
     return NextResponse.json({ error: 'Failed to create project' }, { status: 500 });
@@ -110,7 +112,9 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ success: true, project: data });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+      const issue = err.issues[0];
+      const field = issue.path.join('.') || 'request';
+      return NextResponse.json({ error: `${field}: ${issue.message}` }, { status: 400 });
     }
     console.error('Error updating project:', err);
     return NextResponse.json({ error: 'Failed to update project' }, { status: 500 });

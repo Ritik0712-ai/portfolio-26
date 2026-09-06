@@ -11,7 +11,7 @@ const testimonialSchema = z.object({
   content: z.string().min(1),
   rating: z.coerce.number().min(1).max(5).optional(),
   approved: z.boolean().optional(),
-  display_order: z.number().optional(),
+  display_order: z.coerce.number().int().optional(),
 });
 
 export async function GET() {
@@ -44,7 +44,11 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ testimonial: data });
   } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+    if (err instanceof z.ZodError) {
+      const issue = err.issues[0];
+      const field = issue.path.join('.') || 'request';
+      return NextResponse.json({ error: `${field}: ${issue.message}` }, { status: 400 });
+    }
     console.error('Error creating testimonial:', err);
     return NextResponse.json({ error: 'Failed to create testimonial' }, { status: 500 });
   }
@@ -66,7 +70,11 @@ export async function PUT(request: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ testimonial: data });
   } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+    if (err instanceof z.ZodError) {
+      const issue = err.issues[0];
+      const field = issue.path.join('.') || 'request';
+      return NextResponse.json({ error: `${field}: ${issue.message}` }, { status: 400 });
+    }
     console.error('Error updating testimonial:', err);
     return NextResponse.json({ error: 'Failed to update testimonial' }, { status: 500 });
   }

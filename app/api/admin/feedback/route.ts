@@ -27,7 +27,7 @@ const testimonialSchema = z.object({
   company: z.string().optional(),
   avatar: z.string().optional(),
   content: z.string().min(1),
-  rating: z.number().optional(),
+  rating: z.coerce.number().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -48,7 +48,11 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ testimonial: data });
   } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+    if (err instanceof z.ZodError) {
+      const issue = err.issues[0];
+      const field = issue.path.join('.') || 'request';
+      return NextResponse.json({ error: `${field}: ${issue.message}` }, { status: 400 });
+    }
     console.error('Error creating testimonial from feedback:', err);
     return NextResponse.json({ error: 'Failed to create testimonial' }, { status: 500 });
   }

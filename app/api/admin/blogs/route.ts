@@ -10,7 +10,8 @@ const blogSchema = z.object({
   content: z.string().min(1),
   cover_image: z.string().url().optional().or(z.literal('')),
   tags: z.array(z.string()).optional(),
-  reading_time: z.string().optional(),
+  // Tolerant: older client bundles (and browser-cached ones) send a number.
+  reading_time: z.union([z.string(), z.number()]).transform(String).optional(),
   featured: z.boolean().optional(),
   published: z.boolean().optional(),
   category: z.string().optional(),
@@ -85,7 +86,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, blog: data });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+      const issue = err.issues[0];
+      const field = issue.path.join('.') || 'request';
+      return NextResponse.json({ error: `${field}: ${issue.message}` }, { status: 400 });
     }
     console.error('Error creating blog:', err);
     return NextResponse.json({ error: 'Failed to create blog' }, { status: 500 });
@@ -116,7 +119,9 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ success: true, blog: data });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+      const issue = err.issues[0];
+      const field = issue.path.join('.') || 'request';
+      return NextResponse.json({ error: `${field}: ${issue.message}` }, { status: 400 });
     }
     console.error('Error updating blog:', err);
     return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 });

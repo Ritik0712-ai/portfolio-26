@@ -8,7 +8,7 @@ const statSchema = z.object({
   value: z.coerce.number().int().nonnegative(),
   suffix: z.string(),
   label: z.string().min(1),
-  display_order: z.number().optional(),
+  display_order: z.coerce.number().int().optional(),
 });
 
 export async function GET() {
@@ -41,7 +41,11 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ stat: data });
   } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+    if (err instanceof z.ZodError) {
+      const issue = err.issues[0];
+      const field = issue.path.join('.') || 'request';
+      return NextResponse.json({ error: `${field}: ${issue.message}` }, { status: 400 });
+    }
     console.error('Error creating stat:', err);
     return NextResponse.json({ error: 'Failed to create stat' }, { status: 500 });
   }
@@ -63,7 +67,11 @@ export async function PUT(request: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ stat: data });
   } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+    if (err instanceof z.ZodError) {
+      const issue = err.issues[0];
+      const field = issue.path.join('.') || 'request';
+      return NextResponse.json({ error: `${field}: ${issue.message}` }, { status: 400 });
+    }
     console.error('Error updating stat:', err);
     return NextResponse.json({ error: 'Failed to update stat' }, { status: 500 });
   }

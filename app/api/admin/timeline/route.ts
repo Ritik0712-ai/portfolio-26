@@ -7,7 +7,7 @@ const timelineSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
   event_date: z.string().min(1),
-  display_order: z.number().optional(),
+  display_order: z.coerce.number().int().optional(),
 });
 
 export async function GET() {
@@ -40,7 +40,11 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ event: data });
   } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+    if (err instanceof z.ZodError) {
+      const issue = err.issues[0];
+      const field = issue.path.join('.') || 'request';
+      return NextResponse.json({ error: `${field}: ${issue.message}` }, { status: 400 });
+    }
     console.error('Error creating timeline event:', err);
     return NextResponse.json({ error: 'Failed to create timeline event' }, { status: 500 });
   }
@@ -62,7 +66,11 @@ export async function PUT(request: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ event: data });
   } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0].message }, { status: 400 });
+    if (err instanceof z.ZodError) {
+      const issue = err.issues[0];
+      const field = issue.path.join('.') || 'request';
+      return NextResponse.json({ error: `${field}: ${issue.message}` }, { status: 400 });
+    }
     console.error('Error updating timeline event:', err);
     return NextResponse.json({ error: 'Failed to update timeline event' }, { status: 500 });
   }
