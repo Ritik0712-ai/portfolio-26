@@ -8,7 +8,7 @@ const statSchema = z.object({
   value: z.coerce.number().int().nonnegative(),
   suffix: z.string(),
   label: z.string().min(1),
-  display_order: z.coerce.number().int().optional(),
+  display_order: z.coerce.number().int().nullish(),
 });
 
 export async function GET() {

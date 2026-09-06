@@ -6,15 +6,15 @@ import { z } from 'zod';
 const blogSchema = z.object({
   title: z.string().min(1),
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
-  excerpt: z.string().optional(),
+  excerpt: z.string().nullish(),
   content: z.string().min(1),
-  cover_image: z.string().url().optional().or(z.literal('')),
-  tags: z.array(z.string()).optional(),
+  cover_image: z.string().url().nullish().or(z.literal('')),
+  tags: z.array(z.string()).nullish(),
   // Tolerant: older client bundles (and browser-cached ones) send a number.
-  reading_time: z.union([z.string(), z.number()]).transform(String).optional(),
+  reading_time: z.union([z.string(), z.number()]).transform(String).nullish(),
   featured: z.boolean().optional(),
   published: z.boolean().optional(),
-  category: z.string().optional(),
+  category: z.string().nullish(),
 });
 
 export async function GET(request: NextRequest) {

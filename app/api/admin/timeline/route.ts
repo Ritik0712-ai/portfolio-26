@@ -5,9 +5,9 @@ import { z } from 'zod';
 
 const timelineSchema = z.object({
   title: z.string().min(1),
-  description: z.string().optional(),
+  description: z.string().nullish(),
   event_date: z.string().min(1),
-  display_order: z.coerce.number().int().optional(),
+  display_order: z.coerce.number().int().nullish(),
 });
 
 export async function GET() {

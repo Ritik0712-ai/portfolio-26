@@ -5,13 +5,13 @@ import { z } from 'zod';
 
 const testimonialSchema = z.object({
   name: z.string().min(1),
-  role: z.string().optional(),
-  company: z.string().optional(),
-  avatar: z.string().url().optional().or(z.literal('')),
+  role: z.string().nullish(),
+  company: z.string().nullish(),
+  avatar: z.string().url().nullish().or(z.literal('')),
   content: z.string().min(1),
-  rating: z.coerce.number().min(1).max(5).optional(),
+  rating: z.coerce.number().min(1).max(5).nullish(),
   approved: z.boolean().optional(),
-  display_order: z.coerce.number().int().optional(),
+  display_order: z.coerce.number().int().nullish(),
 });
 
 export async function GET() {

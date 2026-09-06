@@ -5,8 +5,8 @@ import { z } from 'zod';
 const listSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
-  action: z.string().optional(),
-  resource_type: z.string().optional(),
+  action: z.string().nullish(),
+  resource_type: z.string().nullish(),
 });
 
 // GET /api/admin/activity-log - List activity log entries
@@ -30,11 +30,14 @@ export async function GET(request: Request) {
 
   try {
     const { searchParams } = new URL(request.url);
+    // searchParams.get() returns null for a missing param, and Zod's
+    // .default() only fires on undefined — so null would coerce to 0 and fail
+    // min(1). Normalise to undefined before validating.
     const validated = listSchema.parse({
-      page: searchParams.get('page'),
-      limit: searchParams.get('limit'),
-      action: searchParams.get('action'),
-      resource_type: searchParams.get('resource_type'),
+      page: searchParams.get('page') ?? undefined,
+      limit: searchParams.get('limit') ?? undefined,
+      action: searchParams.get('action') ?? undefined,
+      resource_type: searchParams.get('resource_type') ?? undefined,
     });
 
     const { page, limit, action, resource_type } = validated;
