@@ -282,9 +282,17 @@ export default function BlogsPage() {
         throw new Error(data.error || 'Failed to save blog');
       }
 
+      // A draft is deliberately hidden from /blog. Say so explicitly —
+      // "created successfully" followed by an empty public blog is the
+      // single most confusing thing this screen can do.
+      const savedAsDraft = !formData.published;
       toast(
-        isEditing ? 'Blog post updated successfully' : 'Blog post created successfully',
-        'success'
+        savedAsDraft
+          ? 'Saved as draft — tick "Published" to make it visible on /blog'
+          : isEditing
+            ? 'Blog post updated — live on /blog'
+            : 'Blog post published — live on /blog',
+        savedAsDraft ? 'warning' : 'success'
       );
       closeModal();
       fetchBlogs();
