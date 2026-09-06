@@ -3,9 +3,6 @@
 import { useState } from 'react';
 import { Star, Send } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
-import { pageMetadata } from '@/lib/metadata';
-
-export const generateMetadata = () => pageMetadata({ title: 'Feedback', path: '/feedback' });
 
 export default function FeedbackPage() {
   const { toast } = useToast();

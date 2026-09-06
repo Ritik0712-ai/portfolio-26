@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ritik.dev';
+// Fallback must be a domain we actually own. `www` is currently canonical:
+// Vercel serves apex as a 308 redirect to www. If that flips, change this and
+// NEXT_PUBLIC_SITE_URL together.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.ritikagarwal.me';
 export { siteUrl };
 const siteName = 'Ritik Agarwal Portfolio';
 const defaultTitle = 'Ritik Agarwal | Product-Minded Engineer';

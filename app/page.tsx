@@ -13,9 +13,6 @@ import Stats from '@/components/Stats';
 import Testimonials from '@/components/Testimonials';
 import Timeline from '@/components/Timeline';
 import NewsletterSignup from '@/components/NewsletterSignup';
-import { pageMetadata } from '@/lib/metadata';
-
-export const generateMetadata = () => pageMetadata({ title: undefined });
 
 export default function Home() {
   return (

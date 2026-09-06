@@ -2,9 +2,6 @@
 
 import GitHubTracker from '@/components/GitHubTracker';
 import { Github } from 'lucide-react';
-import { pageMetadata } from '@/lib/metadata';
-
-export const generateMetadata = () => pageMetadata({ title: 'GitHub', path: '/github' });
 
 export default function GitHubPage() {
   return (

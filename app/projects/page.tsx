@@ -6,9 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ProjectFilter from '@/components/ProjectFilter';
 import type { Project } from '@/types';
-import { pageMetadata } from '@/lib/metadata';
-
-export const generateMetadata = () => pageMetadata({ title: 'Projects', path: '/projects' });
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);

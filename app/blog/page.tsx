@@ -4,9 +4,6 @@ import { useState, useEffect } from 'react';
 import { Clock, Calendar, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { pageMetadata } from '@/lib/metadata';
-
-export const generateMetadata = () => pageMetadata({ title: 'Notes & Reflections', path: '/blog' });
 
 interface BlogPost {
   id: string;
