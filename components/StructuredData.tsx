@@ -1,3 +1,5 @@
+import { siteUrl } from '@/lib/metadata';
+
 interface StructuredDataProps {
   type: 'person' | 'blog' | 'website';
   data: Record<string, unknown>;
@@ -11,7 +13,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           '@context': 'https://schema.org',
           '@type': 'Person',
           name: data.name || 'Ritik Agarwal',
-          url: data.url || 'https://ritik.dev',
+          url: data.url || siteUrl,
           jobTitle: data.jobTitle || 'Product Engineer',
           description: data.description || 'Full-stack engineer focused on clean architecture and thoughtful UX.',
           sameAs: data.sameAs || [],
@@ -36,13 +38,13 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
           name: data.name || 'Ritik Agarwal',
-          url: data.url || 'https://ritik.dev',
+          url: data.url || siteUrl,
           description: data.description,
           potentialAction: {
             '@type': 'SearchAction',
             target: {
               '@type': 'EntryPoint',
-              urlTemplate: 'https://ritik.dev/blog?q={search_term_string}',
+              urlTemplate: `${siteUrl}/blog?q={search_term_string}`,
             },
             'query-input': 'required name=search_term_string',
           },

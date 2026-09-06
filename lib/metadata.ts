@@ -11,6 +11,10 @@ const defaultDescription =
   'I build dependable products from idea to production. Full-stack engineer focused on clean architecture and thoughtful UX.';
 
 export const defaultMetadata: Metadata = {
+  // Without metadataBase, Next.js emits canonical/og:url as bare relative
+  // paths. Setting it resolves them to absolute URLs, which is what crawlers
+  // want on a canonical tag.
+  metadataBase: new URL(siteUrl),
   title: {
     default: defaultTitle,
     template: '%s | Ritik Agarwal',

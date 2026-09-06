@@ -5,6 +5,7 @@ import SkipNav from '@/components/SkipNav';
 import ScrollProgress from '@/components/ScrollProgress';
 import Analytics from '@/components/Analytics';
 import StructuredData from '@/components/StructuredData';
+import { defaultMetadata, siteUrl } from '@/lib/metadata';
 import './globals.css';
 
 const dmSans = DM_Sans({
@@ -21,52 +22,10 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: {
-    default: 'Ritik Agarwal | Product-Minded Engineer',
-    template: '%s | Ritik Agarwal',
-  },
-  description:
-    'I build dependable products from idea to production. Full-stack engineer focused on clean architecture and thoughtful UX.',
-  keywords: [
-    'developer',
-    'full-stack',
-    'portfolio',
-    'product engineer',
-    'Ritik Agarwal',
-    'Next.js',
-    'React',
-  ],
-  authors: [{ name: 'Ritik Agarwal' }],
-  creator: 'Ritik Agarwal',
+  ...defaultMetadata,
   openGraph: {
-    title: 'Ritik Agarwal | Product-Minded Engineer',
-    description:
-      'I build dependable products from idea to production. Full-stack engineer focused on clean architecture and thoughtful UX.',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://ritik.dev',
-    siteName: 'Ritik Agarwal Portfolio',
-    locale: 'en_US',
-    type: 'website',
-    images: [
-      {
-        url: '/og-default.png',
-        width: 1200,
-        height: 630,
-        alt: 'Ritik Agarwal - Product-Minded Engineer',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Ritik Agarwal | Product-Minded Engineer',
-    description: 'I build dependable products from idea to production.',
-    images: ['/og-default.png'],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  alternates: {
-    canonical: '/',
+    ...defaultMetadata.openGraph!,
+    url: siteUrl,
   },
 };
 
@@ -90,11 +49,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             type="person"
             data={{
               name: 'Ritik Agarwal',
-              url: 'https://ritik.dev',
+              url: siteUrl,
               jobTitle: 'Product Engineer',
               sameAs: [
                 'https://github.com/Ritik0712-ai',
-                'https://linkedin.com/in/ritikagarwal',
+                'https://www.linkedin.com/in/ritik-agarwal-58ba012b4/',
               ],
             }}
           />
@@ -102,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             type="website"
             data={{
               name: 'Ritik Agarwal Portfolio',
-              url: 'https://ritik.dev',
+              url: siteUrl,
             }}
           />
         </ThemeProvider>

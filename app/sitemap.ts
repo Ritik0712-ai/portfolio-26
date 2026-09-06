@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { siteUrl } from '@/lib/metadata';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://ritik.dev'
+  const baseUrl = siteUrl
 
   const staticPages = [
     {

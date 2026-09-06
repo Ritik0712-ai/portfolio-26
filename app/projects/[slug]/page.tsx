@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import ProjectDetailClient from './ProjectDetailClient';
+import { siteUrl } from '@/lib/metadata';
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: project.title,
       description: project.short_description || undefined,
-      url: `https://ritik.dev${canonical}`,
+      url: `${siteUrl}${canonical}`,
       siteName: 'Ritik Agarwal Portfolio',
       locale: 'en_US',
       type: 'website',

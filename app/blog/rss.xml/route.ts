@@ -1,9 +1,10 @@
 import { MetadataRoute } from 'next'
+import { siteUrl } from '@/lib/metadata';
 
 export const dynamic = 'force-static'
 
 export async function GET(): Promise<Response> {
-  const baseUrl = 'https://ritik.dev'
+  const baseUrl = siteUrl
   let rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>

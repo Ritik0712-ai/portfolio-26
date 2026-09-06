@@ -12,6 +12,7 @@ import type { Components } from 'react-markdown';
 import TableOfContents from '@/components/TableOfContents';
 import SocialShare from '@/components/SocialShare';
 import StructuredData from '@/components/StructuredData';
+import { siteUrl } from '@/lib/metadata';
 
 interface BlogPost {
   slug: string;
@@ -78,7 +79,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
     } catch { return dateStr; }
   };
 
-  const blogPostUrl = `https://ritik.dev/blog/${post.slug}`;
+  const blogPostUrl = `${siteUrl}/blog/${post.slug}`;
 
   const markdownComponents: Components = {
     h1: ({ children }) => <h1 className="font-display text-3xl font-semibold text-text-primary mt-10 mb-4">{children}</h1>,
