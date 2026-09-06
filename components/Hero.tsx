@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowRight, BookOpen, Download } from 'lucide-react';
+import PhotoCarousel from './PhotoCarousel';
 
 const roles = ['Product Engineer', 'Full-Stack Developer', 'Builder'];
 
@@ -70,21 +70,9 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right: Portrait */}
+          {/* Right: Portrait Carousel */}
           <div className="relative flex justify-center md:justify-end">
-            <div className="relative w-72 h-72 md:w-80 md:h-80">
-              <div className="absolute inset-0 border border-border rounded transform rotate-3" />
-              <div className="absolute inset-0 border border-border rounded transform -rotate-2" />
-              <div className="relative w-full h-full rounded overflow-hidden bg-bg-secondary">
-                <Image
-                  src="/profile.jpg"
-                  alt="Ritik Agarwal"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-            </div>
+            <PhotoCarousel interval={2000} />
           </div>
         </div>
 
