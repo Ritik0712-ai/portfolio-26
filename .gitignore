@@ -57,3 +57,8 @@ supabase/.temp/
 
 # Claude Code local settings
 .claude/
+
+# ...but everything in public/ is a shipped site asset, not a stray
+# local file. Without this, public/profile.jpg and public/resume.pdf
+# are excluded by the *.jpg / *.pdf rules above and never deploy.
+!public/**
