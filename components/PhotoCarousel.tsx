@@ -39,6 +39,10 @@ export default function PhotoCarousel({ interval = 2000 }: PhotoCarouselProps) {
             src={src}
             alt={`Photo ${index + 1}`}
             fill
+            // Without `sizes`, `fill` assumes the image spans the viewport and
+            // Next.js requests the 3840px variant — for a box that renders at
+            // 320px. This keeps it to the 384px variant.
+            sizes="(min-width: 768px) 320px, 288px"
             className="object-cover"
             priority={index === 0}
           />
