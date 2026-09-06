@@ -7,9 +7,25 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const featured = searchParams.get('featured');
+    const slug = searchParams.get('slug');
     // BlogPreview on the homepage requests ?limit=3; without this it was
     // silently ignored and the homepage listed every published post.
     const limit = searchParams.get('limit');
+
+    // app/blog/[slug]/page.tsx fetches /api/blogs?slug=... and reads
+    // data.blog (singular). Without this branch the slug was ignored, the
+    // route returned the full { blogs: [...] } list, data.blog was always
+    // undefined, and every post rendered "Post Not Found".
+    if (slug) {
+      const { data, error } = await supabase
+        .from('blogs')
+        .select('*')
+        .eq('slug', slug)
+        .eq('published', true)
+        .maybeSingle();
+      if (error) throw error;
+      return NextResponse.json({ blog: data });
+    }
 
     let query = supabase
       .from('blogs')
