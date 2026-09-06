@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Plus, Edit2, Trash2, ExternalLink, Github, Star, Calendar, ArrowUpDown } from 'lucide-react';
+import { Plus, Edit2, Trash2, ExternalLink, Github, Star, Calendar, ArrowUpDown, CheckSquare, Square, Trash2 as BulkDelete } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input, Textarea } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
@@ -106,6 +106,12 @@ export default function ProjectsPage() {
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Bulk operations state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState<'publish' | 'unpublish' | 'delete'>('publish');
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -312,6 +318,63 @@ export default function ProjectsPage() {
     }
   };
 
+  // Bulk operations
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredProjects.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredProjects.map((p) => p.id)));
+    }
+  };
+
+  const handleBulkAction = async () => {
+    if (selectedIds.size === 0) return;
+
+    setBulkProcessing(true);
+    try {
+      const res = await fetch('/api/admin/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'projects',
+          action: bulkAction,
+          ids: Array.from(selectedIds),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Bulk action failed');
+      }
+
+      toast(`Successfully ${bulkAction === 'delete' ? 'deleted' : bulkAction === 'publish' ? 'published' : 'unpublished'} ${data.affected} project(s)`, 'success');
+      setSelectedIds(new Set());
+      setShowBulkConfirm(false);
+      fetchProjects();
+    } catch {
+      toast('Bulk action failed', 'error');
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    setBulkAction('delete');
+    await handleBulkAction();
+  };
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -353,6 +416,43 @@ export default function ProjectsPage() {
           ))}
         </div>
 
+        {/* Bulk Actions Toolbar */}
+        {selectedIds.size > 0 && (
+          <div className="flex items-center justify-between p-3 bg-accent/10 border border-accent/20 rounded-lg mb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-body font-medium text-accent">
+                {selectedIds.size} selected
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <select
+                value={bulkAction}
+                onChange={(e) => setBulkAction(e.target.value as 'publish' | 'unpublish' | 'delete')}
+                className="text-sm font-body bg-surface border border-border rounded px-2 py-1 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
+              >
+                <option value="publish">Publish</option>
+                <option value="unpublish">Unpublish</option>
+                <option value="delete">Delete</option>
+              </select>
+              <Button
+                variant={bulkAction === 'delete' ? 'danger' : 'primary'}
+                size="sm"
+                onClick={bulkAction === 'delete' ? () => setShowBulkConfirm(true) : handleBulkAction}
+                loading={bulkProcessing}
+              >
+                {bulkAction === 'delete' ? 'Delete Selected' : bulkAction === 'publish' ? 'Publish Selected' : 'Unpublish Selected'}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedIds(new Set())}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Projects List */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
@@ -367,6 +467,19 @@ export default function ProjectsPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border bg-bg-secondary">
+                  <th className="px-4 py-3 text-left text-xs font-body font-semibold text-text-muted uppercase tracking-wider w-10">
+                    <button
+                      onClick={toggleSelectAll}
+                      className="p-0.5 hover:bg-bg-secondary rounded transition-colors"
+                      title={selectedIds.size === filteredProjects.length ? 'Deselect all' : 'Select all'}
+                    >
+                      {selectedIds.size === filteredProjects.length && filteredProjects.length > 0 ? (
+                        <CheckSquare className="w-4 h-4 text-accent" />
+                      ) : (
+                        <Square className="w-4 h-4 text-text-muted" />
+                      )}
+                    </button>
+                  </th>
                   <th className="px-4 py-3 text-left text-xs font-body font-semibold text-text-muted uppercase tracking-wider">
                     Project
                   </th>
@@ -389,7 +502,19 @@ export default function ProjectsPage() {
               </thead>
               <tbody className="divide-y divide-border">
                 {filteredProjects.map((project) => (
-                  <tr key={project.id} className="hover:bg-bg-secondary/50 transition-colors">
+                  <tr key={project.id} className={`hover:bg-bg-secondary/50 transition-colors ${selectedIds.has(project.id) ? 'bg-accent/5' : ''}`}>
+                    <td className="px-4 py-4">
+                      <button
+                        onClick={() => toggleSelect(project.id)}
+                        className="p-0.5 hover:bg-bg-secondary rounded transition-colors"
+                      >
+                        {selectedIds.has(project.id) ? (
+                          <CheckSquare className="w-4 h-4 text-accent" />
+                        ) : (
+                          <Square className="w-4 h-4 text-text-muted" />
+                        )}
+                      </button>
+                    </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
                         {project.cover_image && (
@@ -797,6 +922,23 @@ export default function ProjectsPage() {
           </Button>
         </div>
       </Modal>
+
+      {/* Bulk Delete Confirmation */}
+      <ConfirmDialog
+        open={showBulkConfirm}
+        onClose={() => setShowBulkConfirm(false)}
+        onConfirm={handleBulkDelete}
+        title="Bulk Delete Projects"
+        message={
+          <div className="space-y-2">
+            <p>Are you sure you want to delete <strong className="text-text-primary">{selectedIds.size} project(s)</strong>?</p>
+            <p className="text-xs text-text-faint">This action cannot be undone.</p>
+          </div>
+        }
+        confirmLabel="Delete Selected"
+        confirmVariant="danger"
+        loading={bulkProcessing}
+      />
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog

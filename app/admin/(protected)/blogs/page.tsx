@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, Search, Edit2, Eye, Trash2, Star, Calendar, Clock, X } from 'lucide-react';
+import { Plus, Search, Edit2, Eye, Trash2, Star, Calendar, Clock, X, CheckSquare, Square, Trash2 as BulkDelete } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
@@ -156,6 +156,12 @@ export default function BlogsPage() {
   // Delete confirmation state
   const [deleteTarget, setDeleteTarget] = useState<BlogPost | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Bulk operations state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState<'publish' | 'unpublish' | 'delete'>('publish');
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
 
   // Fetch blogs
   const fetchBlogs = useCallback(async () => {
@@ -327,6 +333,63 @@ export default function BlogsPage() {
     }
   };
 
+  // Bulk operations
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredBlogs.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredBlogs.map((b) => String(b.id))));
+    }
+  };
+
+  const handleBulkAction = async () => {
+    if (selectedIds.size === 0) return;
+
+    setBulkProcessing(true);
+    try {
+      const res = await fetch('/api/admin/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'blogs',
+          action: bulkAction,
+          ids: Array.from(selectedIds),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Bulk action failed');
+      }
+
+      toast(`Successfully ${bulkAction === 'delete' ? 'deleted' : bulkAction === 'publish' ? 'published' : 'unpublished'} ${data.affected} blog(s)`, 'success');
+      setSelectedIds(new Set());
+      setShowBulkConfirm(false);
+      fetchBlogs();
+    } catch {
+      toast('Bulk action failed', 'error');
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    setBulkAction('delete');
+    await handleBulkAction();
+  };
+
   // Preview URL
   const previewUrl = editingPost?.slug ? `/blog/${editingPost.slug}` : null;
 
@@ -427,6 +490,43 @@ export default function BlogsPage() {
         </div>
       </div>
 
+      {/* Bulk Actions Toolbar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center justify-between p-3 bg-accent/10 border border-accent/20 rounded-lg mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-body font-medium text-accent">
+              {selectedIds.size} selected
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <select
+              value={bulkAction}
+              onChange={(e) => setBulkAction(e.target.value as 'publish' | 'unpublish' | 'delete')}
+              className="text-sm font-body bg-surface border border-border rounded px-2 py-1 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
+            >
+              <option value="publish">Publish</option>
+              <option value="unpublish">Unpublish</option>
+              <option value="delete">Delete</option>
+            </select>
+            <Button
+              variant={bulkAction === 'delete' ? 'danger' : 'primary'}
+              size="sm"
+              onClick={bulkAction === 'delete' ? () => setShowBulkConfirm(true) : handleBulkAction}
+              loading={bulkProcessing}
+            >
+              {bulkAction === 'delete' ? 'Delete Selected' : bulkAction === 'publish' ? 'Publish Selected' : 'Unpublish Selected'}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedIds(new Set())}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Blog List */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
@@ -441,6 +541,19 @@ export default function BlogsPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border bg-bg-secondary">
+                <th className="text-left px-4 py-3 text-xs font-body font-semibold text-text-muted uppercase tracking-wide w-10">
+                  <button
+                    onClick={toggleSelectAll}
+                    className="p-0.5 hover:bg-bg-secondary rounded transition-colors"
+                    title={selectedIds.size === filteredBlogs.length ? 'Deselect all' : 'Select all'}
+                  >
+                    {selectedIds.size === filteredBlogs.length && filteredBlogs.length > 0 ? (
+                      <CheckSquare className="w-4 h-4 text-accent" />
+                    ) : (
+                      <Square className="w-4 h-4 text-text-muted" />
+                    )}
+                  </button>
+                </th>
                 <th className="text-left px-4 py-3 text-xs font-body font-semibold text-text-muted uppercase tracking-wide">
                   Post
                 </th>
@@ -466,16 +579,26 @@ export default function BlogsPage() {
             </thead>
             <tbody className="divide-y divide-border">
               {filteredBlogs.map((blog) => (
-                <tr key={blog.id} className="hover:bg-bg-secondary/50 transition-colors">
+                <tr key={blog.id} className={`hover:bg-bg-secondary/50 transition-colors ${selectedIds.has(String(blog.id)) ? 'bg-accent/5' : ''}`}>
                   <td className="px-4 py-4">
-                    <div>
-                      <p className="font-body font-medium text-text-primary line-clamp-1">
-                        {blog.title}
-                      </p>
-                      <p className="text-xs text-text-muted mt-0.5">
-                        /{blog.slug}
-                      </p>
-                    </div>
+                    <button
+                      onClick={() => toggleSelect(String(blog.id))}
+                      className="p-0.5 hover:bg-bg-secondary rounded transition-colors"
+                    >
+                      {selectedIds.has(String(blog.id)) ? (
+                        <CheckSquare className="w-4 h-4 text-accent" />
+                      ) : (
+                        <Square className="w-4 h-4 text-text-muted" />
+                      )}
+                    </button>
+                  </td>
+                  <td className="px-4 py-4">
+                    <p className="font-body font-medium text-text-primary line-clamp-1">
+                      {blog.title}
+                    </p>
+                    <p className="text-xs text-text-muted mt-0.5">
+                      /{blog.slug}
+                    </p>
                   </td>
                   <td className="px-4 py-4">
                     <Badge
@@ -788,6 +911,22 @@ export default function BlogsPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Bulk Delete Confirmation */}
+      <ConfirmDialog
+        open={showBulkConfirm}
+        onClose={() => setShowBulkConfirm(false)}
+        onConfirm={handleBulkDelete}
+        title="Bulk Delete Blog Posts"
+        message={
+          <span>
+            Are you sure you want to delete <strong className="text-text-primary">{selectedIds.size} blog post(s)</strong>? This action cannot be undone.
+          </span>
+        }
+        confirmLabel="Delete Selected"
+        confirmVariant="danger"
+        loading={bulkProcessing}
+      />
 
       {/* Delete Confirmation */}
       <ConfirmDialog

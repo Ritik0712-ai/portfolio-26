@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, Check, X, Eye, EyeOff } from 'lucide-react';
+import { Plus, Pencil, Trash2, Check, X, Eye, EyeOff, CheckSquare, Square } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input, Textarea } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
-import { Modal } from '@/components/ui/Modal';
+import { Modal, ConfirmDialog } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 
 interface Testimonial {
@@ -31,6 +31,12 @@ export default function TestimonialsAdminPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', role: '', company: '', avatar: '', content: '', rating: '5', approved: false });
   const [saving, setSaving] = useState(false);
+
+  // Bulk operations state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState<'approve' | 'delete'>('approve');
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
 
   useEffect(() => { fetchTestimonials(); }, []);
 
@@ -95,6 +101,65 @@ export default function TestimonialsAdminPage() {
     else toast('Failed to update', 'error');
   };
 
+  // Bulk operations
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filtered.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((t) => t.id)));
+    }
+  };
+
+  const handleBulkAction = async () => {
+    if (selectedIds.size === 0) return;
+
+    setBulkProcessing(true);
+    try {
+      if (bulkAction === 'approve') {
+        // Approve all selected
+        const promises = Array.from(selectedIds).map((id) =>
+          fetch(`/api/admin/testimonials?id=${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ approved: true }),
+          })
+        );
+        await Promise.all(promises);
+        toast(`Approved ${selectedIds.size} testimonial(s)`, 'success');
+      } else if (bulkAction === 'delete') {
+        const res = await fetch('/api/admin/bulk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'testimonials',
+            action: 'delete',
+            ids: Array.from(selectedIds),
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Bulk action failed');
+        toast(`Deleted ${data.affected} testimonial(s)`, 'success');
+      }
+
+      setSelectedIds(new Set());
+      setShowBulkConfirm(false);
+      fetchTestimonials();
+    } catch {
+      toast('Bulk action failed', 'error');
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
   return (
     <div className="p-8">
       <div className="flex items-center justify-between mb-8">
@@ -115,6 +180,42 @@ export default function TestimonialsAdminPage() {
         ))}
       </div>
 
+      {/* Bulk Actions Toolbar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center justify-between p-3 bg-accent/10 border border-accent/20 rounded-lg mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-body font-medium text-accent">
+              {selectedIds.size} selected
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <select
+              value={bulkAction}
+              onChange={(e) => setBulkAction(e.target.value as 'approve' | 'delete')}
+              className="text-sm font-body bg-surface border border-border rounded px-2 py-1 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
+            >
+              <option value="approve">Approve</option>
+              <option value="delete">Delete</option>
+            </select>
+            <Button
+              variant={bulkAction === 'delete' ? 'danger' : 'primary'}
+              size="sm"
+              onClick={bulkAction === 'delete' ? () => setShowBulkConfirm(true) : handleBulkAction}
+              loading={bulkProcessing}
+            >
+              {bulkAction === 'delete' ? 'Delete Selected' : 'Approve Selected'}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedIds(new Set())}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="text-text-muted py-12 text-center">Loading…</div>
       ) : filtered.length === 0 ? (
@@ -124,22 +225,38 @@ export default function TestimonialsAdminPage() {
       ) : (
         <div className="space-y-4">
           {filtered.map(t => (
-            <div key={t.id} className="bg-surface border border-border rounded-lg p-6">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="font-body font-medium text-text-primary">{t.name}</span>
-                    {t.role && <span className="text-sm text-text-muted">{t.role}{t.company ? ` at ${t.company}` : ''}</span>}
-                    <Badge variant={t.approved ? 'success' : 'warning'}>{t.approved ? 'Approved' : 'Pending'}</Badge>
-                  </div>
-                  <p className="text-sm text-text-secondary line-clamp-2">{t.content}</p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button onClick={() => toggleApproved(t)} className={`p-1.5 rounded transition-colors ${t.approved ? 'text-success' : 'text-text-muted hover:text-success'}`} title={t.approved ? 'Approved — click to unapprove' : 'Approve'}>
-                    <Check className="w-4 h-4" />
+            <div key={t.id} className={`bg-surface border border-border rounded-lg p-6 ${selectedIds.has(t.id) ? 'bg-accent/5 border-accent/30' : ''}`}>
+              <div className="flex items-start gap-4">
+                <div className="pt-1">
+                  <button
+                    onClick={() => toggleSelect(t.id)}
+                    className="p-0.5 hover:bg-bg-secondary rounded transition-colors"
+                  >
+                    {selectedIds.has(t.id) ? (
+                      <CheckSquare className="w-4 h-4 text-accent" />
+                    ) : (
+                      <Square className="w-4 h-4 text-text-muted" />
+                    )}
                   </button>
-                  <button onClick={() => openEdit(t)} className="p-1.5 text-text-muted hover:text-text-primary transition-colors"><Pencil className="w-4 h-4" /></button>
-                  <button onClick={() => setDeleteId(t.id)} className="p-1.5 text-text-muted hover:text-error transition-colors"><Trash2 className="w-4 h-4" /></button>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="font-body font-medium text-text-primary">{t.name}</span>
+                        {t.role && <span className="text-sm text-text-muted">{t.role}{t.company ? ` at ${t.company}` : ''}</span>}
+                        <Badge variant={t.approved ? 'success' : 'warning'}>{t.approved ? 'Approved' : 'Pending'}</Badge>
+                      </div>
+                      <p className="text-sm text-text-secondary line-clamp-2">{t.content}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button onClick={() => toggleApproved(t)} className={`p-1.5 rounded transition-colors ${t.approved ? 'text-success' : 'text-text-muted hover:text-success'}`} title={t.approved ? 'Approved — click to unapprove' : 'Approve'}>
+                        <Check className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => openEdit(t)} className="p-1.5 text-text-muted hover:text-text-primary transition-colors"><Pencil className="w-4 h-4" /></button>
+                      <button onClick={() => setDeleteId(t.id)} className="p-1.5 text-text-muted hover:text-error transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -169,6 +286,23 @@ export default function TestimonialsAdminPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Bulk Delete Confirmation */}
+      <ConfirmDialog
+        open={showBulkConfirm}
+        onClose={() => setShowBulkConfirm(false)}
+        onConfirm={handleBulkAction}
+        title="Bulk Delete Testimonials"
+        message={
+          <div className="space-y-2">
+            <p>Are you sure you want to delete <strong className="text-text-primary">{selectedIds.size} testimonial(s)</strong>?</p>
+            <p className="text-xs text-text-faint">This action cannot be undone.</p>
+          </div>
+        }
+        confirmLabel="Delete Selected"
+        confirmVariant="danger"
+        loading={bulkProcessing}
+      />
 
       {/* Delete */}
       <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="Delete Testimonial?" size="sm">

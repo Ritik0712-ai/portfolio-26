@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import ProjectFilter from './ProjectFilter';
 import type { Project } from '@/types';
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
   useEffect(() => {
     fetch('/api/projects?featured=true')
@@ -15,6 +17,10 @@ export default function Projects() {
       .then((d) => setProjects(d.projects || []))
       .catch(() => {});
   }, []);
+
+  const filteredProjects = activeCategory === 'all'
+    ? projects
+    : projects.filter((p) => p.technologies?.includes(activeCategory));
 
   return (
     <section id="projects" className="py-20">
@@ -30,15 +36,20 @@ export default function Projects() {
           </Link>
         </div>
 
+        {/* Filter + Search */}
+        <div className="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <ProjectFilter projects={projects} activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
+        </div>
+
         {/* Projects grid */}
-        {projects.length === 0 ? (
+        {filteredProjects.length === 0 ? (
           <p className="text-text-muted font-body text-sm py-12 text-center border border-dashed border-border rounded-lg">
-            No featured projects yet. <Link href="/admin" className="text-accent hover:underline">Add some →</Link>
+            No projects match this filter.
           </p>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
-            {projects.map((project) => (
-              <article key={project.id} className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-rule transition-colors">
+            {filteredProjects.map((project) => (
+              <article key={project.id} className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-accent/30 transition-all duration-slow hover:shadow-lg hover:shadow-accent/5">
                 {/* Cover image */}
                 {project.cover_image ? (
                   <div className="aspect-video overflow-hidden bg-bg-secondary">
