@@ -33,7 +33,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name, message, and slug are required' }, { status: 400 })
     }
 
-    const { data, error } = await supabase
+    // No .select() here — `anon` has no SELECT policy on `comments` for
+    // unapproved rows, so a RETURNING clause fails with 42501.
+    const { error } = await supabase
       .from('comments')
       .insert([{
         name,
@@ -43,11 +45,9 @@ export async function POST(request: NextRequest) {
         approved: false, // Comments require approval
         created_at: new Date().toISOString()
       }])
-      .select()
-      .single()
     
     if (error) throw error
-    return NextResponse.json({ success: true, comment: data })
+    return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error creating comment:', error)
     return NextResponse.json({ error: 'Failed to create comment' }, { status: 500 })

@@ -25,10 +25,10 @@ export default function BlogComments({ blogSlug }: { blogSlug: string }) {
     if (!name.trim() || !content.trim()) return;
     setSubmitting(true);
 
-    const res = await fetch('/api/feedback', {
+    const res = await fetch('/api/comments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ blog_slug: blogSlug, author: name, content, type: 'comment' }),
+      body: JSON.stringify({ slug: blogSlug, name, message: content }),
     });
 
     if (res.ok) {
