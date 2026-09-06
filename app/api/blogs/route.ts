@@ -7,6 +7,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const featured = searchParams.get('featured');
+    // BlogPreview on the homepage requests ?limit=3; without this it was
+    // silently ignored and the homepage listed every published post.
+    const limit = searchParams.get('limit');
 
     let query = supabase
       .from('blogs')
@@ -19,6 +22,11 @@ export async function GET(request: NextRequest) {
     }
     if (featured === 'true') {
       query = query.eq('featured', true);
+    }
+
+    if (limit) {
+      const n = Number.parseInt(limit, 10);
+      if (Number.isFinite(n) && n > 0) query = query.limit(n);
     }
 
     const { data: blogs, error } = await query;
