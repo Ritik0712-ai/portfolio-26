@@ -1,27 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import ProjectFilter from '@/components/ProjectFilter';
+import type { Project } from '@/types';
+import { pageMetadata } from '@/lib/metadata';
 
-interface Project {
-  id: string;
-  slug: string;
-  title: string;
-  short_description: string | null;
-  cover_image: string | null;
-  technologies: string[];
-  demo_url: string | null;
-  repo_url: string | null;
-  featured: boolean;
-  created_at: string;
-}
+export const generateMetadata = () => pageMetadata({ title: 'Projects', path: '/projects' });
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>('All');
 
   useEffect(() => {
     fetchProjects();
@@ -31,7 +25,10 @@ export default function ProjectsPage() {
     try {
       const res = await fetch('/api/projects');
       const data = await res.json();
-      if (data.projects) setProjects(data.projects);
+      if (data.projects) {
+        setProjects(data.projects);
+        setFilteredProjects(data.projects);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -39,10 +36,21 @@ export default function ProjectsPage() {
     }
   };
 
-  const filtered = projects.filter((p) =>
-    p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.short_description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Apply category and search filters
+  const displayed = useMemo(() => {
+    let result = projects;
+    if (activeCategory) {
+      result = result.filter(p => p.technologies?.includes(activeCategory));
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(p =>
+        p.title.toLowerCase().includes(q) ||
+        p.short_description?.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [projects, activeCategory, searchQuery]);
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
@@ -56,6 +64,15 @@ export default function ProjectsPage() {
           <p className="text-text-secondary mt-3 max-w-xl">
             Selected work in product engineering, full-stack development, and open source.
           </p>
+        </div>
+
+        {/* Category Filter */}
+        <div className="mb-6">
+          <ProjectFilter
+            projects={projects}
+            activeCategory={activeCategory}
+            onCategoryChange={setActiveCategory}
+          />
         </div>
 
         {/* Search */}
@@ -74,11 +91,11 @@ export default function ProjectsPage() {
               <div key={i} className="bg-surface border border-border rounded-lg h-64 animate-pulse" />
             ))}
           </div>
-        ) : filtered.length === 0 ? (
+        ) : displayed.length === 0 ? (
           <div className="text-center py-16 text-text-muted">No projects found.</div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
-            {filtered.map((project) => (
+            {displayed.map((project) => (
               <article
                 key={project.id}
                 className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-rule transition-colors"
@@ -89,6 +106,8 @@ export default function ProjectsPage() {
                       src={project.cover_image}
                       alt={project.title}
                       fill
+                      placeholder="blur"
+                      blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect fill='%23EFEBE3' width='640' height='360'/%3E%3C/svg%3E"
                       className="object-cover group-hover:scale-105 transition-transform duration-slow"
                     />
                   </div>

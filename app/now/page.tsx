@@ -2,6 +2,9 @@
 
 import { motion } from 'framer-motion';
 import { Code, Book, Lightbulb, Target, Calendar } from 'lucide-react';
+import { pageMetadata } from '@/lib/metadata';
+
+export const generateMetadata = () => pageMetadata({ title: '/now', path: '/now' });
 
 const nowData = {
   lastUpdated: 'January 2024',

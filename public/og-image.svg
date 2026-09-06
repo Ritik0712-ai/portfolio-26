@@ -13,7 +13,7 @@
   <circle cx="200" cy="150" r="100" fill="#7c3aed" opacity="0.3"/>
   <circle cx="1000" cy="500" r="150" fill="#ec4899" opacity="0.2"/>
   <text x="600" y="250" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="url(#text)" text-anchor="middle">Ritik Agarwal</text>
-  <text x="600" y="340" font-family="Arial, sans-serif" font-size="36" fill="#9ca3af" text-anchor="middle">Developer & Builder</text>
+  <text x="600" y="340" font-family="Arial, sans-serif" font-size="36" fill="#9ca3af" text-anchor="middle">Developer &amp; Builder</text>
   <text x="600" y="420" font-family="Arial, sans-serif" font-size="24" fill="#6b7280" text-anchor="middle">Building products that solve problems I actually have</text>
   <rect x="450" y="470" width="300" height="60" rx="30" fill="url(#text)"/>
   <text x="600" y="510" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">ritikagarwal.dev</text>

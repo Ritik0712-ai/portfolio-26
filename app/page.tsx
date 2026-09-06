@@ -12,11 +12,15 @@ import BackToTop from '@/components/BackToTop';
 import Stats from '@/components/Stats';
 import Testimonials from '@/components/Testimonials';
 import Timeline from '@/components/Timeline';
+import NewsletterSignup from '@/components/NewsletterSignup';
+import { pageMetadata } from '@/lib/metadata';
+
+export const generateMetadata = () => pageMetadata({ title: undefined });
 
 export default function Home() {
   return (
     <>
-      <main className="min-h-screen">
+      <main id="main-content" className="min-h-screen">
         <NavBar />
         <Hero />
         <Stats />
@@ -27,6 +31,7 @@ export default function Home() {
         <Testimonials />
         <BlogPreview />
         <Contact />
+        <NewsletterSignup variant="compact" />
         <Footer />
       </main>
       <BackToTop />

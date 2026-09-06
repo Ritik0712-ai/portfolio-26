@@ -2,6 +2,9 @@
 
 import { Download, ExternalLink, Mail } from 'lucide-react';
 import Link from 'next/link';
+import { pageMetadata } from '@/lib/metadata';
+
+export const generateMetadata = () => pageMetadata({ title: 'Resume', path: '/resume' });
 
 export default function ResumePage() {
   return (

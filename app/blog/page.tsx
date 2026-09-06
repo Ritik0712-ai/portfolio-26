@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { Clock, Calendar, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { pageMetadata } from '@/lib/metadata';
+
+export const generateMetadata = () => pageMetadata({ title: 'Notes & Reflections', path: '/blog' });
 
 interface BlogPost {
   id: string;
@@ -119,6 +122,8 @@ export default function BlogPage() {
                       src={post.cover_image}
                       alt={post.title}
                       fill
+                      placeholder="blur"
+                      blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect fill='%23EFEBE3' width='640' height='360'/%3E%3C/svg%3E"
                       className="object-cover"
                     />
                   </div>
