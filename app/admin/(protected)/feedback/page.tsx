@@ -64,7 +64,11 @@ export default function FeedbackAdminPage() {
       body: JSON.stringify({ feedbackId: f.id, name: f.name, role: f.role, company: f.company, content: f.content, rating: f.rating, approved: false }),
     });
     if (res.ok) { toast('Converted to testimonial', 'success'); fetchFeedback(); }
-    else toast('Failed to convert', 'error');
+    else {
+      // Surface the API's message — it names the offending field on a 400.
+      const body = await res.json().catch(() => ({}));
+      toast(body.error ? `Failed to convert — ${body.error}` : 'Failed to convert', 'error');
+    }
   };
 
   const handleDelete = async () => {

@@ -21,13 +21,16 @@ export async function GET() {
   }
 }
 
+// `feedback` stores role/company/rating as nullable, and the admin UI forwards
+// those values as-is. z.string().optional() accepts undefined but REJECTS null,
+// so these must be .nullish() or every conversion 400s on a blank company.
 const testimonialSchema = z.object({
   name: z.string().min(1),
-  role: z.string().optional(),
-  company: z.string().optional(),
-  avatar: z.string().optional(),
+  role: z.string().nullish(),
+  company: z.string().nullish(),
+  avatar: z.string().nullish(),
   content: z.string().min(1),
-  rating: z.coerce.number().optional(),
+  rating: z.coerce.number().nullish(),
 });
 
 export async function POST(request: NextRequest) {
@@ -39,13 +42,20 @@ export async function POST(request: NextRequest) {
     const parsed = testimonialSchema.parse(body);
     const supabase = await createClient();
 
-    // Mark feedback as reviewed if provided
-    if (body.feedbackId) {
-      await supabase.from('feedback').update({ reviewed: true }).eq('id', body.feedbackId);
-    }
-
+    // Insert the testimonial FIRST. Marking the feedback reviewed beforehand
+    // meant a failed insert still burned the flag, leaving feedback marked as
+    // handled with no testimonial to show for it.
     const { data, error } = await supabase.from('testimonials').insert([parsed]).select().single();
     if (error) throw error;
+
+    if (body.feedbackId) {
+      const { error: flagError } = await supabase
+        .from('feedback')
+        .update({ reviewed: true })
+        .eq('id', body.feedbackId);
+      if (flagError) console.error('Testimonial created but feedback not marked reviewed:', flagError);
+    }
+
     return NextResponse.json({ testimonial: data });
   } catch (err) {
     if (err instanceof z.ZodError) {
