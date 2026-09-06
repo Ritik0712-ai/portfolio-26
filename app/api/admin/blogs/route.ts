@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
+import { sendNewPostEmails } from '@/lib/newsletter';
 import { z } from 'zod';
 
 const blogSchema = z.object({
@@ -116,7 +117,40 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (error) throw error;
-    return NextResponse.json({ success: true, blog: data });
+
+    // Notify subscribers the first time a post becomes publicly visible.
+    // newsletter_sent_at is the guard: without it, every subsequent edit to a
+    // published post would re-mail everyone. It is set before sending, so a
+    // double-click cannot produce two broadcasts.
+    let newsletter;
+    if (data?.published && !data.newsletter_sent_at) {
+      const { data: claimed } = await supabase
+        .from('blogs')
+        .update({ newsletter_sent_at: new Date().toISOString() })
+        .eq('id', id)
+        .is('newsletter_sent_at', null)
+        .select('id')
+        .maybeSingle();
+
+      if (claimed) {
+        const { data: subs } = await supabase
+          .from('newsletter_subscribers')
+          .select('email, unsubscribe_token')
+          .eq('confirmed', true);
+
+        if (subs?.length) {
+          newsletter = await sendNewPostEmails(
+            { title: data.title, slug: data.slug, excerpt: data.excerpt },
+            subs
+          );
+          console.log('Newsletter broadcast:', data.slug, newsletter);
+        } else {
+          newsletter = { sent: 0, failed: 0 };
+        }
+      }
+    }
+
+    return NextResponse.json({ success: true, blog: data, newsletter });
   } catch (err) {
     if (err instanceof z.ZodError) {
       const issue = err.issues[0];
