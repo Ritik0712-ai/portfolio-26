@@ -119,7 +119,10 @@ export default function ProjectsPage() {
       const res = await fetch('/api/admin/projects');
       if (!res.ok) throw new Error('Failed to fetch projects');
       const data = await res.json();
-      setProjects(data);
+      // The route returns { projects: [...] }. Assigning the whole envelope
+      // made `projects` an object, so the filter on render threw
+      // "t.filter is not a function" and the page never mounted.
+      setProjects(Array.isArray(data?.projects) ? data.projects : []);
     } catch (error) {
       toast('Failed to load projects', 'error');
     } finally {
