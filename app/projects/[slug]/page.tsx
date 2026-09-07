@@ -1,14 +1,27 @@
 import type { Metadata } from 'next';
 import ProjectDetailClient from './ProjectDetailClient';
 import { siteUrl } from '@/lib/metadata';
+import { createClient } from '@/lib/supabase/server';
 
 type PageProps = { params: Promise<{ slug: string }> };
 
+// Runs on the server, where a relative fetch('/api/...') has no origin to
+// resolve against and throws ERR_INVALID_URL. Querying Supabase directly is
+// also one network hop instead of two.
 async function getProject(slug: string) {
-  const res = await fetch(`/api/projects?slug=${encodeURIComponent(slug)}`, { next: { revalidate: 3600 } });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.project || null;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('projects')
+    .select('slug, title, short_description, cover_image')
+    .eq('slug', slug)
+    .eq('published', true)
+    .maybeSingle();
+
+  if (error) {
+    console.error('getProject failed for slug', slug, error);
+    return null;
+  }
+  return data;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

@@ -1,14 +1,27 @@
 import { Metadata } from 'next';
 import BlogPostClient from './BlogPostClient';
 import { siteUrl } from '@/lib/metadata';
+import { createClient } from '@/lib/supabase/server';
 
 type PageProps = { params: Promise<{ slug: string }> };
 
+// Same fix as the project detail page: a relative fetch has no origin to
+// resolve against on the server and throws ERR_INVALID_URL. Query Supabase
+// directly instead of the app calling its own API over the network.
 async function getBlogPost(slug: string) {
-  const res = await fetch(`/api/blogs?slug=${encodeURIComponent(slug)}`, { next: { revalidate: 3600 } });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.blog || null;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('blogs')
+    .select('slug, title, excerpt, cover_image, created_at, updated_at, tags')
+    .eq('slug', slug)
+    .eq('published', true)
+    .maybeSingle();
+
+  if (error) {
+    console.error('getBlogPost failed for slug', slug, error);
+    return null;
+  }
+  return data;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
