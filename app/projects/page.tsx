@@ -36,7 +36,11 @@ export default function ProjectsPage() {
   // Apply category and search filters
   const displayed = useMemo(() => {
     let result = projects;
-    if (activeCategory) {
+    // 'All' is the sentinel for "no filter", not a real technology name. The
+    // old check was `if (activeCategory)`, and since 'All' is a truthy string
+    // it filtered for projects whose technologies literally contained "All" —
+    // which is none of them, so the page always rendered "No projects found".
+    if (activeCategory && activeCategory !== 'All') {
       result = result.filter(p => p.technologies?.includes(activeCategory));
     }
     if (searchQuery.trim()) {

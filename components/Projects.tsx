@@ -9,7 +9,7 @@ import type { Project } from '@/types';
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeCategory, setActiveCategory] = useState<string>('All');
 
   useEffect(() => {
     fetch('/api/projects?featured=true')
@@ -18,7 +18,9 @@ export default function Projects() {
       .catch(() => {});
   }, []);
 
-  const filteredProjects = activeCategory === 'all'
+  // Must match the 'All' sentinel ProjectFilter renders. This used to compare
+  // against lowercase 'all', so clicking the All chip filtered everything out.
+  const filteredProjects = activeCategory === 'All'
     ? projects
     : projects.filter((p) => p.technologies?.includes(activeCategory));
 
