@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
+import { logActivity } from '@/lib/activity-log';
 import { z } from 'zod';
 
 const timelineSchema = z.object({
@@ -38,6 +39,9 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     const { data, error } = await supabase.from('timeline_events').insert([parsed]).select().single();
     if (error) throw error;
+    await logActivity(supabase, {
+      userId: admin.user.id, action: 'create', resourceType: 'timeline_event', resourceId: data?.id ?? null,
+    });
     return NextResponse.json({ event: data });
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -64,6 +68,9 @@ export async function PUT(request: NextRequest) {
     const supabase = await createClient();
     const { data, error } = await supabase.from('timeline_events').update(parsed).eq('id', id).select().single();
     if (error) throw error;
+    await logActivity(supabase, {
+      userId: admin.user.id, action: 'update', resourceType: 'timeline_event', resourceId: data?.id ?? null,
+    });
     return NextResponse.json({ event: data });
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -88,6 +95,9 @@ export async function DELETE(request: NextRequest) {
     const supabase = await createClient();
     const { error } = await supabase.from('timeline_events').delete().eq('id', id);
     if (error) throw error;
+    await logActivity(supabase, {
+      userId: admin.user.id, action: 'delete', resourceType: 'timeline_event', resourceId: id,
+    });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('Error deleting timeline event:', err);

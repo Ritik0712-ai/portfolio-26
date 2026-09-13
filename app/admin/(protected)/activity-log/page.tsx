@@ -5,6 +5,15 @@ import { createClient } from '@/lib/supabase/client';
 import { Activity, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
+import { ActivityBars, ActivityPie } from '@/components/admin/ActivityCharts';
+
+type Summary = {
+  total: number;
+  days: number;
+  byDay: { date: string; count: number }[];
+  byResource: { label: string; count: number }[];
+  byAction: { label: string; count: number }[];
+};
 
 interface ActivityEntry {
   id: string;
@@ -26,8 +35,18 @@ export default function AdminActivityLogPage() {
   const [filterAction, setFilterAction] = useState('');
   const [filterResource, setFilterResource] = useState('');
   const [error, setError] = useState('');
+  const [summary, setSummary] = useState<Summary | null>(null);
 
   const supabase = createClient();
+
+  const loadSummary = async () => {
+    try {
+      const res = await fetch('/api/admin/activity-log/summary');
+      if (res.ok) setSummary(await res.json());
+    } catch {
+      // Charts are supplementary — a failure here must not block the table.
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -35,6 +54,7 @@ export default function AdminActivityLogPage() {
       if (data?.user) {
         setUser(data.user);
         await loadLogs(1);
+        await loadSummary();
       } else {
         window.location.href = '/admin/login';
       }
@@ -115,6 +135,36 @@ export default function AdminActivityLogPage() {
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
+        {summary && (
+          <div className="grid lg:grid-cols-2 gap-4 mb-8">
+            <div className="rounded-xl border border-border bg-surface p-5">
+              <div className="flex items-baseline justify-between mb-4">
+                <h2 className="text-sm font-medium text-text-muted uppercase tracking-wider">
+                  Activity, last {summary.days} days
+                </h2>
+                <span className="text-sm text-text-muted font-mono">{summary.total} total</span>
+              </div>
+              <ActivityBars data={summary.byDay} />
+            </div>
+
+            <div className="rounded-xl border border-border bg-surface p-5">
+              <h2 className="text-sm font-medium text-text-muted uppercase tracking-wider mb-4">
+                By content type
+              </h2>
+              <ActivityPie data={summary.byResource} />
+            </div>
+
+            {summary.byAction.length > 0 && (
+              <div className="rounded-xl border border-border bg-surface p-5 lg:col-span-2">
+                <h2 className="text-sm font-medium text-text-muted uppercase tracking-wider mb-4">
+                  By action
+                </h2>
+                <ActivityPie data={summary.byAction} />
+              </div>
+            )}
+          </div>
+        )}
+
         {error && (
           <div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
             {error}
