@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, CheckSquare, Square } from 'lucide-react';
+import { Plus, Pencil, Trash2, CheckSquare, Square, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input, Textarea } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
@@ -24,7 +24,7 @@ export default function TimelineAdminPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<TimelineEvent | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState({ title: '', description: '', event_date: '' });
+  const [form, setForm] = useState({ title: '', description: '', event_date: '', display_order: 0 });
   const [saving, setSaving] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState<string>('');
@@ -43,14 +43,55 @@ export default function TimelineAdminPage() {
 
   const openNew = () => {
     setEditing(null);
-    setForm({ title: '', description: '', event_date: new Date().toISOString().slice(0, 10) });
+    // New events go to the end of the list rather than colliding on 0.
+    const nextOrder = events.length
+      ? Math.max(...events.map(ev => ev.display_order ?? 0)) + 1
+      : 0;
+    setForm({ title: '', description: '', event_date: new Date().toISOString().slice(0, 10), display_order: nextOrder });
     setModalOpen(true);
   };
 
   const openEdit = (e: TimelineEvent) => {
     setEditing(e);
-    setForm({ title: e.title, description: e.description || '', event_date: e.event_date });
+    setForm({ title: e.title, description: e.description || '', event_date: e.event_date, display_order: e.display_order ?? 0 });
     setModalOpen(true);
+  };
+
+  // Swap this row's display_order with its neighbour's. Working off the
+  // rendered order rather than the raw numbers means gaps in the sequence
+  // (0, 1, 4, 5) don't matter.
+  const move = async (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= events.length) return;
+
+    const a = events[index];
+    const b = events[target];
+    const aOrder = a.display_order ?? index;
+    const bOrder = b.display_order ?? target;
+
+    // Optimistic reorder so the table doesn't visibly lag behind the click.
+    const reordered = [...events];
+    reordered[index] = { ...b, display_order: aOrder };
+    reordered[target] = { ...a, display_order: bOrder };
+    setEvents(reordered.sort((x, y) => (x.display_order ?? 0) - (y.display_order ?? 0)));
+
+    const save = (e: TimelineEvent, display_order: number) =>
+      fetch(`/api/admin/timeline?id=${e.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: e.title,
+          description: e.description,
+          event_date: e.event_date,
+          display_order,
+        }),
+      });
+
+    const [r1, r2] = await Promise.all([save(a, bOrder), save(b, aOrder)]);
+    if (!r1.ok || !r2.ok) {
+      toast('Failed to reorder', 'error');
+      fetchEvents(); // roll back to whatever the database actually holds
+    }
   };
 
   const handleSave = async (ev: React.FormEvent) => {
@@ -183,7 +224,7 @@ export default function TimelineAdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {events.map((e) => (
+                {events.map((e, i) => (
                   <tr key={e.id} className={`border-b border-border last:border-0 hover:bg-bg-secondary/50 transition-colors ${selectedIds.has(e.id) ? 'bg-accent/5' : ''}`}>
                     <td className="px-4 py-3">
                       <button onClick={() => toggleSelect(e.id)} className="text-text-muted hover:text-text-primary transition-colors">
@@ -196,6 +237,18 @@ export default function TimelineAdminPage() {
                     <td className="px-4 py-3 text-text-muted">{e.display_order ?? '—'}</td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => move(i, -1)}
+                          disabled={i === 0}
+                          title="Move up"
+                          className="p-1.5 text-text-muted hover:text-text-primary disabled:opacity-25 disabled:hover:text-text-muted transition-colors"
+                        ><ArrowUp className="w-4 h-4" /></button>
+                        <button
+                          onClick={() => move(i, 1)}
+                          disabled={i === events.length - 1}
+                          title="Move down"
+                          className="p-1.5 text-text-muted hover:text-text-primary disabled:opacity-25 disabled:hover:text-text-muted transition-colors"
+                        ><ArrowDown className="w-4 h-4" /></button>
                         <button onClick={() => openEdit(e)} className="p-1.5 text-text-muted hover:text-text-primary transition-colors"><Pencil className="w-4 h-4" /></button>
                         <button onClick={() => setDeleteId(e.id)} className="p-1.5 text-text-muted hover:text-error transition-colors"><Trash2 className="w-4 h-4" /></button>
                       </div>
@@ -213,6 +266,16 @@ export default function TimelineAdminPage() {
           <Input label="Date" type="date" value={form.event_date} onChange={e => setForm({ ...form, event_date: e.target.value })} required />
           <Input label="Title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Started at VIT Bhopal" required />
           <Textarea label="Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Optional details about this event…" rows={3} />
+          <Input
+            label="Order"
+            type="number"
+            value={form.display_order}
+            onChange={e => setForm({ ...form, display_order: Number(e.target.value) })}
+            placeholder="0"
+          />
+          <p className="text-xs text-text-faint -mt-2">
+            Lowest number appears first on the About section. You can also use the arrows in the table to move an event up or down.
+          </p>
           <div className="flex gap-3 pt-2">
             <Button type="button" variant="ghost" onClick={() => setModalOpen(false)} className="flex-1">Cancel</Button>
             <Button type="submit" variant="primary" loading={saving} className="flex-1">{editing ? 'Update' : 'Create'}</Button>
