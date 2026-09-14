@@ -25,7 +25,15 @@ const projectSchema = z.object({
   demo_url: z.string().url().nullish().or(z.literal('')),
   repo_url: z.string().url().nullish().or(z.literal('')),
   cover_image: z.string().url().nullish().or(z.literal('')),
-  gallery: z.array(z.string()).nullish(),
+  // Trimmed and URL-checked. cover_image above is validated with .url(), which
+  // is why a stray leading tab from a paste never reached it — but gallery was
+  // only z.array(z.string()), so tab-prefixed URLs stored fine and then 404'd
+  // on the public page.
+  gallery: z.array(
+    z.string()
+      .transform((s) => s.trim())
+      .refine((s) => /^https?:\/\//.test(s), { message: 'must be an absolute http(s) URL' })
+  ).nullish(),
   featured: z.boolean().optional(),
   published: z.boolean().optional(),
   display_order: z.coerce.number().int().nullish(),

@@ -237,9 +237,11 @@ export default function ProjectsPage() {
   };
 
   const addGalleryImage = (url: string) => {
+    const clean = url.trim();
+    if (!clean) return;
     setFormData((prev) => ({
       ...prev,
-      gallery: [...prev.gallery, url],
+      gallery: [...prev.gallery, clean],
     }));
   };
 
