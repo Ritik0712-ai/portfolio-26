@@ -9,6 +9,7 @@ import {
   MessageSquareQuote,
   Calendar,
   Activity,
+  Award,
 } from 'lucide-react';
 import { LogoutButton } from '@/components/admin/LogoutButton';
 
@@ -63,6 +64,7 @@ export default async function AdminDashboardPage() {
     { label: 'Stats', description: 'Edit stats and numbers', href: '/admin/stats', icon: BarChart3 },
     { label: 'Testimonials', description: 'Review and manage testimonials', href: '/admin/testimonials', icon: MessageSquareQuote },
     { label: 'Timeline', description: 'Edit career timeline', href: '/admin/timeline', icon: Calendar },
+    { label: 'Certifications', description: 'Manage certifications', href: '/admin/certifications', icon: Award },
     { label: 'Feedback', description: 'View visitor feedback', href: '/admin/feedback', icon: MessageSquareQuote },
     { label: 'Activity Log', description: 'Track all admin actions', href: '/admin/activity-log', icon: Activity },
     { label: 'Export / Import', description: 'Back up or migrate portfolio data', href: '/admin/export', icon: BarChart3 },

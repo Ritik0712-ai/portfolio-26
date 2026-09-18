@@ -13,6 +13,7 @@ import Stats from '@/components/Stats';
 import Testimonials from '@/components/Testimonials';
 import Timeline from '@/components/Timeline';
 import NewsletterSignup from '@/components/NewsletterSignup';
+import Certifications from '@/components/Certifications';
 
 export default function Home() {
   return (
@@ -25,6 +26,7 @@ export default function Home() {
         <Timeline />
         <Skills />
         <Projects />
+        <Certifications />
         <Testimonials />
         <BlogPreview />
         <Contact />

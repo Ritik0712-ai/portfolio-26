@@ -125,3 +125,16 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
+
+export interface Certification {
+  id: string;
+  title: string;
+  issuer: string;
+  issue_date: string | null;
+  expiry_date: string | null;
+  credential_url: string | null;
+  image_url: string | null;
+  display_order: number;
+  published: boolean;
+  created_at: string;
+}
