@@ -31,6 +31,7 @@ import CalculatorApp from './apps/CalculatorApp';
 import SystemSettings from './apps/SystemSettings';
 import Trash from './apps/Trash';
 import GitHubPanel from '@/components/os/GitHubPanel';
+import MusicPlayer from '@/components/os/MusicPlayer';
 import { useAskEnabled } from '@/components/os/data';
 
 type Phase = 'boot' | 'login' | 'desktop' | 'off';
@@ -180,6 +181,8 @@ export default function MacDesktop() {
         return <SystemSettings key={win.params?.pane} initialPane={win.params?.pane} onClassic={goClassic} />;
       case 'trash':
         return <Trash />;
+      case 'music':
+        return <MusicPlayer layout="mac" />;
     }
   };
 
@@ -233,6 +236,7 @@ export default function MacDesktop() {
         { divider: true, label: '' },
         { label: 'Blog & case studies', run: () => launch('safari') },
         { label: 'GitHub activity', run: () => launch('github') },
+        { label: 'Music', run: () => launch('music') },
       ],
     },
     {

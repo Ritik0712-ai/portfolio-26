@@ -15,6 +15,7 @@ export const APPS: Record<AppId, AppMeta> = {
   safari: { name: 'Safari', icon: 'safari', w: 1000, h: 680, keywords: 'browser blog case studies web' },
   mail: { name: 'Mail', icon: 'mail', w: 640, h: 520, keywords: 'contact email message hire' },
   notes: { name: 'Notes', icon: 'notes', w: 820, h: 560, keywords: 'about now uses bio' },
+  music: { name: 'Music', icon: 'music', w: 820, h: 560, keywords: 'spotify songs playlist listen' },
   photos: { name: 'Photos', icon: 'photos', w: 920, h: 600, keywords: 'gallery pictures screenshots' },
   terminal: { name: 'Terminal', icon: 'terminal', w: 720, h: 460, keywords: 'shell command line cli' },
   github: { name: 'GitHub', icon: 'github', w: 720, h: 640, keywords: 'code repositories contributions activity' },
@@ -27,7 +28,7 @@ export const APPS: Record<AppId, AppMeta> = {
 };
 
 /** Order of apps in the Dock (before the separator). */
-export const DOCK_APPS: AppId[] = ['finder', 'safari', 'mail', 'notes', 'photos', 'terminal', 'github', 'contacts', 'calculator', 'settings'];
+export const DOCK_APPS: AppId[] = ['finder', 'safari', 'mail', 'notes', 'photos', 'music', 'terminal', 'github', 'contacts', 'calculator', 'settings'];
 
 /** Apps listed in Launchpad and Spotlight. */
-export const LAUNCHPAD_APPS: AppId[] = ['finder', 'safari', 'mail', 'notes', 'photos', 'terminal', 'github', 'contacts', 'calculator', 'preview', 'settings'];
+export const LAUNCHPAD_APPS: AppId[] = ['finder', 'safari', 'mail', 'notes', 'photos', 'music', 'terminal', 'github', 'contacts', 'calculator', 'preview', 'settings'];

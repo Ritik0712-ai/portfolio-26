@@ -12,6 +12,8 @@ import { IOS_APPS, type IOSAppId } from './apps-meta';
 import { ProjectsApp, ExperienceApp, CertificationsApp, SafariApp, NotesApp, ResumeApp } from './apps/content';
 import { MailApp, PhotosApp, GitHubApp, ContactsApp, SettingsApp, AskApp } from './apps/system';
 import CalculatorApp from '@/components/macos/apps/CalculatorApp';
+import MusicPlayer from '@/components/os/MusicPlayer';
+import IOSPage from './IOSPage';
 import { readPref, writePref } from '@/components/macos/settings';
 import { useBlogs, useProjects, useAskEnabled } from '@/components/os/data';
 
@@ -67,6 +69,7 @@ export default function IOSDevice() {
       case 'mail': return <MailApp onDone={close} />;
       case 'photos': return <PhotosApp />;
       case 'github': return <GitHubApp />;
+      case 'music': return <IOSPage title="Listen Now"><MusicPlayer layout="ios" /></IOSPage>;
       case 'contacts': return <ContactsApp onMessage={() => open('mail')} />;
       case 'calculator': return <div className="absolute inset-0 bg-black pt-[60px] pb-[40px]"><CalculatorApp /></div>;
       case 'ask': return askEnabled ? <AskApp /> : <div className="absolute inset-0 ios-screen flex items-center justify-center ios-secondary">Assistant is offline right now.</div>;

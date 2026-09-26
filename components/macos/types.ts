@@ -1,6 +1,6 @@
 export type AppId =
   | 'finder' | 'notes' | 'preview' | 'about-portfolio' | 'safari' | 'mail' | 'terminal'
-  | 'github' | 'photos' | 'contacts' | 'calculator' | 'settings' | 'trash';
+  | 'github' | 'photos' | 'contacts' | 'calculator' | 'settings' | 'trash' | 'music';
 
 export interface WindowState {
   id: string;
