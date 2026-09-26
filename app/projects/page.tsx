@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import ProjectFilter from '@/components/ProjectFilter';
+import ProjectFilter, { projectHasTech } from '@/components/ProjectFilter';
 import type { Project } from '@/types';
 
 export default function ProjectsPage() {
@@ -41,7 +41,7 @@ export default function ProjectsPage() {
     // it filtered for projects whose technologies literally contained "All" —
     // which is none of them, so the page always rendered "No projects found".
     if (activeCategory && activeCategory !== 'All') {
-      result = result.filter(p => p.technologies?.includes(activeCategory));
+      result = result.filter(p => projectHasTech(p, activeCategory));
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();

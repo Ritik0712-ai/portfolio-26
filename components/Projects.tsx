@@ -4,12 +4,10 @@ import { useState, useEffect } from 'react';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import ProjectFilter from './ProjectFilter';
 import type { Project } from '@/types';
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string>('All');
 
   useEffect(() => {
     fetch('/api/projects?featured=true')
@@ -18,14 +16,12 @@ export default function Projects() {
       .catch(() => {});
   }, []);
 
-  // Must match the 'All' sentinel ProjectFilter renders. This used to compare
-  // against lowercase 'all', so clicking the All chip filtered everything out.
-  const filteredProjects = activeCategory === 'All'
-    ? projects
-    : projects.filter((p) => p.technologies?.includes(activeCategory));
+  // The homepage shows only featured work, so it skips the tech filter —
+  // /projects has the full list with filtering.
+  const filteredProjects = projects;
 
   return (
-    <section id="projects" className="py-20">
+    <section id="projects" className="py-20 bg-bg-secondary">
       <div className="max-w-5xl mx-auto px-4">
         {/* Section header */}
         <div className="mb-12 flex items-end justify-between">
@@ -38,17 +34,8 @@ export default function Projects() {
           </Link>
         </div>
 
-        {/* Filter + Search */}
-        <div className="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <ProjectFilter projects={projects} activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
-        </div>
-
         {/* Projects grid */}
-        {filteredProjects.length === 0 ? (
-          <p className="text-text-muted font-body text-sm py-12 text-center border border-dashed border-border rounded-lg">
-            No projects match this filter.
-          </p>
-        ) : (
+        {filteredProjects.length === 0 ? null : (
           <div className="grid md:grid-cols-2 gap-6">
             {filteredProjects.map((project) => (
               <article key={project.id} className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-accent/30 transition-all duration-slow hover:shadow-lg hover:shadow-accent/5">
@@ -60,12 +47,13 @@ export default function Projects() {
                       alt={project.title}
                       width={640}
                       height={360}
+                      sizes="(min-width: 768px) 480px, 100vw"
                       className="object-cover w-full h-full group-hover:scale-[1.02] transition-transform duration-slow"
                     />
                   </div>
                 ) : (
                   <div className="aspect-video bg-bg-secondary flex items-center justify-center">
-                    <span className="text-xs text-text-faint font-mono">{project.title[0]}</span>
+                    <span className="text-4xl text-text-faint font-display">{project.title}</span>
                   </div>
                 )}
 

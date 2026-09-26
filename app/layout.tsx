@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { DM_Sans, Cormorant_Garamond } from 'next/font/google';
+import { DM_Sans, Cormorant_Garamond, JetBrains_Mono } from 'next/font/google';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import SkipNav from '@/components/SkipNav';
 import ScrollProgress from '@/components/ScrollProgress';
@@ -21,6 +21,12 @@ const cormorant = Cormorant_Garamond({
   weight: ['300', '400', '500', '600', '700'],
 });
 
+const jetbrains = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   ...defaultMetadata,
   openGraph: {
@@ -33,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${cormorant.variable}`}
+      className={`${dmSans.variable} ${cormorant.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >
       <head>

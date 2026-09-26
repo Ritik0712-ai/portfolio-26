@@ -1,57 +1,34 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, BookOpen, Download } from 'lucide-react';
-import PhotoCarousel from './PhotoCarousel';
-
-const roles = ['Product Engineer', 'Full-Stack Developer', 'Builder'];
+import Image from 'next/image';
+import { ArrowRight, BookOpen } from 'lucide-react';
 
 export default function Hero() {
-  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentRoleIndex((prev) => (prev + 1) % roles.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <section className="min-h-[90vh] flex items-center pt-16 px-4">
+    <section className="pt-32 pb-20 md:pt-40 md:pb-28 px-4">
       <div className="max-w-5xl mx-auto w-full">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="grid md:grid-cols-[1.4fr_1fr] gap-12 md:gap-16 items-center">
           {/* Left: Text */}
           <div>
-            {/* Monogram */}
-            <div className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-6">
-              RA — Portfolio
-            </div>
-
-            {/* Headline */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-semibold text-text-primary leading-[1.05] mb-4">
-              Ritik<br />Agarwal
-            </h1>
-
-            {/* Role */}
-            <div className="mb-6 overflow-hidden">
-              <p className="text-lg text-accent font-body font-medium">
-                {roles[currentRoleIndex]}
-              </p>
-            </div>
-
-            {/* Positioning */}
-            <p className="text-base text-text-secondary font-body leading-relaxed max-w-sm mb-8">
-              I build dependable products from idea to production. Focused on clean architecture, thoughtful UX, and code that teams can actually maintain.
+            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-6">
+              Full-Stack Developer
             </p>
 
-            {/* Availability badge */}
-            <div className="flex items-center gap-2 mb-8">
-              <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span className="text-sm text-text-muted font-body">Open to opportunities</span>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-semibold text-text-primary leading-[1.05] mb-6">
+              Ritik Agarwal
+            </h1>
+
+            <p className="text-lg text-text-secondary font-body leading-relaxed max-w-md mb-8">
+              I build dependable products from idea to production — clean architecture,
+              thoughtful UX, and code that teams can actually maintain.
+            </p>
+
+            <div className="flex items-center gap-2 mb-10">
+              <span className="w-2 h-2 rounded-full bg-success" />
+              <span className="text-sm text-text-muted font-body">
+                Open to internships &amp; projects
+              </span>
             </div>
 
-            {/* CTAs */}
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/#projects"
@@ -70,15 +47,19 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right: Portrait Carousel */}
-          <div className="relative flex justify-center md:justify-end">
-            <PhotoCarousel interval={2000} />
+          {/* Right: Portrait */}
+          <div className="flex justify-center md:justify-end">
+            <div className="relative w-64 md:w-full max-w-xs aspect-[4/5] overflow-hidden rounded-lg bg-bg-tertiary">
+              <Image
+                src="/IMG-20260904-WA0065.jpg"
+                alt="Ritik Agarwal"
+                fill
+                priority
+                sizes="(min-width: 768px) 320px, 256px"
+                className="object-cover object-top"
+              />
+            </div>
           </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="mt-16 md:mt-24 text-center">
-          <div className="w-px h-12 bg-border mx-auto" />
         </div>
       </div>
     </section>

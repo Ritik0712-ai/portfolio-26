@@ -29,9 +29,9 @@ module.exports = {
         error: 'var(--color-error)',
       },
       fontFamily: {
-        display: ['Cormorant Garamond', 'Georgia', 'serif'],
-        body: ['DM Sans', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        display: ['var(--font-cormorant)', 'Georgia', 'serif'],
+        body: ['var(--font-dm-sans)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-jetbrains)', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
         sm: 'var(--radius-sm)',

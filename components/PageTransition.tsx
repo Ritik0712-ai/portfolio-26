@@ -1,17 +1,17 @@
 'use client';
 
-import { motion, MotionProps } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 
 interface PageTransitionProps {
   children: React.ReactNode;
 }
 
-const transitionVariants = {
+const transitionVariants: Variants = {
   hidden: { opacity: 0, y: 8 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] },
+    transition: { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] as const },
   },
 };
 

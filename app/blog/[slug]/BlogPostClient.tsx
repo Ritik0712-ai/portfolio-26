@@ -132,7 +132,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
         </pre>
       );
     },
-    img: ({ src, alt }) => src ? (
+    img: ({ src, alt }) => typeof src === 'string' && src ? (
       <span className="block my-6">
         <Image src={src} alt={alt || ''} width={800} height={450} className="rounded-lg w-full object-cover" />
         {alt && <p className="text-xs text-text-faint mt-2 text-center">{alt}</p>}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Coffee, Moon, Bug, Sparkles } from 'lucide-react';
 
@@ -10,7 +11,23 @@ const personalityTraits = [
   { icon: Sparkles, text: 'Learns in public — sharing the journey, not just the destination' },
 ];
 
+interface StatItem {
+  id: string;
+  value: number;
+  suffix: string;
+  label: string;
+}
+
 export default function About() {
+  const [stats, setStats] = useState<StatItem[]>([]);
+
+  useEffect(() => {
+    fetch('/api/stats')
+      .then((r) => r.json())
+      .then((d) => setStats(d.stats || []))
+      .catch(() => {});
+  }, []);
+
   return (
     <section id="about" className="py-20 bg-bg-secondary">
       <div className="max-w-5xl mx-auto px-4">
@@ -65,12 +82,26 @@ export default function About() {
               </p>
             </div>
 
+            {stats.length > 0 && (
+              <div className="mt-8 pt-8 border-t border-border flex flex-wrap gap-x-12 gap-y-6">
+                {stats.map((stat) => (
+                  <div key={stat.id}>
+                    <p className="text-3xl md:text-4xl font-display font-semibold text-text-primary">
+                      {stat.value}
+                      {stat.suffix}
+                    </p>
+                    <p className="text-xs text-text-muted font-body mt-1">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="mt-8 pt-8 border-t border-border">
               <p className="text-xs font-mono text-text-faint uppercase tracking-widest mb-4">Quick Facts</p>
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { label: 'Based in', value: 'India' },
-                  { label: 'Education', value: 'CS Student' },
+                  { label: 'Education', value: 'B.Tech CSE, VIT Bhopal' },
                   { label: 'Languages', value: 'Java, TS, Python' },
                   { label: 'Focus', value: 'Product Engineering' },
                 ].map(f => (
