@@ -30,6 +30,8 @@ interface Project {
   role?: string;
   problem?: string;
   approach?: string;
+  architecture?: string | null;
+  learnings?: string | null;
   technical_decisions?: TechnicalDecision[];
   outcomes?: Outcome[];
   technologies?: string[];
@@ -54,6 +56,8 @@ interface ProjectFormData {
   role: string;
   problem: string;
   approach: string;
+  architecture: string;
+  learnings: string;
   technical_decisions: TechnicalDecision[];
   outcomes: Outcome[];
   technologies: string;
@@ -74,6 +78,8 @@ const initialFormData: ProjectFormData = {
   role: '',
   problem: '',
   approach: '',
+  architecture: '',
+  learnings: '',
   technical_decisions: [],
   outcomes: [],
   technologies: '',
@@ -157,6 +163,8 @@ export default function ProjectsPage() {
       role: project.role || '',
       problem: project.problem || '',
       approach: project.approach || '',
+      architecture: project.architecture || '',
+      learnings: project.learnings || '',
       technical_decisions: project.technical_decisions || [],
       outcomes: project.outcomes || [],
       technologies: project.technologies?.join(', ') || '',
@@ -703,6 +711,23 @@ export default function ProjectsPage() {
               value={formData.approach}
               onChange={(e) => setFormData((prev) => ({ ...prev, approach: e.target.value }))}
               placeholder="How was the project approached?"
+              className="min-h-[100px]"
+            />
+            <Textarea
+              label="Architecture diagram (Mermaid)"
+              name="architecture"
+              value={formData.architecture}
+              onChange={(e) => setFormData((prev) => ({ ...prev, architecture: e.target.value }))}
+              placeholder={'flowchart LR\n  User --> App[Next.js] --> DB[(Postgres)]'}
+              hint="Mermaid flowchart syntax — preview at mermaid.live"
+              className="min-h-[140px] font-mono text-xs"
+            />
+            <Textarea
+              label="What I'd do differently"
+              name="learnings"
+              value={formData.learnings}
+              onChange={(e) => setFormData((prev) => ({ ...prev, learnings: e.target.value }))}
+              placeholder="Retrospective: what you'd change with hindsight"
               className="min-h-[100px]"
             />
           </div>

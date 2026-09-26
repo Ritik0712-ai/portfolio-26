@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import TransitionLink from '@/components/TransitionLink';
 import Image from 'next/image';
 import ProjectFilter, { projectHasTech } from '@/components/ProjectFilter';
 import type { Project } from '@/types';
@@ -99,23 +100,36 @@ export default function ProjectsPage() {
             {displayed.map((project) => (
               <article
                 key={project.id}
-                className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-rule transition-colors"
+                className="reveal group bg-surface border border-border rounded-lg overflow-hidden hover:border-rule transition-colors"
               >
                 {project.cover_image && (
-                  <div className="relative h-44 w-full overflow-hidden">
+                  <TransitionLink
+                    href={`/projects/${project.slug}`}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    className="relative block aspect-video w-full overflow-hidden bg-bg-secondary"
+                    style={{ viewTransitionName: `project-cover-${project.slug}` }}
+                  >
                     <Image
                       src={project.cover_image}
                       alt={project.title}
                       fill
                       placeholder="blur"
                       blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect fill='%23EFEBE3' width='640' height='360'/%3E%3C/svg%3E"
-                      className="object-cover group-hover:scale-105 transition-transform duration-slow"
+                      sizes="(min-width: 768px) 480px, 100vw"
+                      className="object-cover object-top group-hover:scale-[1.02] transition-transform duration-slow"
                     />
-                  </div>
+                  </TransitionLink>
                 )}
                 <div className="p-6">
                   <h2 className="text-xl font-display font-semibold text-text-primary mb-2">
-                    {project.title}
+                    <TransitionLink
+                      href={`/projects/${project.slug}`}
+                      className="hover:text-accent transition-colors"
+                      style={{ viewTransitionName: `project-title-${project.slug}` }}
+                    >
+                      {project.title}
+                    </TransitionLink>
                   </h2>
                   {project.short_description && (
                     <p className="text-text-secondary text-sm mb-4 line-clamp-3">
@@ -157,12 +171,12 @@ export default function ProjectsPage() {
                         Code
                       </a>
                     )}
-                    <Link
+                    <TransitionLink
                       href={`/projects/${project.slug}`}
                       className="ml-auto inline-flex items-center gap-1 text-sm text-accent hover:text-accent-warm transition-colors"
                     >
                       Details <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    </TransitionLink>
                   </div>
                 </div>
               </article>

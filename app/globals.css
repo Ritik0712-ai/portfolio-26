@@ -590,3 +590,55 @@ h1, h2, h3, h4, h5, h6 {
 .stagger-2 { animation-delay: 100ms; }
 .stagger-3 { animation-delay: 200ms; }
 .stagger-4 { animation-delay: 300ms; }
+
+/* ============================================
+   MOTION — view transitions + scroll reveals
+   Everything here is progressive enhancement and switched off for
+   visitors who ask their OS for reduced motion.
+   ============================================ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-group(*) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes palette-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.palette-in { animation: palette-in 160ms cubic-bezier(0.2, 0, 0, 1); }
+
+/* Scroll-driven reveal: CSS only, no JS observers. Browsers without
+   animation-timeline simply show content immediately. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

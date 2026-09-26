@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import TransitionLink from './TransitionLink';
 import Image from 'next/image';
 import type { Project } from '@/types';
 
@@ -38,19 +39,25 @@ export default function Projects() {
         {filteredProjects.length === 0 ? null : (
           <div className="grid md:grid-cols-2 gap-6">
             {filteredProjects.map((project) => (
-              <article key={project.id} className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-accent/30 transition-all duration-slow hover:shadow-lg hover:shadow-accent/5">
+              <article key={project.id} className="reveal group bg-surface border border-border rounded-lg overflow-hidden hover:border-accent/30 transition-all duration-slow hover:shadow-lg hover:shadow-accent/5">
                 {/* Cover image */}
                 {project.cover_image ? (
-                  <div className="aspect-video overflow-hidden bg-bg-secondary">
+                  <TransitionLink
+                    href={`/projects/${project.slug}`}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    className="block aspect-video overflow-hidden bg-bg-secondary"
+                    style={{ viewTransitionName: `project-cover-${project.slug}` }}
+                  >
                     <Image
                       src={project.cover_image}
                       alt={project.title}
                       width={640}
                       height={360}
                       sizes="(min-width: 768px) 480px, 100vw"
-                      className="object-cover w-full h-full group-hover:scale-[1.02] transition-transform duration-slow"
+                      className="object-cover object-top w-full h-full group-hover:scale-[1.02] transition-transform duration-slow"
                     />
-                  </div>
+                  </TransitionLink>
                 ) : (
                   <div className="aspect-video bg-bg-secondary flex items-center justify-center">
                     <span className="text-4xl text-text-faint font-display">{project.title}</span>
@@ -60,7 +67,12 @@ export default function Projects() {
                 {/* Content */}
                 <div className="p-6">
                   <h3 className="font-display font-semibold text-xl text-text-primary mb-1 group-hover:text-accent transition-colors">
-                    <Link href={`/projects/${project.slug}`}>{project.title}</Link>
+                    <TransitionLink
+                      href={`/projects/${project.slug}`}
+                      style={{ viewTransitionName: `project-title-${project.slug}` }}
+                    >
+                      {project.title}
+                    </TransitionLink>
                   </h3>
                   {project.short_description && (
                     <p className="text-sm text-text-secondary font-body leading-relaxed mb-4">
@@ -94,9 +106,9 @@ export default function Projects() {
                         <Github className="w-3.5 h-3.5" /> Code
                       </a>
                     )}
-                    <Link href={`/projects/${project.slug}`} className="ml-auto inline-flex items-center gap-1 text-xs text-accent hover:text-accent-warm font-body transition-colors">
+                    <TransitionLink href={`/projects/${project.slug}`} className="ml-auto inline-flex items-center gap-1 text-xs text-accent hover:text-accent-warm font-body transition-colors">
                       Details <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    </TransitionLink>
                   </div>
                 </div>
               </article>

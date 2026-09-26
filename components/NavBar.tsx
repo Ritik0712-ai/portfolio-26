@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Github, Linkedin, Menu, X } from 'lucide-react';
+import { Github, Linkedin, Menu, X, Search } from 'lucide-react';
+import { OPEN_PALETTE_EVENT } from './CommandPalette';
 import ThemeToggle from './ThemeToggle';
 
 const navLinks = [
@@ -56,6 +57,14 @@ export default function NavBar() {
 
           {/* Right: Social + Theme */}
           <div className="hidden md:flex items-center gap-4">
+            <button
+              onClick={() => window.dispatchEvent(new Event(OPEN_PALETTE_EVENT))}
+              className="inline-flex items-center gap-2 pl-2.5 pr-1.5 py-1 text-xs font-body text-text-muted border border-border rounded hover:text-text-primary hover:border-rule transition-colors"
+              aria-label="Open command menu"
+            >
+              <Search className="w-3.5 h-3.5" />
+              <kbd className="font-mono text-[10px] text-text-faint border border-border rounded px-1">⌘K</kbd>
+            </button>
             <a href="https://github.com/Ritik0712-ai" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="text-text-muted hover:text-text-primary transition-colors">
               <Github className="w-4 h-4" />
             </a>
@@ -65,7 +74,14 @@ export default function NavBar() {
             <ThemeToggle />
           </div>
 
-          {/* Mobile Menu Toggle */}
+          {/* Mobile: search + menu */}
+          <button
+            onClick={() => window.dispatchEvent(new Event(OPEN_PALETTE_EVENT))}
+            className="md:hidden ml-auto p-2 text-text-muted hover:text-text-primary transition-colors"
+            aria-label="Search"
+          >
+            <Search className="w-5 h-5" />
+          </button>
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden p-2 text-text-muted hover:text-text-primary transition-colors"

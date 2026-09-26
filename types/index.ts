@@ -27,6 +27,8 @@ export interface Project {
   role: string | null;
   problem: string | null;
   approach: string | null;
+  architecture: string | null;
+  learnings: string | null;
   technical_decisions: TechnicalDecision[] | null;
   outcomes: Outcome[] | null;
   technologies: string[];

@@ -1,18 +1,21 @@
 import type { Metadata } from 'next';
 import ProjectDetailClient from './ProjectDetailClient';
 import { siteUrl } from '@/lib/metadata';
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
+import type { Project } from '@/types';
 
 type PageProps = { params: Promise<{ slug: string }> };
 
 // Runs on the server, where a relative fetch('/api/...') has no origin to
 // resolve against and throws ERR_INVALID_URL. Querying Supabase directly is
 // also one network hop instead of two.
-async function getProject(slug: string) {
+// cache() dedupes the query between generateMetadata and the page render.
+const getProject = cache(async (slug: string): Promise<Project | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('projects')
-    .select('slug, title, short_description, cover_image')
+    .select('*')
     .eq('slug', slug)
     .eq('published', true)
     .maybeSingle();
@@ -21,8 +24,8 @@ async function getProject(slug: string) {
     console.error('getProject failed for slug', slug, error);
     return null;
   }
-  return data;
-}
+  return data as Project | null;
+});
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -41,13 +44,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: 'Ritik Agarwal Portfolio',
       locale: 'en_US',
       type: 'website',
-      images: project.cover_image ? [{ url: project.cover_image, width: 1200, height: 630, alt: project.title }] : undefined,
     },
-    twitter: { card: 'summary_large_image', title: project.title, description: project.short_description || undefined, images: project.cover_image ? [project.cover_image] : undefined },
+    twitter: { card: 'summary_large_image', title: project.title, description: project.short_description || undefined },
   };
 }
 
 export default async function ProjectDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  return <ProjectDetailClient slug={slug} />;
+  // Rendering with the project already loaded (no client fetch spinner) is
+  // what lets the cover and title morph in with a view transition.
+  const project = await getProject(slug);
+  return <ProjectDetailClient slug={slug} initialProject={project} />;
 }

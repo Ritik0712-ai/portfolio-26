@@ -54,7 +54,7 @@ export default function Experience() {
               <h3 className="text-xs font-mono text-text-faint uppercase tracking-widest mb-6">Journey</h3>
               <ol className="relative border-l border-border ml-1.5 space-y-8">
                 {events.map((event) => (
-                  <li key={event.id} className="pl-6 relative">
+                  <li key={event.id} className="reveal pl-6 relative">
                     <span className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-bg border-2 border-rule" />
                     <p className="text-xs font-mono text-accent uppercase tracking-wider mb-1">
                       {formatEventDate(event.event_date)}

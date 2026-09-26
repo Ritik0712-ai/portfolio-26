@@ -1,5 +1,5 @@
-import NavBar from '@/components/NavBar';
 import Hero from '@/components/Hero';
+import NowBento from '@/components/NowBento';
 import About from '@/components/About';
 import Skills from '@/components/Skills';
 import Projects from '@/components/Projects';
@@ -8,15 +8,14 @@ import Testimonials from '@/components/Testimonials';
 import BlogPreview from '@/components/BlogPreview';
 import Contact from '@/components/Contact';
 import NewsletterSignup from '@/components/NewsletterSignup';
-import Footer from '@/components/Footer';
 import BackToTop from '@/components/BackToTop';
 
 export default function Home() {
   return (
     <>
       <main id="main-content" className="min-h-screen">
-        <NavBar />
         <Hero />
+        <NowBento />
         <About />
         <Skills />
         <Projects />
@@ -39,7 +38,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <Footer />
       </main>
       <BackToTop />
     </>

@@ -2,26 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { Code, Book, Lightbulb, Target, Calendar } from 'lucide-react';
+import { nowData } from '@/data/now';
 
-const nowData = {
-  lastUpdated: 'January 2024',
-  currentlyBuilding: [
-    'Portfolio website v2 — finally getting around to documenting my work',
-    'StockSchool v2 — adding more lesson modules and improving the paper trading engine',
-    'DSA practice routine — 2 problems daily, consistent progress over speed',
-  ],
-  currentlyLearning: [
-    'System Design — building scalable architectures for real-world applications',
-    'Advanced React patterns — compound components, render props, and custom hooks',
-    'PostgreSQL optimization — indexes, query planning, and performance tuning',
-  ],
-  currentlyReading: [
-    'Designing Data-Intensive Applications — Martin Kleppmann',
-    'The Pragmatic Programmer — David Thomas & Andrew Hunt',
-    'Atomic Habits — James Clear (re-reading)',
-  ],
-  thisMonthsFocus: 'Ship the portfolio. Document everything. Land an internship.',
-}
 
 export default function NowPage() {
   return (
@@ -48,7 +30,7 @@ export default function NowPage() {
             </div>
             <p className="text-xs font-mono text-text-faint uppercase tracking-wider">This Month&apos;s Focus</p>
           </div>
-          <p className="text-lg font-body text-text-primary leading-relaxed">{nowData.thisMonthsFocus}</p>
+          <p className="text-lg font-body text-text-primary leading-relaxed">{nowData.focus}</p>
         </motion.div>
 
         {/* Grid */}

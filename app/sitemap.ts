@@ -43,6 +43,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     },
     {
+      url: `${baseUrl}/uses`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.5,
+    },
+    {
       url: `${baseUrl}/contact`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
@@ -72,5 +78,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // If Supabase fails, return static pages only
   }
 
-  return [...staticPages, ...blogPosts]
+  let projectPages: MetadataRoute.Sitemap = []
+  try {
+    const supabase = await createClient()
+    const { data: projects } = await supabase
+      .from('projects')
+      .select('slug, updated_at, created_at')
+      .eq('published', true)
+    projectPages = (projects ?? []).map((p) => ({
+      url: `${baseUrl}/projects/${p.slug}`,
+      lastModified: new Date(p.updated_at || p.created_at),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    }))
+  } catch {
+    // Static pages still render if this fails
+  }
+
+  return [...staticPages, ...projectPages, ...blogPosts]
 }

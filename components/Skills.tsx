@@ -1,21 +1,4 @@
-const skillGroups = [
-  {
-    title: 'Languages',
-    skills: ['TypeScript', 'JavaScript', 'Python', 'Java', 'SQL'],
-  },
-  {
-    title: 'Frontend',
-    skills: ['React', 'Next.js', 'Tailwind CSS', 'React Native'],
-  },
-  {
-    title: 'Backend & Data',
-    skills: ['Node.js', 'Express', 'PostgreSQL', 'Supabase', 'MongoDB', 'Redis'],
-  },
-  {
-    title: 'AI & Infra',
-    skills: ['OpenAI / Gemini / Groq APIs', 'Git', 'Docker', 'Vercel', 'Render', 'Cloudflare R2'],
-  },
-];
+import { skillGroups } from '@/data/skills';
 
 export default function Skills() {
   return (
@@ -28,7 +11,7 @@ export default function Skills() {
 
         <dl className="divide-y divide-border border-y border-border">
           {skillGroups.map((group) => (
-            <div key={group.title} className="grid md:grid-cols-[200px_1fr] gap-3 md:gap-8 py-6">
+            <div key={group.title} className="reveal grid md:grid-cols-[200px_1fr] gap-3 md:gap-8 py-6">
               <dt className="text-xs font-mono text-text-faint uppercase tracking-widest pt-1.5">
                 {group.title}
               </dt>

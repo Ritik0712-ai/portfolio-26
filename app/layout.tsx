@@ -5,6 +5,11 @@ import SkipNav from '@/components/SkipNav';
 import ScrollProgress from '@/components/ScrollProgress';
 import Analytics from '@/components/Analytics';
 import StructuredData from '@/components/StructuredData';
+import CommandPalette from '@/components/CommandPalette';
+import AskAI from '@/components/AskAI';
+import MotionProvider from '@/components/MotionProvider';
+import SiteChrome from '@/components/SiteChrome';
+import { ViewTransitionsListener } from '@/components/TransitionLink';
 import { defaultMetadata, siteUrl } from '@/lib/metadata';
 import './globals.css';
 
@@ -48,8 +53,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-bg text-text-primary antialiased">
         <SkipNav />
         <ThemeProvider>
-          {children}
+          <MotionProvider>
+            <SiteChrome>{children}</SiteChrome>
+          </MotionProvider>
+          <ViewTransitionsListener />
           <ScrollProgress />
+          <CommandPalette />
+          <AskAI />
           <Analytics />
           <StructuredData
             type="person"

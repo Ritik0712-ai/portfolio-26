@@ -12,6 +12,8 @@ const projectSchema = z.object({
   role: z.string().nullish(),
   problem: z.string().nullish(),
   approach: z.string().nullish(),
+  architecture: z.string().nullish(),
+  learnings: z.string().nullish(),
   technical_decisions: z.array(z.object({
     decision: z.string(),
     rationale: z.string(),
@@ -24,7 +26,8 @@ const projectSchema = z.object({
   technologies: z.array(z.string()).nullish(),
   demo_url: z.string().url().nullish().or(z.literal('')),
   repo_url: z.string().url().nullish().or(z.literal('')),
-  cover_image: z.string().url().nullish().or(z.literal('')),
+  // Absolute URL (Supabase storage) or a site-relative path under /public.
+  cover_image: z.string().url().or(z.string().regex(/^\/[^\s]*$/)).nullish().or(z.literal('')),
   // Trimmed and URL-checked. cover_image above is validated with .url(), which
   // is why a stray leading tab from a paste never reached it — but gallery was
   // only z.array(z.string()), so tab-prefixed URLs stored fine and then 404'd

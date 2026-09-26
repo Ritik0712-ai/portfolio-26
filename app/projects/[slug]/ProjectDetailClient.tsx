@@ -1,21 +1,65 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import TransitionLink from '@/components/TransitionLink';
 import Image from 'next/image';
-import { ExternalLink, Github, ArrowLeft } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { ExternalLink, Github, ArrowLeft, ArrowRight } from 'lucide-react';
 import type { Project, TechnicalDecision, Outcome } from '@/types';
+
+const MermaidDiagram = dynamic(() => import('@/components/MermaidDiagram'), {
+  ssr: false,
+  loading: () => <div className="h-40 rounded-lg bg-bg-secondary animate-pulse" />,
+});
+
+const BLUR =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect fill='%23EFEBE3' width='640' height='360'/%3E%3C/svg%3E";
+
+// Long-form fields are stored as plain text with blank lines between
+// paragraphs; render each paragraph instead of collapsing the whitespace.
+function Paragraphs({ text }: { text: string }) {
+  return (
+    <div className="space-y-4">
+      {text
+        .split(/\n\s*\n/)
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .map((p, i) => (
+          <p key={i} className="text-text-secondary font-body leading-relaxed">
+            {p}
+          </p>
+        ))}
+    </div>
+  );
+}
+
+function SectionHeading({ index, children }: { index: number; children: React.ReactNode }) {
+  return (
+    <h2 className="flex items-baseline gap-3 mb-5">
+      <span className="text-xs font-mono text-text-faint">{String(index).padStart(2, '0')}</span>
+      <span className="text-2xl font-display font-semibold text-text-primary">{children}</span>
+    </h2>
+  );
+}
 
 interface ProjectDetailClientProps {
   slug: string;
+  initialProject?: Project | null;
 }
 
-export default function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
-  const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+export default function ProjectDetailClient({ slug, initialProject }: ProjectDetailClientProps) {
+  const [project, setProject] = useState<Project | null>(initialProject ?? null);
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(!initialProject);
+  const [error, setError] = useState(initialProject === null);
 
   useEffect(() => {
+    fetch('/api/projects')
+      .then((r) => r.json())
+      .then((d) => setAllProjects(d.projects || []))
+      .catch(() => {});
+    if (initialProject !== undefined) return;
     fetch(`/api/projects?slug=${encodeURIComponent(slug)}`)
       .then((r) => r.json())
       .then((d) => {
@@ -24,146 +68,265 @@ export default function ProjectDetailClient({ slug }: ProjectDetailClientProps) 
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, [slug]);
+  }, [slug, initialProject]);
 
-  if (loading) return (
-    <div className="min-h-screen pt-24 flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-border border-t-text-primary rounded-full animate-spin" />
-    </div>
+  const decisions = useMemo(
+    () => ((project?.technical_decisions || []) as TechnicalDecision[]).filter((d) => d.decision?.trim()),
+    [project]
+  );
+  const outcomes = useMemo(
+    () => ((project?.outcomes || []) as Outcome[]).filter((o) => o.outcome?.trim() || o.result?.trim()),
+    [project]
   );
 
-  if (error || !project) return (
-    <div className="min-h-screen pt-24 flex flex-col items-center justify-center px-4">
-      <h1 className="text-4xl font-display font-semibold text-text-primary mb-4">Project Not Found</h1>
-      <Link href="/projects" className="text-text-muted hover:text-text-primary transition-colors">← Back to Projects</Link>
-    </div>
-  );
+  const sections = useMemo(() => {
+    if (!project) return [];
+    return [
+      project.problem?.trim() && { id: 'problem', label: 'Problem' },
+      project.approach?.trim() && { id: 'approach', label: 'Approach' },
+      project.architecture?.trim() && { id: 'architecture', label: 'Architecture' },
+      decisions.length > 0 && { id: 'decisions', label: 'Decisions & trade-offs' },
+      outcomes.length > 0 && { id: 'outcomes', label: 'Outcomes' },
+      project.learnings?.trim() && { id: 'learnings', label: "What I'd do differently" },
+      project.gallery?.length > 0 && { id: 'screenshots', label: 'Screenshots' },
+    ].filter(Boolean) as { id: string; label: string }[];
+  }, [project, decisions, outcomes]);
+
+  const next = useMemo(() => {
+    if (!project || allProjects.length < 2) return null;
+    const i = allProjects.findIndex((p) => p.slug === project.slug);
+    return allProjects[(i + 1) % allProjects.length];
+  }, [project, allProjects]);
+
+  if (loading)
+    return (
+      <div className="min-h-screen pt-24 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-border border-t-text-primary rounded-full animate-spin" />
+      </div>
+    );
+
+  if (error || !project)
+    return (
+      <div className="min-h-screen pt-24 flex flex-col items-center justify-center px-4">
+        <h1 className="text-4xl font-display font-semibold text-text-primary mb-4">Project Not Found</h1>
+        <Link href="/projects" className="text-text-muted hover:text-text-primary transition-colors">
+          ← Back to Projects
+        </Link>
+      </div>
+    );
+
+  const sectionIndex = (id: string) => sections.findIndex((s) => s.id === id) + 1;
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Back */}
-        <Link href="/projects" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors mb-8">
+      <div className="max-w-5xl mx-auto">
+        <TransitionLink
+          href="/projects"
+          className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors mb-10"
+        >
           <ArrowLeft className="w-4 h-4" /> All Projects
-        </Link>
+        </TransitionLink>
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-display font-semibold text-text-primary mb-3">
+        <header className="max-w-3xl mb-10">
+          <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-3">Case study</p>
+          <h1
+            className="text-4xl md:text-6xl font-display font-semibold text-text-primary leading-[1.05] mb-4"
+            style={{ viewTransitionName: `project-title-${project.slug}` }}
+          >
             {project.title}
           </h1>
           {project.short_description && (
-            <p className="text-lg text-text-secondary leading-relaxed">{project.short_description}</p>
+            <p className="text-lg text-text-secondary font-body leading-relaxed">{project.short_description}</p>
           )}
-        </div>
+        </header>
 
-        {/* Cover Image */}
+        {/* At a glance */}
+        <dl className="grid sm:grid-cols-3 gap-6 py-6 mb-10 border-y border-border">
+          {project.role && (
+            <div>
+              <dt className="text-xs font-mono text-text-faint uppercase tracking-widest mb-1.5">Role</dt>
+              <dd className="text-sm text-text-primary font-body">{project.role}</dd>
+            </div>
+          )}
+          {project.technologies?.length > 0 && (
+            <div>
+              <dt className="text-xs font-mono text-text-faint uppercase tracking-widest mb-1.5">Stack</dt>
+              <dd className="text-sm text-text-primary font-body">{project.technologies.slice(0, 6).join(' · ')}</dd>
+            </div>
+          )}
+          {(project.demo_url || project.repo_url) && (
+            <div>
+              <dt className="text-xs font-mono text-text-faint uppercase tracking-widest mb-1.5">Links</dt>
+              <dd className="flex flex-wrap gap-4 text-sm font-body">
+                {project.demo_url && (
+                  <a href={project.demo_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-text-primary hover:text-accent transition-colors">
+                    <ExternalLink className="w-3.5 h-3.5" /> Live demo
+                  </a>
+                )}
+                {project.repo_url && (
+                  <a href={project.repo_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-text-primary hover:text-accent transition-colors">
+                    <Github className="w-3.5 h-3.5" /> Source
+                  </a>
+                )}
+              </dd>
+            </div>
+          )}
+        </dl>
+
+        {/* Cover */}
         {project.cover_image && (
-          <div className="relative w-full aspect-[16/9] mb-10 rounded-lg overflow-hidden border border-border">
-            <Image src={project.cover_image} alt={project.title} fill placeholder="blur" blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect fill='%23EFEBE3' width='640' height='360'/%3E%3C/svg%3E" className="object-cover" />
+          <div
+            className="relative w-full aspect-[16/9] mb-14 rounded-lg overflow-hidden border border-border bg-bg-secondary"
+            style={{ viewTransitionName: `project-cover-${project.slug}` }}
+          >
+            <Image
+              src={project.cover_image}
+              alt={project.title}
+              fill
+              priority
+              sizes="(min-width: 1024px) 1024px, 100vw"
+              placeholder="blur"
+              blurDataURL={BLUR}
+              className="object-cover object-top"
+            />
           </div>
         )}
 
-        {/* Tech stack */}
-        {project.technologies && project.technologies.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-8">
-            {project.technologies.map((tech) => (
-              <span key={tech} className="px-3 py-1 text-xs font-body bg-bg-secondary text-text-secondary border border-border rounded-sm">
-                {tech}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Links */}
-        <div className="flex flex-wrap gap-3 mb-12 pb-12 border-b border-border">
-          {project.demo_url && (
-            <a href={project.demo_url} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-body font-medium bg-text-primary text-bg rounded-sm hover:opacity-90 transition-opacity">
-              <ExternalLink className="w-4 h-4" /> Live Demo
-            </a>
+        <div className="grid lg:grid-cols-[200px_1fr] gap-12">
+          {/* On this page */}
+          {sections.length > 1 && (
+            <nav aria-label="On this page" className="hidden lg:block">
+              <div className="sticky top-28">
+                <p className="text-xs font-mono text-text-faint uppercase tracking-widest mb-4">On this page</p>
+                <ol className="space-y-2.5 border-l border-border">
+                  {sections.map((s) => (
+                    <li key={s.id}>
+                      <a href={`#${s.id}`} className="block -ml-px pl-4 border-l border-transparent text-sm font-body text-text-muted hover:text-text-primary hover:border-text-primary transition-colors">
+                        {s.label}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </nav>
           )}
-          {project.repo_url && (
-            <a href={project.repo_url} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-body font-medium border border-border text-text-primary rounded-sm hover:bg-bg-secondary transition-colors">
-              <Github className="w-4 h-4" /> Source Code
-            </a>
-          )}
-        </div>
 
-        {/* Case Study Sections */}
-        {project.problem && (
-          <section className="mb-10">
-            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-3">Problem</h2>
-            <p className="text-text-secondary leading-relaxed">{project.problem}</p>
-          </section>
-        )}
+          <article className="max-w-3xl space-y-16 lg:col-start-2">
+            {project.problem?.trim() && (
+              <section id="problem" className="scroll-mt-28 reveal">
+                <SectionHeading index={sectionIndex('problem')}>Problem</SectionHeading>
+                <Paragraphs text={project.problem} />
+              </section>
+            )}
 
-        {project.approach && (
-          <section className="mb-10">
-            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-3">Approach</h2>
-            <p className="text-text-secondary leading-relaxed">{project.approach}</p>
-          </section>
-        )}
+            {project.approach?.trim() && (
+              <section id="approach" className="scroll-mt-28 reveal">
+                <SectionHeading index={sectionIndex('approach')}>Approach</SectionHeading>
+                <Paragraphs text={project.approach} />
+              </section>
+            )}
 
-        {project.role && (
-          <section className="mb-10">
-            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-3">Role</h2>
-            <p className="text-text-secondary leading-relaxed">{project.role}</p>
-          </section>
-        )}
-
-        {project.technical_decisions && project.technical_decisions.length > 0 && (
-          <section className="mb-10">
-            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-4">Technical Decisions</h2>
-            <div className="space-y-6">
-              {(project.technical_decisions as TechnicalDecision[]).map((td, i) => (
-                <div key={i} className="border-l-2 border-border pl-5">
-                  <h3 className="text-base font-body font-semibold text-text-primary mb-1.5">{td.decision}</h3>
-                  <p className="text-sm text-text-secondary mb-1.5"><span className="text-text-muted">Rationale: </span>{td.rationale}</p>
-                  <p className="text-sm text-text-muted"><span className="text-text-muted">Trade-off: </span>{td.trade_off}</p>
+            {project.architecture?.trim() && (
+              <section id="architecture" className="scroll-mt-28 reveal">
+                <SectionHeading index={sectionIndex('architecture')}>Architecture</SectionHeading>
+                <div className="bg-surface border border-border rounded-lg p-6">
+                  <MermaidDiagram chart={project.architecture} />
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              </section>
+            )}
 
-        {project.outcomes && project.outcomes.length > 0 && (
-          <section className="mb-10">
-            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-4">Outcomes</h2>
-            <div className="space-y-4">
-              {(project.outcomes as Outcome[]).map((o, i) => (
-                <div key={i} className="flex gap-4">
-                  <span className="text-xs font-body text-text-faint mt-0.5 min-w-[1.5rem]">{String(i + 1).padStart(2, '0')}</span>
-                  <div>
-                    <p className="text-text-secondary font-body">{o.outcome}</p>
-                    {o.result && <p className="text-sm text-text-muted mt-0.5">{o.result}</p>}
-                  </div>
+            {decisions.length > 0 && (
+              <section id="decisions" className="scroll-mt-28 reveal">
+                <SectionHeading index={sectionIndex('decisions')}>Decisions &amp; trade-offs</SectionHeading>
+                <ol className="space-y-8">
+                  {decisions.map((td, i) => (
+                    <li key={i} className="border-l-2 border-border pl-6">
+                      <p className="text-xs font-mono text-accent mb-2">Decision {i + 1}</p>
+                      <Paragraphs text={td.decision} />
+                      {td.rationale?.trim() && (
+                        <p className="text-sm text-text-secondary font-body mt-3">
+                          <span className="text-text-muted">Why: </span>
+                          {td.rationale}
+                        </p>
+                      )}
+                      {td.trade_off?.trim() && (
+                        <p className="text-sm text-text-secondary font-body mt-2">
+                          <span className="text-text-muted">Trade-off: </span>
+                          {td.trade_off}
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )}
+
+            {outcomes.length > 0 && (
+              <section id="outcomes" className="scroll-mt-28 reveal">
+                <SectionHeading index={sectionIndex('outcomes')}>Outcomes</SectionHeading>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {outcomes.map((o, i) => (
+                    <div key={i} className="bg-surface border border-border rounded-lg p-5">
+                      {o.result?.trim() ? (
+                        <>
+                          <p className="text-xs font-mono text-text-faint uppercase tracking-widest mb-2">{o.outcome}</p>
+                          <p className="text-sm text-text-primary font-body leading-relaxed">{o.result}</p>
+                        </>
+                      ) : (
+                        <p className="text-sm text-text-primary font-body leading-relaxed">{o.outcome}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              </section>
+            )}
 
-        {/* Gallery */}
-        {project.gallery && project.gallery.length > 0 && (
-          <section className="mb-10">
-            <h2 className="text-xs font-body font-medium text-text-muted uppercase tracking-widest mb-4">Screenshots</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {project.gallery.map((img, i) => (
-                <div key={i} className="relative aspect-video rounded-lg overflow-hidden border border-border">
-                  <Image src={img} alt={`${project.title} screenshot ${i + 1}`} fill placeholder="blur" blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect fill='%23EFEBE3' width='640' height='360'/%3E%3C/svg%3E" className="object-cover" />
+            {project.learnings?.trim() && (
+              <section id="learnings" className="scroll-mt-28 reveal">
+                <SectionHeading index={sectionIndex('learnings')}>What I&apos;d do differently</SectionHeading>
+                <div className="bg-bg-secondary border-l-2 border-accent rounded-r-lg p-6">
+                  <Paragraphs text={project.learnings} />
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              </section>
+            )}
 
-        {/* Footer nav */}
-        <div className="pt-8 border-t border-border">
-          <Link href="/projects" className="inline-flex items-center gap-2 text-text-muted hover:text-text-primary transition-colors text-sm">
-            <ArrowLeft className="w-4 h-4" /> Back to Projects
-          </Link>
+            {project.gallery?.length > 0 && (
+              <section id="screenshots" className="scroll-mt-28 reveal">
+                <SectionHeading index={sectionIndex('screenshots')}>Screenshots</SectionHeading>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {project.gallery.map((img, i) => (
+                    <a key={i} href={img} target="_blank" rel="noopener noreferrer" className="relative aspect-video rounded-lg overflow-hidden border border-border bg-bg-secondary block">
+                      <Image
+                        src={img}
+                        alt={`${project.title} screenshot ${i + 1}`}
+                        fill
+                        sizes="(min-width: 640px) 384px, 100vw"
+                        placeholder="blur"
+                        blurDataURL={BLUR}
+                        className="object-cover object-top hover:scale-[1.02] transition-transform duration-300"
+                      />
+                    </a>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Next project */}
+            <footer className="pt-8 border-t border-border flex items-center justify-between gap-4">
+              <Link href="/projects" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors">
+                <ArrowLeft className="w-4 h-4" /> All projects
+              </Link>
+              {next && next.slug !== project.slug && (
+                <TransitionLink href={`/projects/${next.slug}`} className="group text-right">
+                  <span className="block text-xs font-mono text-text-faint uppercase tracking-widest">Next</span>
+                  <span className="inline-flex items-center gap-2 font-display text-xl text-text-primary group-hover:text-accent transition-colors">
+                    {next.title} <ArrowRight className="w-4 h-4" />
+                  </span>
+                </TransitionLink>
+              )}
+            </footer>
+          </article>
         </div>
       </div>
     </div>

@@ -32,7 +32,7 @@ export default function BlogPreview() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {posts.map((post) => (
-            <article key={post.id} className="group bg-surface border border-border rounded-lg p-6 hover:border-rule transition-colors">
+            <article key={post.id} className="reveal group bg-surface border border-border rounded-lg p-6 hover:border-rule transition-colors">
               <div className="mb-4">
                 <span className="text-xs font-mono text-accent uppercase tracking-wider">{post.category}</span>
               </div>

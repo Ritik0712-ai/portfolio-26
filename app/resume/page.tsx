@@ -1,7 +1,7 @@
 'use client';
 
 import { Download, ExternalLink, Mail } from 'lucide-react';
-import Link from 'next/link';
+import { resumeUpdated } from '@/data/resume';
 
 export default function ResumePage() {
   return (
@@ -10,9 +10,15 @@ export default function ResumePage() {
         {/* Header */}
         <div className="mb-8">
           <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2">Resume</p>
-          <h1 className="text-4xl font-display font-semibold text-text-primary mb-4">Ritik Agarwal</h1>
+          <h1 className="text-4xl font-display font-semibold text-text-primary mb-2">Ritik Agarwal</h1>
+          <p className="text-sm text-text-muted font-body mb-5">
+            Last updated{' '}
+            <time dateTime={resumeUpdated}>
+              {new Date(resumeUpdated).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </time>
+          </p>
           <div className="flex flex-wrap gap-3">
-            <a href="/resume.pdf" className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white font-body font-medium rounded hover:bg-accent-warm transition-colors text-sm">
+            <a href="/resume.pdf" download="Ritik_Agarwal_Resume.pdf" className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white font-body font-medium rounded hover:bg-accent-warm transition-colors text-sm">
               <Download className="w-4 h-4" /> Download PDF
             </a>
             <a href="mailto:ritikagarwal2468@gmail.com" className="inline-flex items-center gap-2 px-4 py-2 border border-border text-text-secondary font-body text-sm rounded hover:border-rule hover:text-text-primary transition-colors">

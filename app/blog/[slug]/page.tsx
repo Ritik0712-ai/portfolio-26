@@ -42,9 +42,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'en_US',
       type: 'article',
       publishedTime: post.created_at,
-      images: post.cover_image ? [{ url: post.cover_image, width: 1200, height: 630, alt: post.title }] : undefined,
     },
-    twitter: { card: 'summary_large_image', title: post.title, description: post.excerpt || undefined, images: post.cover_image ? [post.cover_image] : undefined },
+    twitter: { card: 'summary_large_image', title: post.title, description: post.excerpt || undefined },
   };
 }
 

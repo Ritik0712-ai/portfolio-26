@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Github, Linkedin, Mail, ExternalLink } from 'lucide-react';
+import { Github, Linkedin, Mail, ExternalLink, Code2 } from 'lucide-react';
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -26,6 +26,7 @@ export default function Footer() {
                 { href: '/blog', label: 'Blog' },
                 { href: '/resume', label: 'Resume' },
                 { href: '/now', label: 'Now' },
+                { href: '/uses', label: 'Uses' },
                 { href: '/contact', label: 'Contact' },
                 { href: '/feedback', label: 'Leave a testimonial' },
               ].map((link) => (
@@ -52,6 +53,11 @@ export default function Footer() {
               <a href="https://www.linkedin.com/in/ritik-agarwal-58ba012b4/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary font-body transition-colors">
                 <Linkedin className="w-4 h-4" />
                 LinkedIn
+                <ExternalLink className="w-3 h-3" />
+              </a>
+              <a href="https://leetcode.com/u/Ritik812800/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary font-body transition-colors">
+                <Code2 className="w-4 h-4" />
+                LeetCode
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
