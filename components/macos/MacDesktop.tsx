@@ -216,6 +216,7 @@ export default function MacDesktop() {
     { divider: true, label: '' },
     { label: 'Switch to Windows edition', run: () => router.push('/magic/windows') },
     { label: 'Switch to Android edition', run: () => router.push('/magic/android') },
+    { label: 'All editions…', run: () => router.push('/magic') },
     { label: 'Back to classic portfolio', run: goClassic },
   ];
 

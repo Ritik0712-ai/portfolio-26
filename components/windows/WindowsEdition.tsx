@@ -26,7 +26,7 @@ export default function WindowsEdition() {
         <p className="text-[14px] text-white/75 max-w-sm">It&apos;s a full desktop with windows and a taskbar. On a phone, the Android edition feels right at home.</p>
         <div className="flex flex-col gap-2 w-full max-w-xs">
           <Link href="/magic/android" className="h-11 rounded-md bg-white text-black font-semibold flex items-center justify-center">Open the Android edition</Link>
-          <Link href="/magic" className="h-11 rounded-md border border-white/30 flex items-center justify-center">iPhone-style edition</Link>
+          <Link href="/magic/mac" className="h-11 rounded-md border border-white/30 flex items-center justify-center">iPhone-style edition</Link>
           <button onClick={() => setForce(true)} className="h-10 text-[13px] text-white/70">Show the desktop anyway</button>
         </div>
       </div>

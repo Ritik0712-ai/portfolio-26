@@ -450,7 +450,7 @@ export function SettingsApp({
   themed: boolean; setThemed: (t: boolean) => void;
   wallpaper: string; setWallpaper: (w: string) => void;
   brightness: number; setBrightness: (b: number) => void;
-  onSwitch: (to: 'mac' | 'windows' | 'classic') => void;
+  onSwitch: (to: 'mac' | 'windows' | 'classic' | 'all') => void;
 }) {
   const [page, setPage] = useState<null | 'style' | 'display' | 'about' | 'editions'>(null);
   const rows = [
@@ -517,6 +517,7 @@ export function SettingsApp({
             <Group>
               <ListItem onClick={() => onSwitch('mac')} icon={<Sym name="apps" size={24} color="var(--md-primary)" />} title="Mac edition" sub="iPhone-style on phones, desktop Mac on laptops" />
               <ListItem onClick={() => onSwitch('windows')} icon={<Sym name="code" size={24} color="var(--md-primary)" />} title="Windows edition" sub="Fluent desktop with Start menu (laptops)" />
+              <ListItem onClick={() => onSwitch('all')} icon={<Sym name="apps" size={24} color="var(--md-primary)" />} title="All editions" sub="Back to the edition picker" />
               <ListItem onClick={() => onSwitch('classic')} icon={<Sym name="language" size={24} color="var(--md-primary)" />} title="Classic portfolio" sub="The regular scrolling website" />
             </Group>
           </Detail>

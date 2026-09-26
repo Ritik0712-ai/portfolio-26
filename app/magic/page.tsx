@@ -1,18 +1,19 @@
 import type { Metadata, Viewport } from 'next';
-import RitikOS from '@/components/os/RitikOS';
+import EditionPicker from '@/components/os/EditionPicker';
 import { pageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = pageMetadata({ title: 'Magic — RitikOS', path: '/magic' });
+export const metadata: Metadata = pageMetadata({
+  title: 'Magic — RitikOS',
+  description: 'Explore Ritik Agarwal’s portfolio as a Mac, Windows or Android-style operating system.',
+  path: '/magic',
+});
 
-// Edge-to-edge on phones so the status bar and home indicator sit in the
-// safe areas like a native app. Pinch-zoom stays enabled for accessibility.
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  viewportFit: 'cover',
-  themeColor: '#000000',
+  themeColor: '#121016',
 };
 
 export default function MagicPage() {
-  return <RitikOS />;
+  return <EditionPicker />;
 }

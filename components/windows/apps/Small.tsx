@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Plus, ArrowUp, Sparkles, Download, Printer, ZoomIn, ZoomOut, Monitor, Palette, User, Info, Smartphone, Laptop, Globe, Search, ChevronRight, Check, History, Delete } from 'lucide-react';
+import { X, Plus, ArrowUp, Sparkles, Download, Printer, ZoomIn, ZoomOut, Monitor, Palette, User, Info, Smartphone, Laptop, Globe, Search, ChevronRight, Check, History, Delete, LayoutGrid } from 'lucide-react';
 import { aboutParagraphs, aboutHeadline } from '@/data/about';
 import { nowData } from '@/data/now';
 import { skillGroups } from '@/data/skills';
@@ -167,7 +167,7 @@ export function WinSettings({
   setBrightness: (b: number) => void;
   transparency: boolean;
   setTransparency: (on: boolean) => void;
-  onSwitch: (to: 'mac' | 'android' | 'classic') => void;
+  onSwitch: (to: 'mac' | 'android' | 'classic' | 'all') => void;
 }) {
   const [pane, setPane] = useState<Pane>((initial as Pane) || 'personalization');
   const [q, setQ] = useState('');
@@ -280,6 +280,7 @@ export function WinSettings({
             {([
               ['mac', 'Mac edition', 'Menu bar, Dock, Finder, Spotlight. iPhone-style on phones.', Laptop],
               ['android', 'Android edition', 'Material You phone with widgets, app drawer and quick settings.', Smartphone],
+              ['all', 'All editions', 'Back to the edition picker.', LayoutGrid],
               ['classic', 'Classic portfolio', 'The regular scrolling website.', Globe],
             ] as const).map(([id, label, desc, Icon]) => (
               <button key={id} onClick={() => onSwitch(id)} className="w-full rounded-lg win-card win-hover p-4 mb-2 flex items-center gap-4 text-left">

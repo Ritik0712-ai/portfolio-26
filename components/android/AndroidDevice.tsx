@@ -72,8 +72,8 @@ export default function AndroidDevice() {
 
   const home = useCallback(() => { setApp(null); setDrawer(false); setShade(false); }, []);
 
-  const switchTo = useCallback((to: 'mac' | 'windows' | 'classic') => {
-    router.push(to === 'mac' ? '/magic' : to === 'windows' ? '/magic/windows' : '/');
+  const switchTo = useCallback((to: 'mac' | 'windows' | 'classic' | 'all') => {
+    router.push(to === 'mac' ? '/magic/mac' : to === 'windows' ? '/magic/windows' : to === 'all' ? '/magic' : '/');
   }, [router]);
 
   // Esc / Backspace-free "back" on keyboards.
@@ -204,8 +204,9 @@ export default function AndroidDevice() {
           Material You colours pulled from the wallpaper, live GitHub and blog data, and every app wired to the real site. Swipe up to unlock, swipe up again for all apps, pull down for quick settings.
         </p>
         <div className="flex flex-wrap gap-2 text-[13px]">
-          <Link href="/magic" className="px-4 h-10 rounded-full bg-white/10 hover:bg-white/15 flex items-center">Mac edition</Link>
+          <Link href="/magic/mac" className="px-4 h-10 rounded-full bg-white/10 hover:bg-white/15 flex items-center">Mac edition</Link>
           <Link href="/magic/windows" className="px-4 h-10 rounded-full bg-white/10 hover:bg-white/15 flex items-center">Windows edition</Link>
+          <Link href="/magic" className="px-4 h-10 rounded-full bg-white/10 hover:bg-white/15 flex items-center">All editions</Link>
           <Link href="/" className="px-4 h-10 rounded-full bg-white text-black flex items-center">Classic portfolio</Link>
         </div>
       </aside>

@@ -85,8 +85,8 @@ export default function WinDesktop() {
     [wm, openAsk]
   );
 
-  const switchTo = useCallback((to: 'mac' | 'android' | 'classic') => {
-    router.push(to === 'mac' ? '/magic' : to === 'android' ? '/magic/android' : '/');
+  const switchTo = useCallback((to: 'mac' | 'android' | 'classic' | 'all') => {
+    router.push(to === 'mac' ? '/magic/mac' : to === 'android' ? '/magic/android' : to === 'all' ? '/magic' : '/');
   }, [router]);
 
   const closeAll = useCallback(() => wm.windows.forEach((w) => wm.close(w.id)), [wm]);

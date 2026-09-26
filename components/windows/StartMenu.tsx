@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Power, ChevronRight, ChevronLeft, Lock, Moon, RotateCcw, Laptop, Smartphone, Globe, Sparkles } from 'lucide-react';
+import { Search, Power, ChevronRight, ChevronLeft, Lock, Moon, RotateCcw, Laptop, Smartphone, Globe, Sparkles, LayoutGrid } from 'lucide-react';
 import { WIN_APPS, PINNED, Fluent, FolderGlyph, type WinAppId } from './meta';
 import { useBlogs, useProjects, PROFILE, timeAgo } from '@/components/os/data';
 
-export type PowerAction = 'lock' | 'sleep' | 'restart' | 'shutdown' | 'mac' | 'android' | 'classic';
+export type PowerAction = 'lock' | 'sleep' | 'restart' | 'shutdown' | 'mac' | 'android' | 'classic' | 'all';
 
 interface Props {
   mode: 'start' | 'search';
@@ -163,6 +163,7 @@ export default function StartMenu({ mode, onClose, onApp, onPower, onAsk }: Prop
             {([
               ['mac', 'Mac edition', Laptop],
               ['android', 'Android edition', Smartphone],
+              ['all', 'All editions', LayoutGrid],
               ['classic', 'Classic portfolio', Globe],
             ] as const).map(([a, label, Icon]) => (
               <button key={a} role="menuitem" onClick={() => onPower(a)} className="w-full flex items-center gap-3 px-3 py-2 rounded-md win-hover text-left">

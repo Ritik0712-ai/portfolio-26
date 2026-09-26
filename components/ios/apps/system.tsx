@@ -161,6 +161,7 @@ export function SettingsApp({ theme, setTheme, wallpaper, setWallpaper, onClassi
         <ListSection header="RitikOS editions" footer="Same portfolio, different skins. The classic portfolio is the standard, scrolling version of this site.">
           <a className="ios-row ios-blue" href="/magic/android">Switch to Android Edition</a>
           <a className="ios-row ios-blue" href="/magic/windows">Switch to Windows Edition (laptop)</a>
+          <a className="ios-row ios-blue" href="/magic">All Editions</a>
           <button className="ios-row ios-blue" onClick={onClassic}>Open Classic Portfolio</button>
         </ListSection>
       </IOSPage>
