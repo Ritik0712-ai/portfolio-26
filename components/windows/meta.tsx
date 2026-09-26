@@ -161,7 +161,7 @@ export const WIN_APPS: Record<WinAppId, AppMeta> = {
   settings: { name: 'Settings', w: 900, h: 620, icon: (s = 24) => <Fluent name="settings_48_color" size={s} />, blurb: 'Theme, wallpaper, switch OS' },
   calculator: { name: 'Calculator', w: 340, h: 520, icon: (s = 24) => <GlyphTile size={s} from="#6B6B6B" to="#3B3B3B" glyph="/os-icons/fluent/calculator_24_filled.svg" />, blurb: 'Standard calculator' },
   copilot: { name: 'Ask Ritik', w: 420, h: 640, icon: (s = 24) => <Fluent name="bot_sparkle_24_color" size={s} />, blurb: 'AI assistant that knows Ritik' },
-  resume: { name: 'Resume.pdf', w: 860, h: 720, icon: (s = 24) => <PdfGlyph size={s} />, blurb: 'View or download the résumé' },
+  resume: { name: 'Resume.pdf', w: 960, h: 720, icon: (s = 24) => <PdfGlyph size={s} />, blurb: 'View or download the résumé' },
   recycle: { name: 'Recycle Bin', w: 640, h: 420, icon: (s = 24) => <BinGlyph size={s} />, blurb: 'Nothing to see here' },
   about: { name: 'About RitikOS', w: 520, h: 460, icon: (s = 24) => <Fluent name="person_48_color" size={s} />, blurb: 'What this is and how it was built' },
 };

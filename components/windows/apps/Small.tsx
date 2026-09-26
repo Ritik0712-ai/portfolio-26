@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Plus, ArrowUp, Sparkles, Download, Printer, ZoomIn, ZoomOut, Monitor, Palette, User, Info, Smartphone, Laptop, Globe, Search, ChevronRight, Check, History, Delete, LayoutGrid } from 'lucide-react';
+import { X, Plus, ArrowUp, Sparkles, Monitor, Palette, User, Info, Smartphone, Laptop, Globe, Search, ChevronRight, Check, History, Delete, LayoutGrid } from 'lucide-react';
 import { aboutParagraphs, aboutHeadline } from '@/data/about';
 import { nowData } from '@/data/now';
 import { skillGroups } from '@/data/skills';
-import { resumeUpdated } from '@/data/resume';
+import InteractiveResume from '@/components/resume/InteractiveResume';
 import { askAssistant, PROFILE } from '@/components/os/data';
 import { WIN_WALLPAPERS, StartGlyph, BinGlyph, Fluent } from '../meta';
 
@@ -135,20 +135,7 @@ export function Notepad() {
 /* --------------------------------------------------------------- PDF viewer */
 
 export function PdfViewer() {
-  return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-1 h-10 px-3 win-mica border-b win-stroke text-[12px] shrink-0">
-        <span className="win-text-2">Updated {new Date(resumeUpdated).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-        <span className="ml-auto flex items-center gap-1">
-          <span className="w-8 h-8 flex items-center justify-center opacity-50"><ZoomOut className="w-4 h-4" /></span>
-          <span className="w-8 h-8 flex items-center justify-center opacity-50"><ZoomIn className="w-4 h-4" /></span>
-          <button onClick={() => window.open('/resume.pdf', '_blank')} aria-label="Print" className="w-8 h-8 rounded-md win-hover flex items-center justify-center"><Printer className="w-4 h-4" /></button>
-          <a href="/resume.pdf" download="Ritik_Agarwal_Resume.pdf" className="win-btn-accent inline-flex items-center gap-1.5 ml-1"><Download className="w-3.5 h-3.5" /> Save</a>
-        </span>
-      </div>
-      <iframe src="/resume.pdf#view=FitH" title="Résumé" className="flex-1 w-full bg-[#525659]" />
-    </div>
-  );
+  return <InteractiveResume />;
 }
 
 /* ----------------------------------------------------------------- Settings */

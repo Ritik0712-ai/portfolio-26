@@ -11,7 +11,7 @@ import { musicPicks, spotifyEmbed, spotifyLink, type MusicItem } from '@/data/mu
 import { aboutParagraphs, aboutHeadline } from '@/data/about';
 import { nowData } from '@/data/now';
 import { skillGroups } from '@/data/skills';
-import { resumeUpdated } from '@/data/resume';
+import InteractiveResume from '@/components/resume/InteractiveResume';
 import { Sym, AppIcon } from './System';
 import { ANDROID_WALLPAPERS } from './theme';
 
@@ -594,27 +594,8 @@ export function ContactsApp({ onBack, onMail }: { onBack: () => void; onMail: ()
 
 export function ResumeApp({ onBack }: { onBack: () => void }) {
   return (
-    <Screen
-      title="Résumé"
-      onBack={onBack}
-      large={false}
-      fab={
-        <a href="/resume.pdf" download="Ritik_Agarwal_Resume.pdf" className="absolute right-4 bottom-10 h-14 px-5 rounded-[16px] md-primary-container flex items-center gap-2 shadow-lg font-medium">
-          <Sym name="download" size={22} /> Download
-        </a>
-      }
-    >
-      <div className="px-4">
-        <div className="rounded-[20px] md-surface-container p-4 mb-3 flex items-center gap-3">
-          <Sym name="description" size={28} color="var(--md-primary)" />
-          <div className="flex-1 min-w-0">
-            <p className="font-medium">Ritik_Agarwal_Resume.pdf</p>
-            <p className="text-[13px] md-variant">Updated {new Date(resumeUpdated).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-          </div>
-          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="h-10 px-4 rounded-full md-bg-primary flex items-center text-[14px]">Open</a>
-        </div>
-        <iframe src="/resume.pdf#view=FitH" title="Résumé" className="w-full h-[560px] rounded-[16px] bg-[#525659]" />
-      </div>
+    <Screen title="Résumé" onBack={onBack} large={false}>
+      <InteractiveResume scroll={false} className="mx-3 rounded-[24px] overflow-hidden" />
     </Screen>
   );
 }

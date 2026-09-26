@@ -77,7 +77,7 @@ export default function WinDesktop() {
       const meta = WIN_APPS[app];
       let title = meta.name;
       if (app === 'explorer') title = FOLDER_TITLE[params?.folder ?? 'home'] ?? 'File Explorer';
-      if (app === 'resume') title = 'Ritik_Agarwal_Resume.pdf';
+      if (app === 'resume') title = 'Ritik Agarwal — Resume';
       if (app === 'terminal') title = 'Windows PowerShell';
       if (app === 'notepad') title = 'Notepad';
       wm.open(app, { title, params, w: meta.w, h: meta.h });
