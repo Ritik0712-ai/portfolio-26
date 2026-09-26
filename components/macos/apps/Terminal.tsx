@@ -8,7 +8,7 @@ import { aboutParagraphs } from '@/data/about';
 
 interface Line { kind: 'in' | 'out' | 'err' | 'accent'; text: string }
 
-const PROMPT = 'ritik@RitikOS ~ %';
+const DEFAULT_PROMPT = 'ritik@RitikOS ~ %';
 const COMMANDS = ['help', 'whoami', 'about', 'ls', 'open', 'projects', 'experience', 'certs', 'skills', 'now', 'resume', 'contact', 'socials', 'ask', 'neofetch', 'date', 'echo', 'history', 'clear', 'exit', 'sudo'];
 
 const HELP = `Available commands:
@@ -25,17 +25,22 @@ const HELP = `Available commands:
   neofetch          system info
   history · clear · date · echo · exit`;
 
-export default function Terminal({ onClose, onOpenResume, onOpenProject, onOpenMail }: {
+export default function Terminal({ onClose, onOpenResume, onOpenProject, onOpenMail, prompt, variant = 'mac' }: {
+  prompt?: string;
+  variant?: 'mac' | 'windows';
   onClose: () => void;
   onOpenResume: () => void;
   onOpenProject: (slug: string) => void;
   onOpenMail: () => void;
 }) {
+  const PROMPT = prompt ?? DEFAULT_PROMPT;
   const { data: projects } = useProjects();
   const { data: certs } = useCertifications();
   const { data: timeline } = useTimeline();
   const [lines, setLines] = useState<Line[]>([
-    { kind: 'accent', text: `Last login: ${new Date().toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} on ttys000` },
+    variant === 'windows'
+      ? { kind: 'accent', text: 'RitikOS Terminal\nCopyright (C) Ritik Agarwal. All rights reserved.' }
+      : { kind: 'accent', text: `Last login: ${new Date().toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} on ttys000` },
     { kind: 'out', text: "Welcome to RitikOS. Type 'help' to see what you can do." },
   ]);
   const [input, setInput] = useState('');
@@ -142,7 +147,7 @@ export default function Terminal({ onClose, onOpenResume, onOpenProject, onOpenM
 
   return (
     <div
-      className="h-full overflow-y-auto bg-[#1E1E1E] text-[#E5E5E5] font-mono text-[12.5px] leading-[1.55] p-3 cursor-text"
+      className={`h-full overflow-y-auto font-mono text-[12.5px] leading-[1.55] p-3 cursor-text ${variant === 'windows' ? 'bg-[#0C0C0C] text-[#CCCCCC]' : 'bg-[#1E1E1E] text-[#E5E5E5]'}`}
       onClick={() => inputRef.current?.focus()}
     >
       {lines.map((l, i) => (
@@ -154,7 +159,7 @@ export default function Terminal({ onClose, onOpenResume, onOpenProject, onOpenM
         <p className="text-[#8B949E]">thinking…</p>
       ) : (
         <div className="flex gap-2">
-          <span className="text-[#7EE787] shrink-0">{PROMPT}</span>
+          <span className={`shrink-0 ${variant === 'windows' ? 'text-[#CCCCCC]' : 'text-[#7EE787]'}`}>{PROMPT}</span>
           <input
             ref={inputRef}
             autoFocus

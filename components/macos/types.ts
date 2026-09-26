@@ -2,9 +2,9 @@ export type AppId =
   | 'finder' | 'notes' | 'preview' | 'about-portfolio' | 'safari' | 'mail' | 'terminal'
   | 'github' | 'photos' | 'contacts' | 'calculator' | 'settings' | 'trash' | 'music';
 
-export interface WindowState {
+export interface WindowState<A extends string = AppId> {
   id: string;
-  app: AppId;
+  app: A;
   title: string;
   /** App-specific launch data, e.g. which Finder folder to open. */
   params?: Record<string, string>;

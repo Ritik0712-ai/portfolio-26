@@ -213,6 +213,9 @@ export default function MacDesktop() {
     { label: 'Shut Down…', run: () => { closeAll(); setPhase('off'); } },
     { divider: true, label: '' },
     { label: 'Lock Screen', shortcut: '⌃⌘Q', run: () => setPhase('login') },
+    { divider: true, label: '' },
+    { label: 'Switch to Windows edition', run: () => router.push('/magic/windows') },
+    { label: 'Switch to Android edition', run: () => router.push('/magic/android') },
     { label: 'Back to classic portfolio', run: goClassic },
   ];
 

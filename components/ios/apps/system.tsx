@@ -158,7 +158,9 @@ export function SettingsApp({ theme, setTheme, wallpaper, setWallpaper, onClassi
           <button className="ios-row" onClick={() => setPane('wallpaper')}><span className="flex-1">Wallpaper</span><ChevronRight className="w-4 h-4 ios-secondary" /></button>
           <button className="ios-row" onClick={() => setPane('about')}><span className="flex-1">About</span><ChevronRight className="w-4 h-4 ios-secondary" /></button>
         </ListSection>
-        <ListSection footer="The classic portfolio is the standard, scrolling version of this site.">
+        <ListSection header="RitikOS editions" footer="Same portfolio, different skins. The classic portfolio is the standard, scrolling version of this site.">
+          <a className="ios-row ios-blue" href="/magic/android">Switch to Android Edition</a>
+          <a className="ios-row ios-blue" href="/magic/windows">Switch to Windows Edition (laptop)</a>
           <button className="ios-row ios-blue" onClick={onClassic}>Open Classic Portfolio</button>
         </ListSection>
       </IOSPage>

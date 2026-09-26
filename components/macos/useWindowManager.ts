@@ -5,20 +5,20 @@ import type { AppId, WindowState } from './types';
 import { MENU_BAR_HEIGHT } from './types';
 
 interface State {
-  windows: WindowState[];
+  windows: WindowState<string>[];
   topZ: number;
   focusedId: string | null;
 }
 
 type Action =
-  | { type: 'open'; win: Omit<WindowState, 'z' | 'minimized' | 'maximized'>; singleton: boolean }
+  | { type: 'open'; win: Omit<WindowState<string>, 'z' | 'minimized' | 'maximized'>; singleton: boolean }
   | { type: 'close'; id: string }
   | { type: 'focus'; id: string }
   | { type: 'minimize'; id: string }
   | { type: 'toggleMax'; id: string }
-  | { type: 'update'; id: string; patch: Partial<WindowState> };
+  | { type: 'update'; id: string; patch: Partial<WindowState<string>> };
 
-function topVisible(windows: WindowState[]) {
+function topVisible(windows: WindowState<string>[]) {
   return windows.filter((w) => !w.minimized).sort((a, b) => b.z - a.z)[0]?.id ?? null;
 }
 
@@ -85,37 +85,39 @@ export interface OpenOptions {
   singleton?: boolean;
 }
 
-export function useWindowManager() {
+export function useWindowManager<A extends string = AppId>(opts?: { top?: number; bottom?: number }) {
   const [state, dispatch] = useReducer(reducer, { windows: [], topZ: 10, focusedId: null });
   // NOTE: z-index stays below the menu bar (9000) / overlays; 10 + one per focus is plenty.
 
-  const open = useCallback((app: AppId, opts: OpenOptions) => {
+  const topInset = opts?.top ?? MENU_BAR_HEIGHT;
+  const bottomInset = opts?.bottom ?? 110;
+  const open = useCallback((app: A, o: OpenOptions) => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const w = Math.min(opts.w, vw - 40);
-    const h = Math.min(opts.h, vh - MENU_BAR_HEIGHT - 110);
+    const w = Math.min(o.w, vw - 40);
+    const h = Math.min(o.h, vh - topInset - bottomInset);
     // Cascade new windows so they don't stack exactly on top of each other.
     const offset = (counter % 6) * 28;
     counter += 1;
     const x = Math.max(20, Math.round((vw - w) / 2) - 80 + offset);
-    const y = Math.max(MENU_BAR_HEIGHT + 16, Math.round((vh - h) / 2) - 60 + offset);
+    const y = Math.max(topInset + 16, Math.round((vh - h) / 2) - 60 + offset);
     dispatch({
       type: 'open',
-      singleton: opts.singleton ?? true,
-      win: { id: `${app}-${Date.now()}-${counter}`, app, title: opts.title, params: opts.params, x, y, w, h },
+      singleton: o.singleton ?? true,
+      win: { id: `${app}-${Date.now()}-${counter}`, app, title: o.title, params: o.params, x, y, w, h },
     });
-  }, []);
+  }, [topInset, bottomInset]);
 
   return {
-    windows: state.windows,
+    windows: state.windows as WindowState<A>[],
     focusedId: state.focusedId,
     open,
     close: useCallback((id: string) => dispatch({ type: 'close', id }), []),
     focus: useCallback((id: string) => dispatch({ type: 'focus', id }), []),
     minimize: useCallback((id: string) => dispatch({ type: 'minimize', id }), []),
     toggleMax: useCallback((id: string) => dispatch({ type: 'toggleMax', id }), []),
-    update: useCallback((id: string, patch: Partial<WindowState>) => dispatch({ type: 'update', id, patch }), []),
+    update: useCallback((id: string, patch: Partial<WindowState<A>>) => dispatch({ type: 'update', id, patch: patch as Partial<WindowState<string>> }), []),
   };
 }
 
-export type WindowManager = ReturnType<typeof useWindowManager>;
+export type WindowManager = ReturnType<typeof useWindowManager<AppId>>;

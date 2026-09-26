@@ -99,7 +99,9 @@ export default function CommandPalette() {
       { id: 'uses', label: 'Uses', group: 'Navigate', icon: Wrench, keywords: 'setup tools gear stack', run: go('/uses') },
       { id: 'resume', label: 'Résumé', group: 'Navigate', icon: FileText, keywords: 'resume cv', run: go('/resume') },
       { id: 'contact', label: 'Contact', group: 'Navigate', icon: Mail, keywords: 'hire email message', run: go('/contact') },
-      { id: 'magic', label: 'Magic — open RitikOS desktop', group: 'Navigate', icon: Sparkles, keywords: 'macos desktop os fun mode', run: go('/magic') },
+      { id: 'magic', label: 'Magic — Mac edition', group: 'Navigate', icon: Sparkles, keywords: 'macos desktop os fun mode', run: go('/magic') },
+      { id: 'magic-win', label: 'Magic — Windows edition', group: 'Navigate', icon: Sparkles, keywords: 'windows 11 fluent desktop os start menu', run: go('/magic/windows') },
+      { id: 'magic-android', label: 'Magic — Android edition', group: 'Navigate', icon: Sparkles, keywords: 'android material you phone os', run: go('/magic/android') },
       { id: 'testimonial', label: 'Leave a testimonial', group: 'Navigate', icon: MessageSquarePlus, keywords: 'feedback review', run: go('/feedback') },
     ];
     for (const p of projects) {

@@ -925,3 +925,219 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 32px;
 }
 .ios-root[data-ios-theme='dark'] .dark-home-indicator { background: #fff; }
+
+/* ============================================
+   RITIKOS FLUENT EDITION (/magic/windows) — Windows 11 design language
+   Mica/Acrylic materials, 8px radii, Fluent colours. Defines --mac-* too so
+   shared readers/panels render correctly.
+   ============================================ */
+.win-root {
+  --win-accent: #005FB8;
+  --win-accent-text: #fff;
+  --win-mica: rgba(243, 243, 243, 0.86);
+  --win-card: rgba(255, 255, 255, 0.72);
+  --win-solid: #F9F9F9;
+  --win-layer: #FFFFFF;
+  --win-text: #1A1A1A;
+  --win-text-2: #5D5D5D;
+  --win-stroke: rgba(0, 0, 0, 0.08);
+  --win-hover: rgba(0, 0, 0, 0.04);
+  --win-press: rgba(0, 0, 0, 0.07);
+  --win-acrylic: rgba(243, 243, 243, 0.78);
+  --win-taskbar: rgba(243, 243, 243, 0.85);
+  --mac-text: var(--win-text);
+  --mac-text-muted: #3d3d3d;
+  --mac-text-faint: var(--win-text-2);
+  --mac-divider: var(--win-stroke);
+  --mac-chip: rgba(0, 0, 0, 0.05);
+  --mac-hover: var(--win-hover);
+  --mac-window-solid: var(--win-layer);
+  color-scheme: light;
+  font-family: "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+.win-root[data-win-theme='dark'] {
+  --win-accent: #4CC2FF;
+  --win-accent-text: #000;
+  --win-mica: rgba(32, 32, 32, 0.9);
+  --win-card: rgba(255, 255, 255, 0.05);
+  --win-solid: #202020;
+  --win-layer: #272727;
+  --win-text: #FFFFFF;
+  --win-text-2: #C5C5C5;
+  --win-stroke: rgba(255, 255, 255, 0.08);
+  --win-hover: rgba(255, 255, 255, 0.06);
+  --win-press: rgba(255, 255, 255, 0.04);
+  --win-acrylic: rgba(44, 44, 44, 0.82);
+  --win-taskbar: rgba(28, 28, 28, 0.85);
+  --mac-text-muted: #e0e0e0;
+  --mac-chip: rgba(255, 255, 255, 0.07);
+  color-scheme: dark;
+}
+.win-root h1, .win-root h2, .win-root h3 { font-family: inherit; }
+.win-text { color: var(--win-text); }
+.win-text-2 { color: var(--win-text-2); }
+.win-accent { color: var(--win-accent); }
+.win-bg-accent { background: var(--win-accent); color: var(--win-accent-text); }
+.win-hover:hover { background: var(--win-hover); }
+.win-hover:active { background: var(--win-press); }
+.win-stroke { border-color: var(--win-stroke); }
+.win-card { background: var(--win-card); border: 1px solid var(--win-stroke); border-radius: 8px; }
+.win-layer { background: var(--win-layer); }
+.win-solid { background: var(--win-solid); }
+.win-acrylic {
+  background: var(--win-acrylic);
+  -webkit-backdrop-filter: blur(60px) saturate(1.5);
+  backdrop-filter: blur(60px) saturate(1.5);
+  border: 1px solid var(--win-stroke);
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.28), 0 2px 21px rgba(0, 0, 0, 0.22);
+}
+.win-mica {
+  background: var(--win-mica);
+  -webkit-backdrop-filter: blur(80px) saturate(1.3);
+  backdrop-filter: blur(80px) saturate(1.3);
+}
+.win-taskbar {
+  background: var(--win-taskbar);
+  -webkit-backdrop-filter: blur(60px) saturate(1.6);
+  backdrop-filter: blur(60px) saturate(1.6);
+  border-top: 1px solid var(--win-stroke);
+}
+.win-window { border: 1px solid var(--win-stroke); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22); }
+.win-window-focused { box-shadow: 0 32px 64px rgba(0, 0, 0, 0.36), 0 2px 21px rgba(0, 0, 0, 0.25); }
+.win-caption { width: 46px; height: 32px; display: inline-flex; align-items: center; justify-content: center; color: var(--win-text); }
+.win-caption:hover { background: var(--win-hover); }
+.win-caption-close:hover { background: #C42B1C; color: #fff; }
+.win-input {
+  background: var(--win-card); border: 1px solid var(--win-stroke); border-bottom: 1px solid var(--win-text-2);
+  border-radius: 4px; padding: 6px 10px; outline: none; color: var(--win-text);
+}
+.win-input:focus { border-bottom: 2px solid var(--win-accent); }
+.win-btn { background: var(--win-card); border: 1px solid var(--win-stroke); border-radius: 4px; padding: 5px 12px; color: var(--win-text); }
+.win-btn:hover { background: var(--win-hover); }
+.win-btn-accent { background: var(--win-accent); color: var(--win-accent-text); border-radius: 4px; padding: 5px 12px; }
+.win-btn-accent:hover { filter: brightness(1.08); }
+.win-toggle { width: 40px; height: 20px; border-radius: 10px; border: 1px solid var(--win-text-2); position: relative; transition: all .15s; }
+.win-toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--win-text-2); transition: all .15s; }
+.win-toggle[aria-checked='true'] { background: var(--win-accent); border-color: var(--win-accent); }
+.win-toggle[aria-checked='true']::after { left: 23px; background: var(--win-accent-text); }
+.win-scroll::-webkit-scrollbar { width: 6px; } .win-scroll::-webkit-scrollbar-thumb { background: var(--win-text-2); border-radius: 3px; }
+
+/* Original wallpapers for the Fluent edition */
+.win-wallpaper-glow {
+  background:
+    radial-gradient(40% 55% at 50% 58%, rgba(120, 190, 255, 0.95) 0%, transparent 70%),
+    radial-gradient(28% 40% at 44% 52%, rgba(0, 120, 212, 0.9) 0%, transparent 70%),
+    radial-gradient(30% 45% at 58% 50%, rgba(80, 60, 220, 0.75) 0%, transparent 70%),
+    linear-gradient(180deg, #d9e8fb 0%, #bcd6f5 100%);
+}
+.win-root[data-win-theme='dark'].win-wallpaper-glow,
+.win-root[data-win-theme='dark'] .win-wallpaper-glow {
+  background:
+    radial-gradient(40% 55% at 50% 58%, rgba(40, 120, 230, 0.9) 0%, transparent 70%),
+    radial-gradient(28% 40% at 44% 52%, rgba(0, 90, 200, 0.95) 0%, transparent 70%),
+    radial-gradient(30% 45% at 58% 50%, rgba(110, 60, 220, 0.7) 0%, transparent 70%),
+    linear-gradient(180deg, #050b1d 0%, #0a1330 100%);
+}
+.win-wallpaper-ribbon {
+  background:
+    conic-gradient(from 210deg at 30% 70%, #ff9a8b, #ff6a88, #ff99ac, #fcb69f, #ff9a8b);
+}
+.win-wallpaper-meadow {
+  background:
+    radial-gradient(70% 50% at 50% 100%, #3a7d44 0%, transparent 70%),
+    radial-gradient(60% 40% at 30% 85%, #6aa84f 0%, transparent 70%),
+    linear-gradient(180deg, #8ec5fc 0%, #e0c3fc 100%);
+}
+.win-wallpaper-night {
+  background:
+    radial-gradient(50% 40% at 70% 30%, rgba(255, 190, 90, 0.6) 0%, transparent 60%),
+    radial-gradient(60% 50% at 20% 80%, rgba(20, 70, 160, 0.8) 0%, transparent 70%),
+    linear-gradient(180deg, #0b0f2a 0%, #1b1f4b 60%, #2b1e4f 100%);
+}
+
+/* Fluent edition — extras */
+.win-root { --mac-sidebar: var(--win-mica); --mac-titlebar: var(--win-mica); --mac-window: var(--win-solid); }
+.win-root[data-win-transparency='off'] .win-acrylic,
+.win-root[data-win-transparency='off'] .win-mica,
+.win-root[data-win-transparency='off'] .win-taskbar { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.win-root[data-win-transparency='off'] .win-acrylic,
+.win-root[data-win-transparency='off'] .win-taskbar { background: var(--win-solid); }
+.win-root[data-win-transparency='off'] .win-mica { background: var(--win-solid); }
+.win-root .mac-urlbar { background: var(--win-card); border: 1px solid var(--win-stroke); }
+.win-root .mac-btn-primary { background: var(--win-accent); color: var(--win-accent-text); border-radius: 4px; }
+.win-root .mac-btn { border-radius: 4px; }
+.win-orbit { animation: win-orbit 2.2s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite; }
+@keyframes win-orbit {
+  0% { transform: rotate(0deg); opacity: 0; }
+  8% { opacity: 1; }
+  30% { transform: rotate(160deg); }
+  60% { transform: rotate(250deg); }
+  80% { transform: rotate(400deg); opacity: 1; }
+  100% { transform: rotate(560deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .win-orbit { animation-duration: 6s; } }
+.win-range { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: linear-gradient(to right, var(--win-accent) var(--p, 50%), var(--win-text-2) var(--p, 50%)); outline: none; }
+.win-range::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--win-layer); border: 5px solid var(--win-accent); box-shadow: 0 0 0 1px var(--win-stroke); cursor: pointer; transition: border-width .12s; }
+.win-range::-webkit-slider-thumb:hover { border-width: 4px; }
+.win-range::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--win-layer); border: 5px solid var(--win-accent); cursor: pointer; }
+.win-snap-cell { background: rgba(128, 128, 128, 0.35); }
+.win-snap-cell:hover { background: var(--win-accent); }
+.win-caption.text-white { color: #fff; }
+.win-window .win-mica { background: color-mix(in srgb, var(--win-solid) 94%, transparent); }
+
+/* ============================================
+   RITIKOS ANDROID EDITION (/magic/android) — Material 3 / Material You
+   Colour roles come from components/android/theme.ts as --md-* variables.
+   ============================================ */
+.and-root {
+  --mac-text: var(--md-on-surface);
+  --mac-text-muted: var(--md-on-surface-variant);
+  --mac-text-faint: var(--md-on-surface-variant);
+  --mac-divider: var(--md-outline-variant);
+  --mac-chip: var(--md-surface-high);
+  --mac-hover: var(--md-surface-high);
+  --mac-window-solid: var(--md-surface);
+  --mac-sidebar: var(--md-surface-low);
+  --mac-titlebar: var(--md-surface-container);
+  font-family: var(--font-roboto), Roboto, "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--md-on-surface);
+}
+.and-root .mac-btn-primary { background: var(--md-primary); color: var(--md-on-primary); border-radius: 999px; padding: 8px 20px; }
+.and-root .mac-btn { border-radius: 999px; padding: 8px 18px; }
+.and-root .os-prose a { color: var(--md-primary); }
+.md-surface { background: var(--md-surface); color: var(--md-on-surface); }
+.md-surface-low { background: var(--md-surface-low); }
+.md-surface-container { background: var(--md-surface-container); }
+.md-surface-high { background: var(--md-surface-high); }
+.md-surface-highest { background: var(--md-surface-highest); }
+.md-primary { color: var(--md-primary); }
+.md-bg-primary { background: var(--md-primary); color: var(--md-on-primary); }
+.md-primary-container { background: var(--md-primary-container); color: var(--md-on-primary-container); }
+.md-secondary-container { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.md-on-surface { color: var(--md-on-surface); }
+.md-variant { color: var(--md-on-surface-variant); }
+.md-outline { border-color: var(--md-outline-variant); }
+.md-state { position: relative; overflow: hidden; }
+.md-state::after { content: ''; position: absolute; inset: 0; background: currentColor; opacity: 0; transition: opacity .15s; pointer-events: none; border-radius: inherit; }
+.md-state:hover::after { opacity: .08; }
+.md-state:active::after { opacity: .14; }
+.md-field { border: 1px solid var(--md-outline); border-radius: 4px; background: transparent; padding: 14px 16px; outline: none; color: var(--md-on-surface); width: 100%; font-size: 16px; }
+.md-field:focus { border: 2px solid var(--md-primary); padding: 13px 15px; }
+.md-scroll { scrollbar-width: none; } .md-scroll::-webkit-scrollbar { display: none; }
+.md-switch { width: 52px; height: 32px; border-radius: 16px; border: 2px solid var(--md-outline); background: var(--md-surface-highest); position: relative; transition: all .2s; flex-shrink: 0; }
+.md-switch::after { content: ''; position: absolute; top: 6px; left: 6px; width: 16px; height: 16px; border-radius: 50%; background: var(--md-outline); transition: all .2s cubic-bezier(.2,0,0,1); }
+.md-switch[aria-checked='true'] { background: var(--md-primary); border-color: var(--md-primary); }
+.md-switch[aria-checked='true']::after { left: 22px; top: 2px; width: 24px; height: 24px; background: var(--md-on-primary); }
+.md-slider { -webkit-appearance: none; appearance: none; height: 44px; border-radius: 22px; background: linear-gradient(to right, var(--md-primary) var(--p, 50%), var(--md-secondary-container) var(--p, 50%)); outline: none; }
+.md-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 4px; height: 44px; background: transparent; }
+.md-slider::-moz-range-thumb { width: 4px; height: 44px; border: 0; background: transparent; }
+
+/* Original wallpapers for the Android edition */
+.and-wallpaper-dune { background: radial-gradient(80% 45% at 20% 100%, #c9622e 0%, transparent 70%), radial-gradient(90% 50% at 90% 85%, #8f3d1c 0%, transparent 70%), radial-gradient(60% 40% at 70% 20%, #ffcfa8 0%, transparent 70%), linear-gradient(180deg, #f6b989 0%, #e0875a 55%, #7e3418 100%); }
+.and-wallpaper-lagoon { background: radial-gradient(70% 40% at 80% 20%, #bff3ee 0%, transparent 70%), radial-gradient(90% 60% at 10% 90%, #064b52 0%, transparent 70%), linear-gradient(160deg, #4fc2c0 0%, #13808a 50%, #083a44 100%); }
+.and-wallpaper-bloom { background: radial-gradient(60% 40% at 25% 25%, #f7c6ff 0%, transparent 70%), radial-gradient(70% 45% at 85% 70%, #5b3fb4 0%, transparent 70%), linear-gradient(170deg, #d9a5f2 0%, #8e6ad8 50%, #2c1a63 100%); }
+.and-wallpaper-forest { background: radial-gradient(70% 40% at 70% 15%, #e9f5c9 0%, transparent 70%), radial-gradient(90% 55% at 20% 95%, #203a10 0%, transparent 70%), linear-gradient(170deg, #b8d98c 0%, #5d8a34 50%, #1d3510 100%); }

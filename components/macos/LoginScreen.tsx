@@ -53,6 +53,11 @@ export default function LoginScreen({ wallpaper, onUnlock }: { wallpaper: string
           </span>
         </button>
         <p className="text-[11px] opacity-70 mt-3">or press Enter</p>
+        <p className="text-[11px] opacity-70 mt-6 flex gap-3">
+          <a href="/magic/windows" className="hover:underline">Windows edition</a>
+          <span aria-hidden>·</span>
+          <a href="/magic/android" className="hover:underline">Android edition</a>
+        </p>
       </div>
     </motion.div>
   );
