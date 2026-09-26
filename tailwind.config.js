@@ -1,3 +1,9 @@
+// Colours are CSS variables (hex values that switch with the theme), so
+// Tailwind can't apply opacity modifiers like `bg-accent/30` to them by
+// itself — those classes silently generated no CSS. color-mix() with the
+// <alpha-value> placeholder makes every modifier work.
+const withAlpha = (name) => `color-mix(in srgb, var(${name}) calc(<alpha-value> * 100%), transparent)`;
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -9,24 +15,24 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        bg: 'var(--color-bg)',
-        'bg-secondary': 'var(--color-bg-secondary)',
-        'bg-tertiary': 'var(--color-bg-tertiary)',
-        surface: 'var(--color-surface)',
-        'surface-hover': 'var(--color-surface-hover)',
-        'text-primary': 'var(--color-text-primary)',
-        'text-secondary': 'var(--color-text-secondary)',
-        'text-muted': 'var(--color-text-muted)',
-        'text-faint': 'var(--color-text-faint)',
-        accent: 'var(--color-accent)',
-        'accent-warm': 'var(--color-accent-warm)',
-        'accent-warm-light': 'var(--color-accent-warm-light)',
-        border: 'var(--color-border)',
-        'border-subtle': 'var(--color-border-subtle)',
-        rule: 'var(--color-rule)',
-        success: 'var(--color-success)',
-        warning: 'var(--color-warning)',
-        error: 'var(--color-error)',
+        bg: withAlpha('--color-bg'),
+        'bg-secondary': withAlpha('--color-bg-secondary'),
+        'bg-tertiary': withAlpha('--color-bg-tertiary'),
+        surface: withAlpha('--color-surface'),
+        'surface-hover': withAlpha('--color-surface-hover'),
+        'text-primary': withAlpha('--color-text-primary'),
+        'text-secondary': withAlpha('--color-text-secondary'),
+        'text-muted': withAlpha('--color-text-muted'),
+        'text-faint': withAlpha('--color-text-faint'),
+        accent: withAlpha('--color-accent'),
+        'accent-warm': withAlpha('--color-accent-warm'),
+        'accent-warm-light': withAlpha('--color-accent-warm-light'),
+        border: withAlpha('--color-border'),
+        'border-subtle': withAlpha('--color-border-subtle'),
+        rule: withAlpha('--color-rule'),
+        success: withAlpha('--color-success'),
+        warning: withAlpha('--color-warning'),
+        error: withAlpha('--color-error'),
       },
       fontFamily: {
         display: ['var(--font-cormorant)', 'Georgia', 'serif'],
