@@ -1,4 +1,5 @@
 'use client';
+import { T } from '@/lib/i18n';
 
 import Link from 'next/link';
 import { Star, Quote, ArrowRight, MessageSquarePlus } from 'lucide-react';
@@ -10,8 +11,8 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
     <section id="testimonials" className="py-20">
       <div className="max-w-5xl mx-auto px-4">
         <div className="mb-12">
-          <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2">Kind Words</p>
-          <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary">Testimonials</h2>
+          <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2"><T en="Kind Words" hi="कुछ अच्छे शब्द" /></p>
+          <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary"><T en="Testimonials" hi="टेस्टिमोनियल्स" /></h2>
         </div>
 
         {testimonials.length > 0 && (
@@ -60,11 +61,13 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
               </div>
               <div>
                 <p className="font-display text-xl font-semibold text-text-primary">
-                  {testimonials.length > 0 ? 'Worked with me?' : 'Worked with me? Be the first.'}
+                  {testimonials.length > 0 ? <T en="Worked with me?" hi="मेरे साथ काम किया है?" /> : <T en="Worked with me? Be the first." hi="मेरे साथ काम किया है? पहले आप लिखिए।" />}
                 </p>
                 <p className="text-sm text-text-muted font-body mt-1 max-w-md">
-                  Teammates, clients, mentors — share a few words about working together.
-                  I review every note before it goes up here.
+                  <T
+                    en="Teammates, clients, mentors — share a few words about working together. I review every note before it goes up here."
+                    hi="साथी, क्लाइंट, मेंटर — साथ काम करने के बारे में कुछ शब्द लिखिए। यहाँ लगने से पहले मैं हर नोट पढ़ता हूँ।"
+                  />
                 </p>
               </div>
             </div>
@@ -72,7 +75,7 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
               href="/feedback"
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-text-primary text-bg font-body font-medium text-sm rounded hover:opacity-90 transition-opacity shrink-0"
             >
-              Leave a testimonial
+              <T en="Leave a testimonial" hi="टेस्टिमोनियल दें" />
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

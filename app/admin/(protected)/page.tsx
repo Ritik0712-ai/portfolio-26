@@ -10,6 +10,8 @@ import {
   Calendar,
   Activity,
   Award,
+  LineChart,
+  BrainCircuit,
 } from 'lucide-react';
 import { LogoutButton } from '@/components/admin/LogoutButton';
 
@@ -59,6 +61,8 @@ export default async function AdminDashboardPage() {
   ];
 
   const navItems = [
+    { label: 'Visitor Insights', description: 'Anonymous traffic, sources and read depth', href: '/admin/insights', icon: LineChart },
+    { label: 'DSA Journal', description: 'Log solved problems, sync from LeetCode', href: '/admin/dsa', icon: BrainCircuit },
     { label: 'Projects', description: 'Manage portfolio projects', href: '/admin/projects', icon: FolderKanban },
     { label: 'Blogs', description: 'Manage blog posts', href: '/admin/blogs', icon: FileText },
     { label: 'Stats', description: 'Edit stats and numbers', href: '/admin/stats', icon: BarChart3 },

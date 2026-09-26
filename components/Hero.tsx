@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, BookOpen } from 'lucide-react';
+import { T } from '@/lib/i18n';
+
 
 export default function Hero() {
   return (
@@ -10,7 +12,7 @@ export default function Hero() {
           {/* Left: Text */}
           <div>
             <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-6">
-              Full-Stack Developer
+              <T en="Full-Stack Developer" hi="फ़ुल-स्टैक डेवलपर" />
             </p>
 
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-semibold text-text-primary leading-[1.05] mb-6">
@@ -18,14 +20,16 @@ export default function Hero() {
             </h1>
 
             <p className="text-lg text-text-secondary font-body leading-relaxed max-w-md mb-8">
-              I build dependable products from idea to production — clean architecture,
-              thoughtful UX, and code that teams can actually maintain.
+              <T
+                en="I build dependable products from idea to production — clean architecture, thoughtful UX, and code that teams can actually maintain."
+                hi="मैं आइडिया से प्रोडक्शन तक भरोसेमंद प्रोडक्ट्स बनाता हूँ — साफ़ आर्किटेक्चर, सोच-समझकर बना UX, और ऐसा कोड जिसे टीमें सच में मेंटेन कर सकें।"
+              />
             </p>
 
             <div className="flex items-center gap-2 mb-10">
               <span className="w-2 h-2 rounded-full bg-success" />
               <span className="text-sm text-text-muted font-body">
-                Open to internships &amp; projects
+                <T en="Open to internships & projects" hi="इंटर्नशिप और प्रोजेक्ट्स के लिए उपलब्ध" />
               </span>
             </div>
 
@@ -34,7 +38,7 @@ export default function Hero() {
                 href="/#projects"
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-text-primary text-bg font-body font-medium text-sm rounded hover:opacity-90 transition-opacity"
               >
-                View Work
+                <T en="View Work" hi="मेरा काम देखें" />
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
@@ -42,7 +46,7 @@ export default function Hero() {
                 className="inline-flex items-center gap-2 px-5 py-2.5 border border-border text-text-primary font-body font-medium text-sm rounded hover:bg-surface-hover transition-colors"
               >
                 <BookOpen className="w-4 h-4" />
-                Read the Blog
+                <T en="Read the Blog" hi="ब्लॉग पढ़ें" />
               </Link>
             </div>
           </div>

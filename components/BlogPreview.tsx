@@ -1,4 +1,5 @@
 'use client';
+import { T } from '@/lib/i18n';
 
 import Link from 'next/link';
 import { ArrowRight, Clock } from 'lucide-react';
@@ -14,11 +15,11 @@ export default function BlogPreview({ posts }: { posts: BlogPost[] }) {
       <div className="max-w-5xl mx-auto px-4">
         <div className="mb-12 flex items-end justify-between">
           <div>
-            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2">Writing</p>
-            <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary">From the Blog</h2>
+            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2"><T en="Writing" hi="लेखन" /></p>
+            <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary"><T en="From the Blog" hi="ब्लॉग से" /></h2>
           </div>
           <Link href="/blog" className="hidden md:inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary font-body transition-colors">
-            All posts <ArrowRight className="w-4 h-4" />
+            <T en="All posts" hi="सभी पोस्ट्स" /> <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -44,7 +45,7 @@ export default function BlogPreview({ posts }: { posts: BlogPost[] }) {
                   </span>
                 )}
                 <Link href={`/blog/${post.slug}`} className="ml-auto text-xs text-accent hover:text-accent-warm font-body transition-colors">
-                  Read →
+                  <T en="Read →" hi="पढ़ें →" />
                 </Link>
               </div>
             </article>

@@ -104,6 +104,8 @@ export default function CommandPalette() {
       { id: 'magic-mac', label: 'Magic — Mac edition', group: 'Navigate', icon: Sparkles, keywords: 'macos iphone ios desktop', run: go('/magic/mac') },
       { id: 'magic-win', label: 'Magic — Windows edition', group: 'Navigate', icon: Sparkles, keywords: 'windows 11 fluent desktop os start menu', run: go('/magic/windows') },
       { id: 'magic-android', label: 'Magic — Android edition', group: 'Navigate', icon: Sparkles, keywords: 'android material you phone os', run: go('/magic/android') },
+      { id: 'dsa', label: 'DSA journal', group: 'Navigate', icon: BookOpen, keywords: 'leetcode dsa problems algorithms data structures', run: go('/dsa') },
+      { id: 'changelog', label: "What's new (changelog)", group: 'Navigate', icon: Clock, keywords: 'changelog updates commits new', run: go('/changelog') },
       { id: 'testimonial', label: 'Leave a testimonial', group: 'Navigate', icon: MessageSquarePlus, keywords: 'feedback review', run: go('/feedback') },
     ];
     for (const p of projects) {

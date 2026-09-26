@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { track } from '@/lib/track';
 
 // Picks the right device for the visitor: iPhone-style on phones, MacBook-style
 // on laptops and desktops. Each is code-split so a phone never downloads the
@@ -20,6 +21,9 @@ export default function RitikOS() {
     window.addEventListener('resize', pick);
     return () => window.removeEventListener('resize', pick);
   }, []);
+  useEffect(() => {
+    if (device) track('edition', { label: device === 'ios' ? 'Mac (iPhone)' : 'Mac' });
+  }, [device]);
   if (!device) return <div className="fixed inset-0 bg-black" />;
   return device === 'ios' ? <IOSDevice /> : <MacDesktop />;
 }

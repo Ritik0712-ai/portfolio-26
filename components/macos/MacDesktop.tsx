@@ -33,6 +33,7 @@ import Trash from './apps/Trash';
 import GitHubPanel from '@/components/os/GitHubPanel';
 import MusicPlayer from '@/components/os/MusicPlayer';
 import StatsRow from '@/components/os/StatsRow';
+import { LiveCursors } from '@/components/os/Live';
 import { useAskEnabled, useContent } from '@/components/os/data';
 
 type Phase = 'boot' | 'login' | 'desktop' | 'off';
@@ -239,6 +240,7 @@ export default function MacDesktop() {
         ...(has.experience ? [{ label: 'Experience', run: () => launch('finder', { folder: 'experience' }) }] : []),
         ...(has.certifications ? [{ label: 'Certifications', run: () => launch('finder', { folder: 'certifications' }) }] : []),
         ...(has.testimonials ? [{ label: 'Testimonials', run: () => launch('finder', { folder: 'testimonials' }) }] : []),
+        ...(has.dsa ? [{ label: 'DSA Journal', run: () => launch('finder', { folder: 'dsa' }) }] : []),
         { label: 'Résumé', run: () => launch('preview') },
         { divider: true, label: '' },
         ...(has.blog || has.projects ? [{ label: 'Blog & case studies', run: () => launch('safari') }] : []),
@@ -318,9 +320,9 @@ export default function MacDesktop() {
             <DesktopIcons
               items={[
                 // Only folders with something in them; they appear live as content is published.
-                ...(['projects', 'experience', 'certifications', 'testimonials'] as const)
+                ...(['projects', 'experience', 'certifications', 'testimonials', 'dsa'] as const)
                   .filter((f) => has[f])
-                  .map((f) => ({ id: f, label: f[0].toUpperCase() + f.slice(1), kind: 'folder' as const, open: () => launch('finder', { folder: f }) })),
+                  .map((f) => ({ id: f, label: f === 'dsa' ? 'DSA Journal' : f[0].toUpperCase() + f.slice(1), kind: 'folder' as const, open: () => launch('finder', { folder: f }) })),
                 { id: 'resume', label: 'Resume.pdf', kind: 'pdf', open: () => launch('preview') },
               ]}
             />
@@ -343,6 +345,7 @@ export default function MacDesktop() {
             </AnimatePresence>
 
             <Dock key={String(dockMagnify)} entries={dock} magnify={dockMagnify} />
+            <LiveCursors edition="mac" />
 
             {ctxMenu && (
               <div role="menu" className="fixed z-[9999] min-w-[210px] mac-menu p-1.5" style={{ left: ctxMenu.x, top: ctxMenu.y }} onMouseDown={(e) => e.stopPropagation()}>

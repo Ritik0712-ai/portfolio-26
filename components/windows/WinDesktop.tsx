@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { track } from '@/lib/track';
 import { AnimatePresence, motion } from 'framer-motion';
 import { RotateCw, Palette, Monitor, Terminal as TerminalIcon, Laptop, Smartphone, Globe, ChevronRight, LayoutGrid } from 'lucide-react';
 import { useWindowManager } from '@/components/macos/useWindowManager';
@@ -13,6 +14,7 @@ import GitHubPanel from '@/components/os/GitHubPanel';
 import MusicPlayer from '@/components/os/MusicPlayer';
 import { useAskEnabled, useContent } from '@/components/os/data';
 import WinWindow, { TASKBAR_H } from './WinWindow';
+import { LiveCursors } from '@/components/os/Live';
 import Taskbar from './Taskbar';
 import StartMenu, { type PowerAction } from './StartMenu';
 import Widgets from './Widgets';
@@ -26,10 +28,11 @@ import { Notepad, PdfViewer, WinSettings, About, RecycleBin, WinCalculator, Copi
 type Phase = 'boot' | 'lock' | 'desktop' | 'off' | 'shutting-down';
 type Overlay = null | 'start' | 'search' | 'widgets' | 'quick' | 'calendar' | 'copilot';
 
-const FOLDER_TITLE: Record<string, string> = { home: 'Home', projects: 'Projects', experience: 'Experience', certifications: 'Certifications', testimonials: 'Testimonials', documents: 'Documents', desktop: 'Desktop' };
+const FOLDER_TITLE: Record<string, string> = { home: 'Home', projects: 'Projects', experience: 'Experience', certifications: 'Certifications', testimonials: 'Testimonials', dsa: 'DSA Journal', documents: 'Documents', desktop: 'Desktop' };
 
 export default function WinDesktop() {
   const router = useRouter();
+  useEffect(() => track('edition', { label: 'Windows' }), []);
   const wm = useWindowManager<WinAppId>({ top: 0, bottom: TASKBAR_H + 20 });
   const askEnabled = useAskEnabled();
   const has = useContent();
@@ -189,7 +192,7 @@ export default function WinDesktop() {
   const desktopIcons: { id: string; label: string; icon: React.ReactNode; open: () => void }[] = [
     { id: 'recycle', label: 'Recycle Bin', icon: WIN_APPS.recycle.icon(44), open: () => launch('recycle') },
     // Content folders only appear once they have something in them (live).
-    ...(['projects', 'experience', 'certifications', 'testimonials'] as const)
+    ...(['projects', 'experience', 'certifications', 'testimonials', 'dsa'] as const)
       .filter((f) => has[f])
       .map((f) => ({ id: f, label: FOLDER_TITLE[f], icon: <FolderGlyph size={44} />, open: () => launch('explorer', { folder: f }) })),
     { id: 'resume', label: 'Resume.pdf', icon: WIN_APPS.resume.icon(44), open: () => launch('resume') },
@@ -248,6 +251,7 @@ export default function WinDesktop() {
             ))}
           </AnimatePresence>
 
+          <LiveCursors edition="windows" />
           <Taskbar
             pinned={TASKBAR}
             running={running}

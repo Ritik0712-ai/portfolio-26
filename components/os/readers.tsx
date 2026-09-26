@@ -5,7 +5,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ExternalLink, Github } from 'lucide-react';
 import type { Project, TechnicalDecision, Outcome } from '@/types';
+import { useEffect } from 'react';
 import { useBlog } from './data';
+import { track } from '@/lib/track';
 
 // Content renderers shared by macOS Safari and the iOS apps. Colours come
 // from the --mac-* variables that both .mac-root and .ios-root define.
@@ -21,6 +23,7 @@ function Paras({ text }: { text: string }) {
 }
 
 export function ProjectReader({ project }: { project: Project }) {
+  useEffect(() => track('project', { path: '/magic', label: project.slug }), [project.slug]);
   const decisions = ((project.technical_decisions || []) as TechnicalDecision[]).filter((d) => d.decision?.trim());
   const outcomes = ((project.outcomes || []) as Outcome[]).filter((o) => o.outcome?.trim() || o.result?.trim());
   return (
@@ -78,6 +81,7 @@ export function ProjectReader({ project }: { project: Project }) {
 }
 
 export function BlogReader({ slug }: { slug: string }) {
+  useEffect(() => track('post', { path: '/magic', label: slug }), [slug]);
   const { data: post, error } = useBlog(slug);
   if (error) return <p className="p-8 mac-text-faint">Couldn&apos;t load this post.</p>;
   if (post === undefined) return <p className="p-8 mac-text-faint">Loading…</p>;

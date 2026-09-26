@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Github, Linkedin, Mail, ExternalLink, Code2 } from 'lucide-react';
+import { T } from '@/lib/i18n';
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -12,26 +13,28 @@ export default function Footer() {
           <div>
             <p className="font-display font-semibold text-xl text-text-primary mb-2">Ritik Agarwal</p>
             <p className="text-sm text-text-muted font-body leading-relaxed">
-              Building dependable products from idea to production. Based in India.
+              <T en="Building dependable products from idea to production. Based in India." hi="आइडिया से प्रोडक्शन तक भरोसेमंद प्रोडक्ट्स बनाता हूँ। भारत से।" />
             </p>
           </div>
 
           {/* Navigation */}
           <div>
-            <p className="text-xs font-body text-text-faint uppercase tracking-widest mb-4">Navigation</p>
+            <p className="text-xs font-body text-text-faint uppercase tracking-widest mb-4"><T en="Navigation" hi="नेविगेशन" /></p>
             <div className="flex flex-col gap-2">
               {[
-                { href: '/', label: 'Home' },
-                { href: '/#projects', label: 'Projects' },
-                { href: '/blog', label: 'Blog' },
-                { href: '/resume', label: 'Resume' },
-                { href: '/now', label: 'Now' },
-                { href: '/uses', label: 'Uses' },
-                { href: '/contact', label: 'Contact' },
-                { href: '/feedback', label: 'Leave a testimonial' },
+                { href: '/', label: 'Home', hi: 'होम' },
+                { href: '/#projects', label: 'Projects', hi: 'प्रोजेक्ट्स' },
+                { href: '/blog', label: 'Blog', hi: 'ब्लॉग' },
+                { href: '/dsa', label: 'DSA journal', hi: 'DSA जर्नल' },
+                { href: '/resume', label: 'Resume', hi: 'रिज़्यूमे' },
+                { href: '/now', label: 'Now', hi: 'अभी' },
+                { href: '/uses', label: 'Uses', hi: 'मेरे टूल्स' },
+                { href: '/changelog', label: "What's new", hi: 'नया क्या है' },
+                { href: '/contact', label: 'Contact', hi: 'संपर्क' },
+                { href: '/feedback', label: 'Leave a testimonial', hi: 'टेस्टिमोनियल दें' },
               ].map((link) => (
                 <Link key={link.href} href={link.href} className="text-sm text-text-muted hover:text-text-primary font-body transition-colors">
-                  {link.label}
+                  <T en={link.label} hi={link.hi} />
                 </Link>
               ))}
             </div>
@@ -39,7 +42,7 @@ export default function Footer() {
 
           {/* Connect */}
           <div>
-            <p className="text-xs font-body text-text-faint uppercase tracking-widest mb-4">Connect</p>
+            <p className="text-xs font-body text-text-faint uppercase tracking-widest mb-4"><T en="Connect" hi="जुड़ें" /></p>
             <div className="flex flex-col gap-2">
               <a href="mailto:ritikagarwal2468@gmail.com" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary font-body transition-colors">
                 <Mail className="w-4 h-4" />
@@ -67,10 +70,10 @@ export default function Footer() {
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-text-faint font-body">
-            © {year} Ritik Agarwal. All rights reserved.
+            © {year} Ritik Agarwal. <T en="All rights reserved." hi="सर्वाधिकार सुरक्षित।" />
           </p>
           <p className="text-xs text-text-faint font-body">
-            Built with Next.js &amp; Supabase
+            <T en="Built with Next.js & Supabase" hi="Next.js और Supabase से बना" />
           </p>
         </div>
       </div>

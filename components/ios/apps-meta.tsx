@@ -1,15 +1,16 @@
-import { Briefcase, Award, MessageSquareQuote } from 'lucide-react';
+import { Briefcase, Award, MessageSquareQuote, BrainCircuit } from 'lucide-react';
 import { AppIcon, Tile } from '@/components/macos/icons';
 
 export type IOSAppId =
   | 'projects' | 'experience' | 'certifications' | 'safari' | 'mail' | 'notes' | 'photos'
-  | 'github' | 'contacts' | 'resume' | 'settings' | 'calculator' | 'ask' | 'classic' | 'music' | 'testimonials';
+  | 'github' | 'contacts' | 'resume' | 'settings' | 'calculator' | 'ask' | 'classic' | 'music' | 'testimonials' | 'dsa';
 
 export const IOS_APPS: Record<IOSAppId, { name: string; icon: (size: number) => React.ReactNode }> = {
   projects: { name: 'Projects', icon: (s) => <AppIcon id="files" size={s} /> },
   experience: { name: 'Experience', icon: (s) => <Tile size={s} from="#5E5CE6" to="#3634A3" glyph={Briefcase} /> },
   certifications: { name: 'Certificates', icon: (s) => <Tile size={s} from="#FFD60A" to="#F5A300" glyph={Award} glyphColor="#5A3A00" /> },
   testimonials: { name: 'Testimonials', icon: (s) => <Tile size={s} from="#34C759" to="#1E8E3E" glyph={MessageSquareQuote} /> },
+  dsa: { name: 'DSA', icon: (s) => <Tile size={s} from="#FF9F0A" to="#FF6A00" glyph={BrainCircuit} /> },
   safari: { name: 'Safari', icon: (s) => <AppIcon id="safari" size={s} /> },
   mail: { name: 'Mail', icon: (s) => <AppIcon id="mail" size={s} /> },
   notes: { name: 'Notes', icon: (s) => <AppIcon id="notes" size={s} /> },
@@ -24,11 +25,12 @@ export const IOS_APPS: Record<IOSAppId, { name: string; icon: (size: number) => 
   classic: { name: 'Classic Site', icon: (s) => <AppIcon id="classic" size={s} /> },
 };
 
-export const HOME_GRID: IOSAppId[] = ['projects', 'experience', 'certifications', 'testimonials', 'resume', 'photos', 'music', 'github', 'notes', 'contacts', 'calculator', 'settings', 'ask', 'classic'];
+export const HOME_GRID: IOSAppId[] = ['projects', 'experience', 'certifications', 'testimonials', 'dsa', 'resume', 'photos', 'music', 'github', 'notes', 'contacts', 'calculator', 'settings', 'ask', 'classic'];
 export const HOME_DOCK: IOSAppId[] = ['mail', 'safari', 'music', 'notes'];
 
 /** Apps backed by site content — hidden while their section is empty. */
-export const CONTENT_APPS: Partial<Record<IOSAppId, 'projects' | 'experience' | 'certifications' | 'testimonials'>> = {
+export const CONTENT_APPS: Partial<Record<IOSAppId, 'projects' | 'experience' | 'certifications' | 'testimonials' | 'dsa'>> = {
+  dsa: 'dsa',
   projects: 'projects',
   experience: 'experience',
   certifications: 'certifications',

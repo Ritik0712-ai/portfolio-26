@@ -6,15 +6,17 @@ import { usePathname } from 'next/navigation';
 import { Github, Linkedin, Menu, X, Search, Sparkles } from 'lucide-react';
 import { OPEN_PALETTE_EVENT } from './CommandPalette';
 import ThemeToggle from './ThemeToggle';
+import { T, LanguageToggle } from '@/lib/i18n';
 
 const navLinks = [
-  { href: '/#projects', label: 'Projects' },
-  { href: '/#experience', label: 'Experience' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/github', label: 'GitHub & LeetCode' },
-  { href: '/resume', label: 'Resume' },
-  { href: '/now', label: 'Now' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/#projects', label: 'Projects', hi: 'प्रोजेक्ट्स' },
+  { href: '/#experience', label: 'Experience', hi: 'अनुभव' },
+  { href: '/blog', label: 'Blog', hi: 'ब्लॉग' },
+  { href: '/dsa', label: 'DSA', hi: 'DSA' },
+  { href: '/github', label: 'GitHub & LeetCode', hi: 'GitHub और LeetCode' },
+  { href: '/resume', label: 'Resume', hi: 'रिज़्यूमे' },
+  { href: '/now', label: 'Now', hi: 'अभी' },
+  { href: '/contact', label: 'Contact', hi: 'संपर्क' },
 ];
 
 export default function NavBar() {
@@ -43,27 +45,28 @@ export default function NavBar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden xl:flex items-center gap-6">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className="text-sm font-body text-text-muted hover:text-text-primary transition-colors whitespace-nowrap"
               >
-                {link.label}
+                <T en={link.label} hi={link.hi} />
               </Link>
             ))}
           </div>
 
           {/* Right: Social + Theme */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden xl:flex items-center gap-4">
             <Link
               href="/magic"
               className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-body font-medium rounded-full text-bg bg-text-primary hover:opacity-90 transition-opacity"
               title="Explore this portfolio as a desktop OS"
             >
-              <Sparkles className="w-3.5 h-3.5" /> Magic
+              <Sparkles className="w-3.5 h-3.5" /> <T en="Magic" hi="मैजिक" />
             </Link>
+            <LanguageToggle className="text-xs font-body text-text-muted hover:text-text-primary transition-colors" />
             <button
               onClick={() => window.dispatchEvent(new Event(OPEN_PALETTE_EVENT))}
               className="inline-flex items-center gap-2 pl-2.5 pr-1.5 py-1 text-xs font-body text-text-muted border border-border rounded hover:text-text-primary hover:border-rule transition-colors"
@@ -84,14 +87,14 @@ export default function NavBar() {
           {/* Mobile: search + menu */}
           <button
             onClick={() => window.dispatchEvent(new Event(OPEN_PALETTE_EVENT))}
-            className="lg:hidden ml-auto p-2 text-text-muted hover:text-text-primary transition-colors"
+            className="xl:hidden ml-auto p-2 text-text-muted hover:text-text-primary transition-colors"
             aria-label="Search"
           >
             <Search className="w-5 h-5" />
           </button>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 text-text-muted hover:text-text-primary transition-colors"
+            className="xl:hidden p-2 text-text-muted hover:text-text-primary transition-colors"
             aria-label="Toggle menu"
           >
             {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -101,7 +104,7 @@ export default function NavBar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="lg:hidden bg-surface border-t border-border">
+        <div className="xl:hidden bg-surface border-t border-border">
           <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
@@ -109,11 +112,11 @@ export default function NavBar() {
                 href={link.href}
                 className="py-2 text-sm font-body text-text-muted hover:text-text-primary transition-colors"
               >
-                {link.label}
+                <T en={link.label} hi={link.hi} />
               </Link>
             ))}
             <Link href="/magic" className="py-2 text-sm font-body text-text-primary inline-flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4" /> Magic — desktop mode
+              <Sparkles className="w-4 h-4" /> <T en="Magic — explore as an OS" hi="मैजिक — OS की तरह देखें" />
             </Link>
             <div className="flex items-center gap-4 pt-3 border-t border-border mt-3">
               <a href="https://github.com/Ritik0712-ai" target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-text-primary">
@@ -123,6 +126,7 @@ export default function NavBar() {
                 <Linkedin className="w-4 h-4" />
               </a>
               <ThemeToggle />
+              <LanguageToggle className="ml-auto text-sm font-body text-text-muted hover:text-text-primary" />
             </div>
           </div>
         </div>

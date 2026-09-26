@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, GitCommitHorizontal, Code2, BookOpen, Sparkles } from 'lucide-react';
-import { nowData } from '@/data/now';
+import { nowData, nowDataHi } from '@/data/now';
+import { T } from '@/lib/i18n';
+import NowPlaying from '@/components/NowPlaying';
 import type { GitHubActivity, LeetCodeStats } from '@/lib/activity';
 import { useLivePoll } from '@/lib/useLivePoll';
 
@@ -61,9 +63,9 @@ export default function NowBento() {
       <div className="max-w-5xl mx-auto">
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2">Right now</p>
+            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2"><T en="Right now" hi="अभी" /></p>
             <h2 id="now-heading" className="text-3xl md:text-4xl font-display font-semibold text-text-primary">
-              What I&apos;m up to
+              <T en="What I'm up to" hi="आजकल क्या कर रहा हूँ" />
             </h2>
           </div>
           <Link href="/now" className="hidden sm:inline-flex items-center gap-1 text-sm text-text-muted hover:text-text-primary font-body transition-colors">
@@ -75,20 +77,20 @@ export default function NowBento() {
           {/* Building — large */}
           <div className={`${cell} md:col-span-2 md:row-span-2 reveal`}>
             <p className={label}>
-              <Sparkles className="w-3.5 h-3.5" /> Building
+              <Sparkles className="w-3.5 h-3.5" /> <T en="Building" hi="बना रहा हूँ" />
             </p>
             <p className="font-display text-2xl md:text-3xl text-text-primary leading-snug mb-6">
-              {nowData.focus}
+              <T en={nowData.focus} hi={nowDataHi.focus} />
             </p>
             <ul className="mt-auto space-y-3">
-              {nowData.currentlyBuilding.slice(0, 2).map((item) => (
+              {nowData.currentlyBuilding.slice(0, 2).map((item, i) => (
                 <li key={item} className="flex gap-3 text-sm text-text-secondary font-body leading-relaxed">
                   <span className="mt-2 w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
-                  {item}
+                  <span><T en={item} hi={nowDataHi.currentlyBuilding[i] ?? item} /></span>
                 </li>
               ))}
             </ul>
-            <p className="text-xs text-text-faint font-mono mt-6">Updated {nowData.lastUpdated}</p>
+            <p className="text-xs text-text-faint font-mono mt-6"><T en={`Updated ${nowData.lastUpdated}`} hi={`अपडेट: ${nowDataHi.lastUpdated}`} /></p>
           </div>
 
           {/* GitHub */}
@@ -99,7 +101,7 @@ export default function NowBento() {
             className={`${cell} md:col-span-2 group hover:border-rule transition-colors reveal`}
           >
             <p className={label}>
-              <GitCommitHorizontal className="w-3.5 h-3.5" /> Latest commit
+              <GitCommitHorizontal className="w-3.5 h-3.5" /> <T en="Latest commit" hi="ताज़ा कमिट" />
               <ArrowUpRight className="w-3.5 h-3.5 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
             </p>
             {github?.latest ? (
@@ -113,7 +115,7 @@ export default function NowBento() {
               </>
             ) : activityLoaded ? (
               <p className="text-sm text-text-secondary font-body">
-                Everything I build is on GitHub — open my profile.
+                <T en="Everything I build is on GitHub — open my profile." hi="मैं जो भी बनाता हूँ, GitHub पर है — प्रोफ़ाइल खोलें।" />
               </p>
             ) : (
               <div className="h-10 rounded bg-bg-secondary animate-pulse" />
@@ -145,20 +147,20 @@ export default function NowBento() {
             {leetcode ? (
               <>
                 <p className="font-display text-4xl text-text-primary">{leetcode.solved}</p>
-                <p className="text-xs text-text-muted font-body">{leetcode.solved === 1 ? 'question' : 'questions'} solved</p>
+                <p className="text-xs text-text-muted font-body"><T en={`${leetcode.solved === 1 ? 'question' : 'questions'} solved`} hi="सवाल हल किए" /></p>
                 <div className="mt-auto pt-4 flex gap-3 text-xs font-mono">
                   <span className="text-success">E {leetcode.easy}</span>
                   <span className="text-warning">M {leetcode.medium}</span>
                   <span className="text-error">H {leetcode.hard}</span>
                 </div>
-                <p className="pt-2 text-xs font-mono text-text-muted group-hover:text-text-primary transition-colors">View on LeetCode →</p>
+                <p className="pt-2 text-xs font-mono text-text-muted group-hover:text-text-primary transition-colors"><T en="View on LeetCode →" hi="LeetCode पर देखें →" /></p>
               </>
             ) : (
               <>
                 <p className="text-sm text-text-primary font-body leading-relaxed">
-                  {activityLoaded ? 'Live count unavailable right now.' : 'Loading…'}
+                  {activityLoaded ? <T en="Live count unavailable right now." hi="लाइव गिनती अभी उपलब्ध नहीं है।" /> : <T en="Loading…" hi="लोड हो रहा है…" />}
                 </p>
-                <p className="mt-auto pt-4 text-xs font-mono text-text-muted group-hover:text-text-primary transition-colors">View on LeetCode →</p>
+                <p className="mt-auto pt-4 text-xs font-mono text-text-muted group-hover:text-text-primary transition-colors"><T en="View on LeetCode →" hi="LeetCode पर देखें →" /></p>
               </>
             )}
           </a>
@@ -167,7 +169,7 @@ export default function NowBento() {
           {post ? (
             <Link href={`/blog/${post.slug}`} className={`${cell} group hover:border-rule transition-colors reveal`}>
               <p className={label}>
-                <BookOpen className="w-3.5 h-3.5" /> Latest post
+                <BookOpen className="w-3.5 h-3.5" /> <T en="Latest post" hi="ताज़ा पोस्ट" />
               </p>
               <p className="font-display text-lg text-text-primary leading-snug group-hover:text-accent transition-colors line-clamp-3">
                 {post.title}
@@ -177,11 +179,14 @@ export default function NowBento() {
           ) : (
             <div className={`${cell} reveal`}>
               <p className={label}>
-                <BookOpen className="w-3.5 h-3.5" /> Reading
+                <BookOpen className="w-3.5 h-3.5" /> <T en="Reading" hi="पढ़ रहा हूँ" />
               </p>
-              <p className="text-sm text-text-primary font-body leading-relaxed">{nowData.currentlyReading[0]}</p>
+              <p className="text-sm text-text-primary font-body leading-relaxed"><T en={nowData.currentlyReading[0]} hi={nowDataHi.currentlyReading[0]} /></p>
             </div>
           )}
+
+          {/* Spotify — only when configured and something played recently */}
+          <NowPlaying className="md:col-span-4" />
         </div>
       </div>
     </section>

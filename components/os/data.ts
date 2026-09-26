@@ -5,7 +5,7 @@
 // in the admin panel shows up everywhere — live, without a reload.
 
 import { useEffect, useState } from 'react';
-import type { BlogPost, Certification, Project, Stat, Testimonial } from '@/types';
+import type { BlogPost, Certification, DsaProblem, Project, Stat, Testimonial } from '@/types';
 import type { GitHubOverview } from '@/lib/github';
 import type { GitHubActivity, LeetCodeStats } from '@/lib/activity';
 import { useLivePoll } from '@/lib/useLivePoll';
@@ -46,6 +46,7 @@ const TABLE_PREFIX: Record<string, string> = {
   certifications: '/api/certifications',
   testimonials: '/api/testimonials',
   stats: '/api/stats',
+  dsa_problems: '/api/dsa',
 };
 
 function refresh(url: string) {
@@ -141,6 +142,7 @@ export const useTimeline = () => useLive<TimelineEvent[]>('/api/timeline', (j) =
 export const useCertifications = () => useLive<Certification[]>('/api/certifications', (j) => j.certifications || []);
 export const useBlogs = () => useLive<BlogPost[]>('/api/blogs', (j) => j.blogs || []);
 export const useTestimonials = () => useLive<Testimonial[]>('/api/testimonials', (j) => j.testimonials || []);
+export const useDsa = () => useLive<DsaProblem[]>('/api/dsa', (j) => j.problems || []);
 export const useStats = () => useLive<Stat[]>('/api/stats', (j) => j.stats || []);
 export const useBlog = (slug: string | null) =>
   useLive<BlogPost | null>(slug ? `/api/blogs?slug=${encodeURIComponent(slug)}` : null, (j) => j.blog ?? null);
@@ -156,7 +158,9 @@ export function useContent() {
   const certifications = useCertifications().data;
   const blogs = useBlogs().data;
   const testimonials = useTestimonials().data;
+  const dsa = useDsa().data;
   return {
+    dsa: !!dsa?.length,
     projects: !!projects?.length,
     experience: !!timeline?.length,
     certifications: !!certifications?.length,

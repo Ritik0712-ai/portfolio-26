@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUp, RotateCw, ChevronRight, Search, Plus, Scissors, Copy, Clipboard, Trash2, ArrowUpDown, LayoutGrid, List, MoreHorizontal, Home, Monitor, ExternalLink, PanelRight } from 'lucide-react';
-import { useProjects, useTimeline, useCertifications, useBlogs, useTestimonials, useContent, formatMonth } from '@/components/os/data';
+import { useProjects, useTimeline, useCertifications, useBlogs, useTestimonials, useDsa, useContent, formatMonth } from '@/components/os/data';
 import { Fluent, FolderGlyph, PdfGlyph } from '../meta';
 import TestimonialsPanel from '@/components/os/TestimonialsPanel';
+import DsaPanel from '@/components/os/DsaPanel';
 
-export type ExplorerFolder = 'home' | 'projects' | 'experience' | 'certifications' | 'testimonials' | 'documents' | 'desktop';
+export type ExplorerFolder = 'home' | 'projects' | 'experience' | 'certifications' | 'testimonials' | 'dsa' | 'documents' | 'desktop';
 
 const NAV: { id: ExplorerFolder; label: string }[] = [
   { id: 'desktop', label: 'Desktop' },
@@ -15,9 +16,10 @@ const NAV: { id: ExplorerFolder; label: string }[] = [
   { id: 'experience', label: 'Experience' },
   { id: 'certifications', label: 'Certifications' },
   { id: 'testimonials', label: 'Testimonials' },
+  { id: 'dsa', label: 'DSA Journal' },
 ];
 
-const LABEL: Record<ExplorerFolder, string> = { home: 'Home', projects: 'Projects', experience: 'Experience', certifications: 'Certifications', testimonials: 'Testimonials', documents: 'Documents', desktop: 'Desktop' };
+const LABEL: Record<ExplorerFolder, string> = { home: 'Home', projects: 'Projects', experience: 'Experience', certifications: 'Certifications', testimonials: 'Testimonials', dsa: 'DSA Journal', documents: 'Documents', desktop: 'Desktop' };
 
 interface Item {
   key: string;
@@ -62,9 +64,10 @@ export default function Explorer({ initial = 'home', onOpenProject, onOpenPost, 
   const { data: certs } = useCertifications();
   const { data: posts } = useBlogs();
   const { data: testimonials } = useTestimonials();
+  const { data: dsa } = useDsa();
   const has = useContent();
   // Folders with nothing in them are hidden; they appear live once content is published.
-  const visible = (f: ExplorerFolder) => !(f === 'projects' || f === 'experience' || f === 'certifications' || f === 'testimonials') || has[f];
+  const visible = (f: ExplorerFolder) => !(f === 'projects' || f === 'experience' || f === 'certifications' || f === 'testimonials' || f === 'dsa') || has[f];
 
   const folderItem = (f: ExplorerFolder, count?: number): Item => ({
     key: `f-${f}`,
@@ -86,6 +89,7 @@ export default function Explorer({ initial = 'home', onOpenProject, onOpenPost, 
           folderItem('experience', timeline?.length),
           folderItem('certifications', certs?.length),
           folderItem('testimonials', testimonials?.length),
+          folderItem('dsa', dsa?.length),
           folderItem('documents'),
         ].filter((i) => visible(i.key.slice(2) as ExplorerFolder));
       case 'documents':
@@ -120,6 +124,12 @@ export default function Explorer({ initial = 'home', onOpenProject, onOpenPost, 
           size: t.rating ? `${t.rating}★` : '', icon: (s: number) => <Fluent name="chat_48_color" size={s} />, open: () => setSelected(t.id),
           details: [...(t.role || t.company ? [{ label: 'Role', value: [t.role, t.company].filter(Boolean).join(' · ') }] : [])],
           description: `“${t.content}”`,
+        }));
+      case 'dsa':
+        return dsa?.map((p) => ({
+          key: p.id, name: p.title, modified: p.solved_at, type: p.difficulty ?? 'Problem', size: p.time_complexity ?? '',
+          icon: (s: number) => <Fluent name="code_block_48_color" size={s} />, open: () => setSelected(p.id),
+          details: [], description: null,
         }));
       case 'certifications':
         return certs?.map((c) => ({
@@ -199,6 +209,8 @@ export default function Explorer({ initial = 'home', onOpenProject, onOpenPost, 
           )}
           {folder === 'testimonials' && !q ? (
             <TestimonialsPanel accent="var(--win-accent)" />
+          ) : folder === 'dsa' ? (
+            <DsaPanel accent="var(--win-accent)" />
           ) : !items ? (
             <p className="p-4 win-text-2">Working on it…</p>
           ) : shown.length === 0 ? (

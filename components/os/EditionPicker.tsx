@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Laptop, Smartphone } from 'lucide-react';
 import { readPref, writePref } from '@/components/macos/settings';
+import { LiveCount } from './Live';
+import { useInstall } from './InstallRegistrar';
+import { Download, Share } from 'lucide-react';
 
 type Edition = 'mac' | 'windows' | 'android';
 
@@ -55,6 +58,10 @@ export default function EditionPicker() {
           <p className="mt-4 text-[15px] sm:text-[17px] text-white/65 leading-relaxed">
             Same portfolio, same live projects, blog and GitHub — just three different ways to explore it. You can switch any time from inside each one.
           </p>
+          <div className="mt-6 flex flex-wrap items-center gap-3 text-[13px]">
+            <LiveCount edition="picker" label="people exploring RitikOS right now" showAlone={false} className="px-3 h-9 rounded-full bg-white/[0.06] border border-white/10 text-white/80" />
+            <InstallButton />
+          </div>
         </header>
 
         <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
@@ -179,4 +186,31 @@ function Preview({ id }: { id: Edition }) {
       </div>
     </div>
   );
+}
+
+function InstallButton() {
+  const { state, install } = useInstall();
+  const [iosHelp, setIosHelp] = useState(false);
+  if (state === 'prompt') {
+    return (
+      <button onClick={install} className="inline-flex items-center gap-2 px-4 h-9 rounded-full bg-white text-black font-medium hover:opacity-90">
+        <Download className="w-4 h-4" /> Install RitikOS as an app
+      </button>
+    );
+  }
+  if (state === 'ios') {
+    return (
+      <span className="relative">
+        <button onClick={() => setIosHelp((v) => !v)} className="inline-flex items-center gap-2 px-4 h-9 rounded-full bg-white/[0.06] border border-white/10 text-white/85">
+          <Download className="w-4 h-4" /> Add to Home Screen
+        </button>
+        {iosHelp && (
+          <span className="absolute left-0 top-11 z-10 w-72 p-3 rounded-xl bg-[#1d1b22] border border-white/10 text-white/80 text-[12px] leading-relaxed shadow-xl">
+            In Safari, tap <Share className="w-3.5 h-3.5 inline -mt-0.5" /> <strong>Share</strong>, then <strong>Add to Home Screen</strong>. RitikOS opens full-screen like an app and works offline.
+          </span>
+        )}
+      </span>
+    );
+  }
+  return null;
 }

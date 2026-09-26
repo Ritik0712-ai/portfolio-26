@@ -6,6 +6,7 @@ import {
   Bluetooth, Radio, BellOff, Monitor,
 } from 'lucide-react';
 import { useOSSettings, WALLPAPERS } from './settings';
+import { LiveCount } from '@/components/os/Live';
 
 export interface MenuAction { label: string; run?: () => void; shortcut?: string; disabled?: boolean; divider?: boolean }
 
@@ -129,6 +130,7 @@ export default function MenuBar(p: Props) {
       </nav>
 
       <div className="ml-auto flex items-center gap-0.5 z-[2]">
+        <LiveCount edition="mac" label="online" className="px-2 h-[22px] text-[12px]" />
         <span className="px-1.5 h-[22px] flex items-center" aria-label={radios.wifi ? 'Wi-Fi connected' : 'Wi-Fi off'}><Wifi className={`w-4 h-4 ${radios.wifi ? '' : 'opacity-40'}`} /></span>
         <span className="px-1.5 h-[22px] flex items-center gap-1" aria-label={battery !== null ? `Battery ${Math.round(battery * 100)}%` : 'Battery'}>
           {battery !== null && <span className="text-[12px]">{Math.round(battery * 100)}%</span>}

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { DM_Sans, Cormorant_Garamond, JetBrains_Mono } from 'next/font/google';
+import { DM_Sans, Cormorant_Garamond, JetBrains_Mono, Noto_Sans_Devanagari } from 'next/font/google';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import SkipNav from '@/components/SkipNav';
 import ScrollProgress from '@/components/ScrollProgress';
@@ -9,6 +9,8 @@ import CommandPalette from '@/components/CommandPalette';
 import AskAI from '@/components/AskAI';
 import MotionProvider from '@/components/MotionProvider';
 import SiteChrome from '@/components/SiteChrome';
+import VisitorTracker from '@/components/VisitorTracker';
+import { LanguageProvider, LANG_BOOT_SCRIPT } from '@/lib/i18n';
 import { ViewTransitionsListener } from '@/components/TransitionLink';
 import { defaultMetadata, siteUrl } from '@/lib/metadata';
 import './globals.css';
@@ -24,6 +26,15 @@ const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
   display: 'swap',
   weight: ['300', '400', '500', '600', '700'],
+});
+
+// Only downloaded when Hindi text is on screen (the font CSS uses unicode-range).
+const devanagari = Noto_Sans_Devanagari({
+  subsets: ['devanagari'],
+  variable: '--font-devanagari',
+  display: 'swap',
+  weight: ['400', '500', '600'],
+  preload: false,
 });
 
 const jetbrains = JetBrains_Mono({
@@ -44,15 +55,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${cormorant.variable} ${jetbrains.variable}`}
+      className={`${dmSans.variable} ${cormorant.variable} ${jetbrains.variable} ${devanagari.variable}`}
       suppressHydrationWarning
     >
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" />
+        {/* Apply the saved language before first paint (no flash, pages stay static). */}
+        <script dangerouslySetInnerHTML={{ __html: LANG_BOOT_SCRIPT }} />
       </head>
       <body className="bg-bg text-text-primary antialiased">
         <SkipNav />
         <ThemeProvider>
+          <LanguageProvider>
           <MotionProvider>
             <SiteChrome>{children}</SiteChrome>
           </MotionProvider>
@@ -61,6 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CommandPalette />
           <AskAI />
           <Analytics />
+          <VisitorTracker />
           <StructuredData
             type="person"
             data={{
@@ -80,6 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               url: siteUrl,
             }}
           />
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

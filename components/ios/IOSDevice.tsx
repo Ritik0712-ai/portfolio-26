@@ -9,6 +9,7 @@ import HomeScreen from './HomeScreen';
 import AppShell from './AppShell';
 import StatusBar from './StatusBar';
 import { IOS_APPS, CONTENT_APPS, type IOSAppId } from './apps-meta';
+import DsaPanel from '@/components/os/DsaPanel';
 import TestimonialsPanel from '@/components/os/TestimonialsPanel';
 import { ProjectsApp, ExperienceApp, CertificationsApp, SafariApp, NotesApp, ResumeApp } from './apps/content';
 import { MailApp, PhotosApp, GitHubApp, ContactsApp, SettingsApp, AskApp } from './apps/system';
@@ -64,6 +65,7 @@ export default function IOSDevice() {
       case 'projects': return <ProjectsApp />;
       case 'experience': return <ExperienceApp />;
       case 'certifications': return <CertificationsApp />;
+      case 'dsa': return <IOSPage title="DSA Journal"><div className="-mx-4"><DsaPanel accent="#007AFF" /></div></IOSPage>;
       case 'testimonials': return <IOSPage title="Testimonials"><div className="-mx-4"><TestimonialsPanel accent="#007AFF" columns={1} /></div></IOSPage>;
       case 'safari': return <SafariApp />;
       case 'notes': return <NotesApp />;

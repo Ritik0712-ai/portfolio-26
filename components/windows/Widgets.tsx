@@ -5,6 +5,7 @@ import { useActivity, useBlogs, useGitHub, useProjects, useTestimonials, PROFILE
 import { nowData } from '@/data/now';
 import { Fluent, FolderGlyph, WIN_APPS } from './meta';
 import { musicPicks } from '@/data/music';
+import NowPlayingBanner from '@/components/os/NowPlayingBanner';
 
 // Widgets board — slides in from the left like Windows 11's, but every card
 // is live portfolio data instead of news and weather.
@@ -116,6 +117,7 @@ export default function Widgets({ onOpen, onClose, onTestimonials }: { onOpen: (
           </button>
         ))}
 
+        <NowPlayingBanner accent="var(--win-accent)" className="col-span-2 !rounded-lg" />
         <button onClick={() => onOpen('music')} className={`${card} col-span-2 flex items-center gap-3`}>
           {WIN_APPS.music.icon(32)}
           <span className="min-w-0">

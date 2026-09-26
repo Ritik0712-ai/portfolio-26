@@ -6,6 +6,8 @@ import { useProjects, useTimeline, useCertifications, useBlogs, askAssistant, se
 import { BlogReader, ProjectReader } from '@/components/os/readers';
 import GitHubPanel from '@/components/os/GitHubPanel';
 import StatsRow from '@/components/os/StatsRow';
+import DsaPanel from '@/components/os/DsaPanel';
+import NowPlayingBanner from '@/components/os/NowPlayingBanner';
 import Terminal from '@/components/macos/apps/Terminal';
 import { usePhotoLibrary } from '@/components/macos/apps/Photos';
 import { musicPicks, spotifyEmbed, spotifyLink, type MusicItem } from '@/data/music';
@@ -160,6 +162,16 @@ export function CertificatesApp({ onBack }: { onBack: () => void }) {
           ))}
         </Group>
       )}
+    </Screen>
+  );
+}
+
+/* --------------------------------------------------------------------- DSA */
+
+export function DsaApp({ onBack }: { onBack: () => void }) {
+  return (
+    <Screen title="DSA journal" onBack={onBack}>
+      <div className="-mt-2"><DsaPanel accent="var(--md-primary)" /></div>
     </Screen>
   );
 }
@@ -363,6 +375,7 @@ export function MusicApp({ onBack }: { onBack: () => void }) {
   return (
     <Screen title="Music" onBack={onBack}>
       <div className="px-4">
+        <NowPlayingBanner accent="var(--md-primary)" className="mb-3 !rounded-[20px]" />
         <div className="rounded-[28px] md-primary-container p-4 flex gap-4 items-center mb-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={current.cover.replace('00001e02', '0000b273')} alt="" className="w-24 h-24 rounded-[16px] object-cover shadow-lg" />

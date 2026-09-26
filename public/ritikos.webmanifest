@@ -1,0 +1,24 @@
+{
+  "id": "/magic",
+  "name": "RitikOS — Ritik Agarwal's portfolio",
+  "short_name": "RitikOS",
+  "description": "Ritik Agarwal's portfolio as an app: Mac, Windows and Android editions, with live projects, blog, GitHub and DSA journal.",
+  "start_url": "/magic?source=pwa",
+  "scope": "/magic",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#121016",
+  "theme_color": "#121016",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "/icons/ritikos-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/ritikos-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/ritikos-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Android edition", "url": "/magic/android?source=pwa", "icons": [{ "src": "/icons/ritikos-192.png", "sizes": "192x192" }] },
+    { "name": "Mac edition", "url": "/magic/mac?source=pwa", "icons": [{ "src": "/icons/ritikos-192.png", "sizes": "192x192" }] },
+    { "name": "Windows edition", "url": "/magic/windows?source=pwa", "icons": [{ "src": "/icons/ritikos-192.png", "sizes": "192x192" }] }
+  ]
+}

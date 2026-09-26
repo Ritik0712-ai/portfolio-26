@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ExternalLink, Play } from 'lucide-react';
+import NowPlayingBanner from './NowPlayingBanner';
 import { musicPicks, spotifyEmbed, spotifyLink, type MusicItem } from '@/data/music';
 
 // Music app shared by macOS and iOS. Playback is Spotify's official embed
@@ -57,6 +58,7 @@ export default function MusicPlayer({ layout }: { layout: 'mac' | 'ios' }) {
   if (ios) {
     return (
       <div className="pb-4">
+        <NowPlayingBanner className="mb-4" />
         <div className="flex flex-col items-center text-center pt-2 pb-5">
           <img src={current.cover.replace('00001e02', '0000b273')} alt="" className="w-56 h-56 rounded-2xl shadow-2xl object-cover mb-4" />
           <p className="text-[22px] font-bold leading-tight">{current.title}</p>
@@ -75,6 +77,7 @@ export default function MusicPlayer({ layout }: { layout: 'mac' | 'ios' }) {
   return (
     <div className="flex h-full mac-text text-[13px]">
       <aside className="w-72 shrink-0 mac-sidebar overflow-y-auto p-2">
+        <NowPlayingBanner className="mb-2" />
         <p className="px-3 pt-1 pb-2 text-[11px] font-semibold mac-text-faint uppercase tracking-wide">Ritik&apos;s picks</p>
         {list}
       </aside>

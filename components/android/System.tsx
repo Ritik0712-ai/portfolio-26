@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerE
 import { motion } from 'framer-motion';
 import { useActivity, useBlogs, useProjects, useTestimonials, useContent } from '@/components/os/data';
 import { nowData } from '@/data/now';
+import { LiveCount } from '@/components/os/Live';
 
 /* ------------------------------------------------------------------ Icons */
 
@@ -21,7 +22,7 @@ export function Sym({ name, size = 24, color = 'currentColor', className = '', s
 
 export type AndAppId =
   | 'projects' | 'experience' | 'certificates' | 'web' | 'mail' | 'notes' | 'gallery' | 'github'
-  | 'terminal' | 'music' | 'calculator' | 'settings' | 'contacts' | 'assistant' | 'resume' | 'testimonials';
+  | 'terminal' | 'music' | 'calculator' | 'settings' | 'contacts' | 'assistant' | 'resume' | 'testimonials' | 'dsa';
 
 /** name, glyph, colourful-mode tint */
 export const AND_APPS: Record<AndAppId, { name: string; glyph: string; tint: [string, string] }> = {
@@ -41,10 +42,12 @@ export const AND_APPS: Record<AndAppId, { name: string; glyph: string; tint: [st
   assistant: { name: 'Ask Ritik', glyph: 'smart_toy-fill', tint: ['#E8DDFF', '#4F378B'] },
   resume: { name: 'Résumé', glyph: 'description-fill', tint: ['#FFDAD6', '#8C1D18'] },
   testimonials: { name: 'Testimonials', glyph: 'reviews-fill', tint: ['#C8F0D2', '#1B6B35'] },
+  dsa: { name: 'DSA', glyph: 'code_blocks', tint: ['#FFE0B2', '#8A4B00'] },
 };
 
 /** Apps backed by site content — hidden while their section is empty. */
-export const CONTENT_APPS: Partial<Record<AndAppId, 'projects' | 'experience' | 'certifications' | 'testimonials' | 'blog'>> = {
+export const CONTENT_APPS: Partial<Record<AndAppId, 'projects' | 'experience' | 'certifications' | 'testimonials' | 'blog' | 'dsa'>> = {
+  dsa: 'dsa',
   web: 'blog',
   projects: 'projects',
   experience: 'experience',
@@ -189,6 +192,7 @@ export function HomeScreen({
           <Sym name="code" size={16} color="#fff" />
           {latest ? `Pushed to ${latest.repo}` : nowData.focus.split('.')[0]}
         </p>
+        <LiveCount edition="android" label="exploring now" showAlone={false} className="mt-1 text-[13px] opacity-90 drop-shadow-sm" />
       </div>
 
       {/* Widgets */}

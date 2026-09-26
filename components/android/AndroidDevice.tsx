@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { track } from '@/lib/track';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { readPref, writePref } from '@/components/macos/settings';
@@ -10,7 +11,7 @@ import { paletteVars } from './theme';
 import { StatusBar, LockScreen, HomeScreen, AppDrawer, Shade, GestureBar, type AndAppId } from './System';
 import {
   ProjectsApp, ExperienceApp, CertificatesApp, WebApp, MailApp, NotesApp, GalleryApp, GitHubApp, TerminalApp,
-  MusicApp, CalculatorApp, SettingsApp, ContactsApp, ResumeApp, AssistantApp, TestimonialsApp,
+  MusicApp, CalculatorApp, SettingsApp, ContactsApp, ResumeApp, AssistantApp, TestimonialsApp, DsaApp,
 } from './Apps';
 
 const W = 412;
@@ -22,6 +23,7 @@ interface Running { id: AndAppId; origin: { x: number; y: number }; params?: Rec
 // phone frame next to a short explainer, scaled to fit the window.
 export default function AndroidDevice() {
   const router = useRouter();
+  useEffect(() => track('edition', { label: 'Android' }), []);
   const askEnabled = useAskEnabled();
   const screenRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<'phone' | 'framed' | null>(null);
@@ -95,6 +97,7 @@ export default function AndroidDevice() {
       case 'experience': return <ExperienceApp onBack={back} />;
       case 'certificates': return <CertificatesApp onBack={back} />;
       case 'testimonials': return <TestimonialsApp onBack={back} />;
+      case 'dsa': return <DsaApp onBack={back} />;
       case 'web': return <WebApp onBack={back} initialPost={r.params?.post} />;
       case 'mail': return <MailApp onBack={back} />;
       case 'notes': return <NotesApp onBack={back} />;

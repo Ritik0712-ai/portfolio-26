@@ -76,3 +76,13 @@ export const getProjectBySlug = (slug: string) =>
 
 export const getBlogBySlug = (slug: string) =>
   readOne<BlogPost>(`blog ${slug}`, () => db().from('blogs').select('*').eq('slug', slug).eq('published', true).maybeSingle());
+
+export const getDsaProblems = () =>
+  read<import('@/types').DsaProblem>('dsa', () =>
+    db().from('dsa_problems').select('*').eq('published', true).order('solved_at', { ascending: false }).order('created_at', { ascending: false }),
+  );
+
+export const getDsaBySlug = (slug: string) =>
+  readOne<import('@/types').DsaProblem>(`dsa ${slug}`, () =>
+    db().from('dsa_problems').select('*').eq('slug', slug).eq('published', true).maybeSingle(),
+  );

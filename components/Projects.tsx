@@ -1,4 +1,5 @@
 'use client';
+import { T } from '@/lib/i18n';
 
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -18,11 +19,11 @@ export default function Projects({ projects }: { projects: Project[] }) {
         {/* Section header */}
         <div className="mb-12 flex items-end justify-between">
           <div>
-            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2">Selected Work</p>
-            <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary">Projects</h2>
+            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2"><T en="Selected Work" hi="चुनिंदा काम" /></p>
+            <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary"><T en="Projects" hi="प्रोजेक्ट्स" /></h2>
           </div>
           <Link href="/projects" className="hidden md:inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary font-body transition-colors">
-            View all <ArrowRight className="w-4 h-4" />
+            <T en="View all" hi="सभी देखें" /> <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -89,16 +90,16 @@ export default function Projects({ projects }: { projects: Project[] }) {
                   <div className="flex items-center gap-3 pt-4 border-t border-border">
                     {project.demo_url && (
                       <a href={project.demo_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-text-primary font-body transition-colors">
-                        <ExternalLink className="w-3.5 h-3.5" /> Demo
+                        <ExternalLink className="w-3.5 h-3.5" /> <T en="Demo" hi="डेमो" />
                       </a>
                     )}
                     {project.repo_url && (
                       <a href={project.repo_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-text-primary font-body transition-colors">
-                        <Github className="w-3.5 h-3.5" /> Code
+                        <Github className="w-3.5 h-3.5" /> <T en="Code" hi="कोड" />
                       </a>
                     )}
                     <TransitionLink href={`/projects/${project.slug}`} className="ml-auto inline-flex items-center gap-1 text-xs text-accent hover:text-accent-warm font-body transition-colors">
-                      Details <ArrowRight className="w-3.5 h-3.5" />
+                      <T en="Details" hi="विवरण" /> <ArrowRight className="w-3.5 h-3.5" />
                     </TransitionLink>
                   </div>
                 </div>
@@ -110,7 +111,7 @@ export default function Projects({ projects }: { projects: Project[] }) {
         {/* Mobile view all */}
         <div className="mt-8 text-center md:hidden">
           <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary font-body transition-colors">
-            View all projects <ArrowRight className="w-4 h-4" />
+            <T en="View all projects" hi="सभी प्रोजेक्ट्स देखें" /> <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>

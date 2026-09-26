@@ -9,6 +9,7 @@ import BlogPreview from '@/components/BlogPreview';
 import Contact from '@/components/Contact';
 import NewsletterSignup from '@/components/NewsletterSignup';
 import BackToTop from '@/components/BackToTop';
+import { T } from '@/lib/i18n';
 import { getBlogs, getCertifications, getProjects, getTestimonials, getTimeline } from '@/lib/public-data';
 
 // Content is rendered on the server (so crawlers and link previews see it)
@@ -41,10 +42,10 @@ export default async function Home() {
             <div className="border-t border-border pt-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
                 <h2 id="newsletter-heading" className="text-2xl font-display font-semibold text-text-primary">
-                  Get new posts by email
+                  <T en="Get new posts by email" hi="नई पोस्ट्स ईमेल पर पाएँ" />
                 </h2>
                 <p className="text-sm text-text-muted font-body mt-1">
-                  Occasional notes on building products. No spam, unsubscribe anytime.
+                  <T en="Occasional notes on building products. No spam, unsubscribe anytime." hi="प्रोडक्ट बनाने पर कभी-कभार नोट्स। कोई स्पैम नहीं, कभी भी अनसब्सक्राइब करें।" />
                 </p>
               </div>
               <NewsletterSignup variant="compact" />

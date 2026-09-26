@@ -1,9 +1,11 @@
 'use client';
+import { T, useLang } from '@/lib/i18n';
 
 import { useState } from 'react';
 import { Mail, Send } from 'lucide-react';
 
 export default function Contact() {
+  const { t } = useLang();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -34,31 +36,31 @@ export default function Contact() {
     <section id="contact" className="py-20">
       <div className="max-w-5xl mx-auto px-4">
         <div className="max-w-lg">
-          <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-4">Contact</p>
+          <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-4"><T en="Contact" hi="संपर्क" /></p>
           <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary mb-4">
-            Let&apos;s work together
+            <T en="Let's work together" hi="चलिए साथ काम करें" />
           </h2>
           <p className="text-text-secondary font-body leading-relaxed mb-8">
-            Have a project in mind, an opportunity, or just want to say hello? My inbox is always open.
+            <T en="Have a project in mind, an opportunity, or just want to say hello? My inbox is always open." hi="कोई प्रोजेक्ट, कोई मौका, या बस हैलो कहना है? मेरा इनबॉक्स हमेशा खुला है।" />
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-body font-medium text-text-secondary mb-1.5">
-                Name <span className="text-error">*</span>
+                <T en="Name" hi="नाम" /> <span className="text-error">*</span>
               </label>
               <input
                 required
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Your name"
+                placeholder={t('Your name', 'आपका नाम')}
                 className="w-full px-3 py-2.5 font-body text-sm bg-surface border border-border rounded text-text-primary placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
               />
             </div>
             <div>
               <label className="block text-sm font-body font-medium text-text-secondary mb-1.5">
-                Email <span className="text-error">*</span>
+                <T en="Email" hi="ईमेल" /> <span className="text-error">*</span>
               </label>
               <input
                 required
@@ -71,21 +73,21 @@ export default function Contact() {
             </div>
             <div>
               <label className="block text-sm font-body font-medium text-text-secondary mb-1.5">
-                Message <span className="text-error">*</span>
+                <T en="Message" hi="संदेश" /> <span className="text-error">*</span>
               </label>
               <textarea
                 required
                 rows={5}
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                placeholder="What&apos;s on your mind?"
+                placeholder={t("What's on your mind?", 'आप क्या कहना चाहते हैं?')}
                 className="w-full px-3 py-2.5 font-body text-sm bg-surface border border-border rounded text-text-primary placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-colors resize-none"
               />
             </div>
 
             {done && (
               <div className="p-3 bg-success/10 border border-success/20 rounded text-sm text-success font-body">
-                Message sent! I&apos;ll get back to you soon.
+                <T en="Message sent! I'll get back to you soon." hi="संदेश भेज दिया गया! मैं जल्द जवाब दूँगा।" />
               </div>
             )}
             {error && (
@@ -102,14 +104,14 @@ export default function Contact() {
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
-                <><Send className="w-4 h-4" /> Send Message</>
+                <><Send className="w-4 h-4" /> <T en="Send Message" hi="संदेश भेजें" /></>
               )}
             </button>
           </form>
 
           <div className="mt-8 pt-8 border-t border-border">
             <p className="text-sm text-text-muted font-body">
-              Prefer email directly?{' '}
+              <T en="Prefer email directly?" hi="सीधे ईमेल करना चाहते हैं?" />{' '}
               <a href="mailto:ritikagarwal2468@gmail.com" className="text-accent hover:text-accent-warm transition-colors">
                 ritikagarwal2468@gmail.com
               </a>

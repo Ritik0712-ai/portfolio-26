@@ -35,8 +35,8 @@ module.exports = {
         error: withAlpha('--color-error'),
       },
       fontFamily: {
-        display: ['var(--font-cormorant)', 'Georgia', 'serif'],
-        body: ['var(--font-dm-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-cormorant)', 'var(--font-devanagari)', 'Georgia', 'serif'],
+        body: ['var(--font-dm-sans)', 'var(--font-devanagari)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-jetbrains)', 'ui-monospace', 'monospace'],
       },
       borderRadius: {

@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { aboutParagraphs } from '@/data/about';
+import { aboutParagraphs, aboutParagraphsHi, aboutHeadline, aboutHeadlineHi } from '@/data/about';
+import { T } from '@/lib/i18n';
 import { Briefcase, Megaphone, Bug, BookOpen } from 'lucide-react';
 
 const personalityTraits = [
-  { icon: Briefcase, text: 'Full-stack intern at Labmentix — shipped SmartERP, PDF Sign, CloudVault and Voxora' },
-  { icon: Megaphone, text: 'Senior Marketing Manager at AIESEC — promoted from Junior within six months' },
-  { icon: Bug, text: 'Debugs in production — my hardest bugs only showed up after deploy, and taught me the most' },
-  { icon: BookOpen, text: 'Writes about Vedanta, philosophy and growing up — not just code' },
+  { icon: Briefcase, text: 'Full-stack intern at Labmentix — shipped SmartERP, PDF Sign, CloudVault and Voxora', hi: 'Labmentix में फ़ुल-स्टैक इंटर्न — SmartERP, PDF Sign, CloudVault और Voxora शिप किए' },
+  { icon: Megaphone, text: 'Senior Marketing Manager at AIESEC — promoted from Junior within six months', hi: 'AIESEC में सीनियर मार्केटिंग मैनेजर — छह महीने में जूनियर से प्रमोशन' },
+  { icon: Bug, text: 'Debugs in production — my hardest bugs only showed up after deploy, and taught me the most', hi: 'प्रोडक्शन में डीबग करता हूँ — सबसे मुश्किल बग डिप्लॉय के बाद ही दिखे, और उन्हीं ने सबसे ज़्यादा सिखाया' },
+  { icon: BookOpen, text: 'Writes about Vedanta, philosophy and growing up — not just code', hi: 'सिर्फ़ कोड नहीं — वेदांत, दर्शन और बड़े होने के बारे में भी लिखता हूँ' },
 ];
 
 interface StatItem {
@@ -35,7 +36,7 @@ export default function About() {
         <div className="grid md:grid-cols-2 gap-16 items-start">
           {/* Left: Profile */}
           <div>
-            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-4">About</p>
+            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-4"><T en="About" hi="परिचय" /></p>
             <div className="relative">
               <div className="aspect-[3/4] rounded-lg overflow-hidden bg-bg-tertiary">
                 <Image
@@ -47,17 +48,17 @@ export default function About() {
                 />
               </div>
               <div className="absolute -bottom-4 -right-4 bg-surface border border-border rounded-lg px-4 py-3 shadow-md">
-                <p className="text-xs text-text-faint font-body">Available for</p>
-                <p className="text-sm font-medium text-text-primary">Internships & Projects</p>
+                <p className="text-xs text-text-faint font-body"><T en="Available for" hi="उपलब्ध हूँ" /></p>
+                <p className="text-sm font-medium text-text-primary"><T en="Internships & Projects" hi="इंटर्नशिप और प्रोजेक्ट्स के लिए" /></p>
               </div>
             </div>
 
             {/* Personality */}
             <div className="mt-8 space-y-3">
-              {personalityTraits.map(({ icon: Icon, text }) => (
+              {personalityTraits.map(({ icon: Icon, text, hi }) => (
                 <div key={text} className="flex items-center gap-3 text-sm text-text-secondary font-body">
                   <Icon className="w-4 h-4 text-accent shrink-0" />
-                  <span>{text}</span>
+                  <span><T en={text} hi={hi} /></span>
                 </div>
               ))}
             </div>
@@ -66,11 +67,11 @@ export default function About() {
           {/* Right: Bio */}
           <div className="pt-8 md:pt-20">
             <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary mb-6 leading-tight">
-              CS student building products that matter
+              <T en={aboutHeadline} hi={aboutHeadlineHi} />
             </h2>
             <div className="space-y-4 text-base text-text-secondary font-body leading-relaxed">
-              {aboutParagraphs.map((p) => (
-                <p key={p.slice(0, 24)}>{p}</p>
+              {aboutParagraphs.map((p, i) => (
+                <p key={p.slice(0, 24)}><T en={p} hi={aboutParagraphsHi[i] ?? p} /></p>
               ))}
             </div>
 
@@ -89,17 +90,17 @@ export default function About() {
             )}
 
             <div className="mt-8 pt-8 border-t border-border">
-              <p className="text-xs font-mono text-text-faint uppercase tracking-widest mb-4">Quick Facts</p>
+              <p className="text-xs font-mono text-text-faint uppercase tracking-widest mb-4"><T en="Quick Facts" hi="झलक" /></p>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { label: 'Based in', value: 'India' },
-                  { label: 'Education', value: 'B.Tech CSE, VIT Bhopal' },
-                  { label: 'Languages', value: 'TypeScript, Java, Python, C++' },
-                  { label: 'Focus', value: 'Full-Stack Development' },
+                  { label: 'Based in', hi: 'कहाँ से', value: 'India', valueHi: 'भारत' },
+                  { label: 'Education', hi: 'पढ़ाई', value: 'B.Tech CSE, VIT Bhopal', valueHi: 'B.Tech CSE, VIT भोपाल' },
+                  { label: 'Languages', hi: 'भाषाएँ', value: 'TypeScript, Java, Python, C++', valueHi: 'TypeScript, Java, Python, C++' },
+                  { label: 'Focus', hi: 'फ़ोकस', value: 'Full-Stack Development', valueHi: 'फ़ुल-स्टैक डेवलपमेंट' },
                 ].map(f => (
                   <div key={f.label}>
-                    <p className="text-xs text-text-faint font-body">{f.label}</p>
-                    <p className="text-sm font-medium text-text-primary font-body">{f.value}</p>
+                    <p className="text-xs text-text-faint font-body"><T en={f.label} hi={f.hi} /></p>
+                    <p className="text-sm font-medium text-text-primary font-body"><T en={f.value} hi={f.valueHi} /></p>
                   </div>
                 ))}
               </div>

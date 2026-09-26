@@ -11,6 +11,7 @@ import Image from 'next/image';
 import type { Components } from 'react-markdown';
 import TableOfContents from '@/components/TableOfContents';
 import SocialShare from '@/components/SocialShare';
+import { AISummary, ListenBar } from '@/components/blog/PostTools';
 import StructuredData from '@/components/StructuredData';
 import { siteUrl } from '@/lib/metadata';
 import { formatReadingTime } from '@/lib/reading-time';
@@ -213,6 +214,10 @@ export default function BlogPostClient({ slug, initialPost }: { slug: string; in
             {/* Rule */}
             <div className="border-t border-border mb-8" />
           </motion.header>
+
+          {/* AI summary + read-aloud */}
+          <AISummary slug={post.slug} />
+          <ListenBar title={post.title} content={post.content} />
 
           {/* Content */}
           <motion.div

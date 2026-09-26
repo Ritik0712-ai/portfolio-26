@@ -2,19 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { ChevronLeft, FolderClosed, Briefcase, Award, FileText, ExternalLink, Github, MessageSquareQuote } from 'lucide-react';
-import { useProjects, useTimeline, useCertifications, useTestimonials, useContent, formatMonth } from '@/components/os/data';
+import { ChevronLeft, FolderClosed, Briefcase, Award, FileText, ExternalLink, Github, MessageSquareQuote, Code2 } from 'lucide-react';
+import { useProjects, useTimeline, useCertifications, useTestimonials, useDsa, useContent, formatMonth } from '@/components/os/data';
 import TestimonialsPanel from '@/components/os/TestimonialsPanel';
+import DsaPanel from '@/components/os/DsaPanel';
 import type { Project } from '@/types';
 import { FolderIcon, DocIcon } from '../icons';
 
-export type FinderFolder = 'projects' | 'experience' | 'certifications' | 'testimonials' | 'documents';
+export type FinderFolder = 'projects' | 'experience' | 'certifications' | 'testimonials' | 'dsa' | 'documents';
 
 const SIDEBAR: { id: FinderFolder; label: string; icon: typeof FolderClosed }[] = [
   { id: 'projects', label: 'Projects', icon: FolderClosed },
   { id: 'experience', label: 'Experience', icon: Briefcase },
   { id: 'certifications', label: 'Certifications', icon: Award },
   { id: 'testimonials', label: 'Testimonials', icon: MessageSquareQuote },
+  { id: 'dsa', label: 'DSA Journal', icon: Code2 },
   { id: 'documents', label: 'Documents', icon: FileText },
 ];
 
@@ -33,6 +35,7 @@ export default function Finder({
   const { data: timeline } = useTimeline();
   const { data: certs } = useCertifications();
   const { data: testimonials } = useTestimonials();
+  const { data: dsa } = useDsa();
   const has = useContent();
   // Sections with nothing in them are hidden (Documents always has the résumé).
   const sidebar = SIDEBAR.filter((s) => s.id === 'documents' || has[s.id]);
@@ -49,7 +52,7 @@ export default function Finder({
   }, [projects]);
 
   const count =
-    folder === 'projects' ? projects?.length : folder === 'experience' ? timeline?.length : folder === 'certifications' ? certs?.length : folder === 'testimonials' ? testimonials?.length : 1;
+    folder === 'projects' ? projects?.length : folder === 'experience' ? timeline?.length : folder === 'certifications' ? certs?.length : folder === 'testimonials' ? testimonials?.length : folder === 'dsa' ? dsa?.length : 1;
 
   return (
     <div className="flex h-full text-[13px] mac-text">
@@ -145,6 +148,8 @@ export default function Finder({
             </Grid>
           ) : folder === 'testimonials' ? (
             <TestimonialsPanel accent="#2E6BD9" />
+          ) : folder === 'dsa' ? (
+            <DsaPanel accent="#2E6BD9" />
           ) : (
             <Grid loading={false}>
               <Item

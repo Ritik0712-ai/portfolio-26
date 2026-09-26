@@ -1,4 +1,5 @@
 'use client';
+import { T } from '@/lib/i18n';
 
 import { Award, ExternalLink } from 'lucide-react';
 import type { Certification } from '@/types';
@@ -24,15 +25,15 @@ export default function Experience({ events, certifications }: { events: Timelin
     <section id="experience" className="py-20">
       <div className="max-w-5xl mx-auto px-4">
         <div className="mb-12">
-          <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2">Background</p>
-          <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary">Experience</h2>
+          <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2"><T en="Background" hi="पृष्ठभूमि" /></p>
+          <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary"><T en="Experience" hi="अनुभव" /></h2>
         </div>
 
         <div className="grid md:grid-cols-[1.3fr_1fr] gap-12 md:gap-16">
           {/* Journey */}
           {events.length > 0 && (
             <div>
-              <h3 className="text-xs font-mono text-text-faint uppercase tracking-widest mb-6">Journey</h3>
+              <h3 className="text-xs font-mono text-text-faint uppercase tracking-widest mb-6"><T en="Journey" hi="सफ़र" /></h3>
               <ol className="relative border-l border-border ml-1.5 space-y-8">
                 {events.map((event) => (
                   <li key={event.id} className="reveal pl-6 relative">
@@ -55,7 +56,7 @@ export default function Experience({ events, certifications }: { events: Timelin
           {/* Certifications */}
           {certifications.length > 0 && (
             <div id="certifications" className="scroll-mt-24">
-              <h3 className="text-xs font-mono text-text-faint uppercase tracking-widest mb-6">Certifications</h3>
+              <h3 className="text-xs font-mono text-text-faint uppercase tracking-widest mb-6"><T en="Certifications" hi="सर्टिफ़िकेशन्स" /></h3>
               <ul className="space-y-3">
                 {certifications.map((cert) => (
                   <li
@@ -88,7 +89,7 @@ export default function Experience({ events, certifications }: { events: Timelin
                           rel="noopener noreferrer"
                           className="mt-2 inline-flex items-center gap-1 text-xs font-body text-text-secondary hover:text-text-primary transition-colors"
                         >
-                          Verify <ExternalLink className="w-3 h-3" />
+                          <T en="Verify" hi="सत्यापित करें" /> <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
                     </div>

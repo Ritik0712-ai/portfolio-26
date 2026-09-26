@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronUp, Wifi, Volume2, BatteryFull, Search, Bell, BellOff } from 'lucide-react';
 import { WIN_APPS, StartGlyph, Fluent, type WinAppId } from './meta';
+import { LiveCount } from '@/components/os/Live';
 
 interface Props {
   pinned: WinAppId[];
@@ -66,6 +67,7 @@ export default function Taskbar({
 
       {/* Tray */}
       <div className="ml-auto flex items-center gap-1 win-text">
+        <LiveCount edition="windows" label="online" className="px-2 text-[12px] win-text-2" />
         <button className="h-10 w-7 rounded-md win-hover flex items-center justify-center" aria-label="Show hidden icons">
           <ChevronUp className="w-4 h-4" />
         </button>

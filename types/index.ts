@@ -140,3 +140,24 @@ export interface Certification {
   published: boolean;
   created_at: string;
 }
+
+export interface DsaProblem {
+  id: string;
+  title: string;
+  slug: string;
+  number: number | null;
+  url: string | null;
+  difficulty: 'Easy' | 'Medium' | 'Hard' | null;
+  topics: string[];
+  approach: string | null;
+  time_complexity: string | null;
+  space_complexity: string | null;
+  code: string | null;
+  language: string | null;
+  notes: string | null;
+  revisit: boolean;
+  solved_at: string;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
+}

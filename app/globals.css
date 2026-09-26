@@ -30,8 +30,8 @@
   --color-success: #4A6741;
   --color-warning: #9A7B2E;
   --color-error: #8B3A3A;
-  --font-display: var(--font-cormorant), Georgia, serif;
-  --font-body: var(--font-dm-sans), system-ui, sans-serif;
+  --font-display: var(--font-cormorant), var(--font-devanagari), Georgia, serif;
+  --font-body: var(--font-dm-sans), var(--font-devanagari), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
   --radius-sm: 2px;
   --radius-md: 4px;
@@ -1141,3 +1141,18 @@ h1, h2, h3, h4, h5, h6 {
 .and-wallpaper-lagoon { background: radial-gradient(70% 40% at 80% 20%, #bff3ee 0%, transparent 70%), radial-gradient(90% 60% at 10% 90%, #064b52 0%, transparent 70%), linear-gradient(160deg, #4fc2c0 0%, #13808a 50%, #083a44 100%); }
 .and-wallpaper-bloom { background: radial-gradient(60% 40% at 25% 25%, #f7c6ff 0%, transparent 70%), radial-gradient(70% 45% at 85% 70%, #5b3fb4 0%, transparent 70%), linear-gradient(170deg, #d9a5f2 0%, #8e6ad8 50%, #2c1a63 100%); }
 .and-wallpaper-forest { background: radial-gradient(70% 40% at 70% 15%, #e9f5c9 0%, transparent 70%), radial-gradient(90% 55% at 20% 95%, #203a10 0%, transparent 70%), linear-gradient(170deg, #b8d98c 0%, #5d8a34 50%, #1d3510 100%); }
+
+/* ============================================
+   English / हिन्दी toggle (lib/i18n.tsx)
+   Both languages are in the HTML; show the one on <html data-lang>.
+   ============================================ */
+html:not([data-lang='hi']) .i18n-hi,
+html[data-lang='hi'] .i18n-en { display: none; }
+html[data-lang='hi'] body { line-height: 1.7; }
+html[data-lang='hi'] .font-display { letter-spacing: 0; }
+[lang='hi'] { font-feature-settings: normal; }
+
+/* Now-playing equaliser */
+@keyframes eq { 0%, 100% { height: 25%; } 50% { height: 100%; } }
+.animate-eq { animation: eq 0.9s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .animate-eq { animation: none; height: 60%; } }
