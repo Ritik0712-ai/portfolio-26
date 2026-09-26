@@ -15,7 +15,7 @@ export const resume = {
   education: {
     school: 'Vellore Institute of Technology, Bhopal',
     degree: 'B.Tech in Computer Science & Engineering',
-    year: '2nd Year',
+    year: '3rd Year',
     graduation: 'Expected Graduation: 2028',
   },
   skills: [
