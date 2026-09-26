@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Github, Linkedin, Menu, X, Search } from 'lucide-react';
+import { Github, Linkedin, Menu, X, Search, Sparkles } from 'lucide-react';
 import { OPEN_PALETTE_EVENT } from './CommandPalette';
 import ThemeToggle from './ThemeToggle';
 
@@ -57,6 +57,13 @@ export default function NavBar() {
 
           {/* Right: Social + Theme */}
           <div className="hidden md:flex items-center gap-4">
+            <Link
+              href="/magic"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-body font-medium rounded-full text-bg bg-text-primary hover:opacity-90 transition-opacity"
+              title="Explore this portfolio as a desktop OS"
+            >
+              <Sparkles className="w-3.5 h-3.5" /> Magic
+            </Link>
             <button
               onClick={() => window.dispatchEvent(new Event(OPEN_PALETTE_EVENT))}
               className="inline-flex items-center gap-2 pl-2.5 pr-1.5 py-1 text-xs font-body text-text-muted border border-border rounded hover:text-text-primary hover:border-rule transition-colors"
@@ -105,6 +112,9 @@ export default function NavBar() {
                 {link.label}
               </Link>
             ))}
+            <Link href="/magic" className="py-2 text-sm font-body text-text-primary inline-flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4" /> Magic — desktop mode
+            </Link>
             <div className="flex items-center gap-4 pt-3 border-t border-border mt-3">
               <a href="https://github.com/Ritik0712-ai" target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-text-primary">
                 <Github className="w-4 h-4" />

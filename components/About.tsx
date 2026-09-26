@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { aboutParagraphs } from '@/data/about';
 import { Coffee, Moon, Bug, Sparkles } from 'lucide-react';
 
 const personalityTraits = [
@@ -68,18 +69,9 @@ export default function About() {
               CS student building products that matter
             </h2>
             <div className="space-y-4 text-base text-text-secondary font-body leading-relaxed">
-              <p>
-                I'm a Computer Science student in India who got tired of tutorials and decided to build real things instead. My first project, MindSpace, tried to make mental health support actually accessible in a country where therapy costs more than most people's rent.
-              </p>
-              <p>
-                That project didn't become a unicorn, but it taught me more about product design, user empathy, and shipping under pressure than any course ever could.
-              </p>
-              <p>
-                Now I work on projects that blend technology with real human needs — fintech for financial literacy, developer tools, and whatever interesting problem lands on my desk.
-              </p>
-              <p>
-                When I'm not building, I'm either grinding LeetCode (I know, I know), reading about system design, or trying to explain to my parents why "just making an app" takes longer than "just writing a document."
-              </p>
+              {aboutParagraphs.map((p) => (
+                <p key={p.slice(0, 24)}>{p}</p>
+              ))}
             </div>
 
             {stats.length > 0 && (

@@ -99,6 +99,7 @@ export default function CommandPalette() {
       { id: 'uses', label: 'Uses', group: 'Navigate', icon: Wrench, keywords: 'setup tools gear stack', run: go('/uses') },
       { id: 'resume', label: 'Résumé', group: 'Navigate', icon: FileText, keywords: 'resume cv', run: go('/resume') },
       { id: 'contact', label: 'Contact', group: 'Navigate', icon: Mail, keywords: 'hire email message', run: go('/contact') },
+      { id: 'magic', label: 'Magic — open RitikOS desktop', group: 'Navigate', icon: Sparkles, keywords: 'macos desktop os fun mode', run: go('/magic') },
       { id: 'testimonial', label: 'Leave a testimonial', group: 'Navigate', icon: MessageSquarePlus, keywords: 'feedback review', run: go('/feedback') },
     ];
     for (const p of projects) {
@@ -150,7 +151,7 @@ export default function CommandPalette() {
     listRef.current?.querySelector(`[data-index="${active}"]`)?.scrollIntoView({ block: 'nearest' });
   }, [active]);
 
-  if (pathname?.startsWith('/admin')) return null;
+  if ((pathname?.startsWith('/admin') || pathname?.startsWith('/magic'))) return null;
   if (!open) return null;
 
   const onKeyDown = (e: React.KeyboardEvent) => {

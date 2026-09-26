@@ -74,7 +74,7 @@ export default function AskAI() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  if (!enabled || pathname?.startsWith('/admin')) return null;
+  if (!enabled || (pathname?.startsWith('/admin') || pathname?.startsWith('/magic'))) return null;
 
   const send = async (text: string) => {
     const q = text.trim();

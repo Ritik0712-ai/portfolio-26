@@ -1,0 +1,237 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { ChevronLeft, FolderClosed, Briefcase, Award, FileText, ExternalLink, Github } from 'lucide-react';
+import type { Certification, Project } from '@/types';
+import { FolderIcon, DocIcon } from '../icons';
+
+export type FinderFolder = 'projects' | 'experience' | 'certifications' | 'documents';
+
+interface TimelineEvent {
+  id: string;
+  title: string;
+  description: string | null;
+  event_date: string;
+}
+
+const SIDEBAR: { id: FinderFolder; label: string; icon: typeof FolderClosed }[] = [
+  { id: 'projects', label: 'Projects', icon: FolderClosed },
+  { id: 'experience', label: 'Experience', icon: Briefcase },
+  { id: 'certifications', label: 'Certifications', icon: Award },
+  { id: 'documents', label: 'Documents', icon: FileText },
+];
+
+function fmt(value: string) {
+  return /^\d{4}-\d{2}/.test(value)
+    ? new Date(value).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    : value;
+}
+
+// Module-level cache so reopening Finder is instant.
+const cache: { projects?: Project[]; timeline?: TimelineEvent[]; certs?: Certification[] } = {};
+
+export default function Finder({
+  initialFolder = 'projects',
+  onOpenResume,
+}: {
+  initialFolder?: FinderFolder;
+  onOpenResume: () => void;
+}) {
+  const [folder, setFolder] = useState<FinderFolder>(initialFolder);
+  const [projects, setProjects] = useState<Project[] | undefined>(cache.projects);
+  const [timeline, setTimeline] = useState<TimelineEvent[] | undefined>(cache.timeline);
+  const [certs, setCerts] = useState<Certification[] | undefined>(cache.certs);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [openProject, setOpenProject] = useState<Project | null>(null);
+
+  useEffect(() => setFolder(initialFolder), [initialFolder]);
+  useEffect(() => {
+    setSelected(null);
+    setOpenProject(null);
+  }, [folder]);
+
+  useEffect(() => {
+    if (!cache.projects)
+      fetch('/api/projects').then((r) => r.json()).then((d) => { cache.projects = d.projects || []; setProjects(cache.projects); }).catch(() => setProjects([]));
+    if (!cache.timeline)
+      fetch('/api/timeline').then((r) => r.json()).then((d) => { cache.timeline = d.events || []; setTimeline(cache.timeline); }).catch(() => setTimeline([]));
+    if (!cache.certs)
+      fetch('/api/certifications').then((r) => r.json()).then((d) => { cache.certs = d.certifications || []; setCerts(cache.certs); }).catch(() => setCerts([]));
+  }, []);
+
+  const count =
+    folder === 'projects' ? projects?.length : folder === 'experience' ? timeline?.length : folder === 'certifications' ? certs?.length : 1;
+
+  return (
+    <div className="flex h-full text-[13px] mac-text">
+      {/* Sidebar */}
+      <aside className="w-44 shrink-0 mac-sidebar px-2 py-3 overflow-y-auto">
+        <p className="px-2 mb-1 text-[11px] font-semibold mac-text-faint">Favourites</p>
+        {SIDEBAR.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => setFolder(s.id)}
+            className={`w-full flex items-center gap-2 px-2 py-1 rounded-md text-left ${folder === s.id ? 'mac-sidebar-active' : 'mac-hover'}`}
+          >
+            <s.icon className="w-4 h-4 text-[#2E86EA]" />
+            {s.label}
+          </button>
+        ))}
+      </aside>
+
+      {/* Main */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        <div className="flex items-center gap-2 h-10 px-4 border-b mac-divider shrink-0">
+          {openProject && (
+            <button onClick={() => setOpenProject(null)} aria-label="Back" className="p-1 rounded mac-hover">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+          <p className="font-semibold capitalize">{openProject ? openProject.title : folder}</p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto" onClick={() => setSelected(null)}>
+          {openProject ? (
+            <ProjectPreview project={openProject} />
+          ) : folder === 'projects' ? (
+            <Grid loading={!projects}>
+              {projects?.map((p) => (
+                <Item
+                  key={p.id}
+                  label={p.title}
+                  selected={selected === p.id}
+                  onSelect={() => setSelected(p.id)}
+                  onOpen={() => setOpenProject(p)}
+                  icon={
+                    p.cover_image ? (
+                      <div className="relative w-24 h-16 rounded-md overflow-hidden shadow-md bg-black/10">
+                        <Image src={p.cover_image} alt="" fill sizes="96px" className="object-cover object-top" />
+                      </div>
+                    ) : (
+                      <FolderIcon size={64} />
+                    )
+                  }
+                />
+              ))}
+            </Grid>
+          ) : folder === 'experience' ? (
+            <table className="w-full text-left">
+              <thead className="text-[11px] mac-text-faint border-b mac-divider">
+                <tr>
+                  <th className="font-medium px-4 py-1.5">Name</th>
+                  <th className="font-medium px-4 py-1.5 w-32">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(timeline ?? []).map((t, i) => (
+                  <tr key={t.id} className={i % 2 ? 'mac-row-alt' : ''}>
+                    <td className="px-4 py-2">
+                      <p className="font-medium">{t.title}</p>
+                      {t.description && <p className="mac-text-faint text-[12px]">{t.description}</p>}
+                    </td>
+                    <td className="px-4 py-2 mac-text-faint whitespace-nowrap align-top">{fmt(t.event_date)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : folder === 'certifications' ? (
+            <Grid loading={!certs}>
+              {certs?.map((c) => (
+                <Item
+                  key={c.id}
+                  label={c.title}
+                  sub={c.issuer}
+                  selected={selected === c.id}
+                  onSelect={() => setSelected(c.id)}
+                  onOpen={() => c.credential_url && window.open(c.credential_url, '_blank', 'noopener,noreferrer')}
+                  icon={
+                    c.image_url ? (
+                      <img src={c.image_url} alt="" className="w-16 h-16 object-contain rounded-md bg-white shadow" />
+                    ) : (
+                      <DocIcon size={60} label="CERT" />
+                    )
+                  }
+                />
+              ))}
+            </Grid>
+          ) : (
+            <Grid loading={false}>
+              <Item
+                label="Ritik_Agarwal_Resume.pdf"
+                selected={selected === 'resume'}
+                onSelect={() => setSelected('resume')}
+                onOpen={onOpenResume}
+                icon={<DocIcon size={64} />}
+              />
+            </Grid>
+          )}
+        </div>
+
+        <div className="h-7 border-t mac-divider px-4 flex items-center text-[11px] mac-text-faint shrink-0">
+          {openProject ? 'Quick Look' : `${count ?? '…'} item${count === 1 ? '' : 's'} · double-click to open`}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Grid({ loading, children }: { loading: boolean; children: React.ReactNode }) {
+  if (loading) return <p className="p-6 mac-text-faint">Loading…</p>;
+  return <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-2 p-4">{children}</div>;
+}
+
+function Item({
+  icon, label, sub, selected, onSelect, onOpen,
+}: {
+  icon: React.ReactNode; label: string; sub?: string; selected: boolean; onSelect: () => void; onOpen: () => void;
+}) {
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); onSelect(); }}
+      onDoubleClick={onOpen}
+      onKeyDown={(e) => e.key === 'Enter' && onOpen()}
+      className="flex flex-col items-center gap-1.5 p-2 rounded-lg text-center focus:outline-none"
+    >
+      <div className={`p-1.5 rounded-md ${selected ? 'mac-select-bg' : ''}`}>{icon}</div>
+      <span className={`px-1.5 rounded text-[12px] leading-tight line-clamp-2 ${selected ? 'bg-[#2E6BD9] text-white' : ''}`}>{label}</span>
+      {sub && <span className="text-[11px] mac-text-faint -mt-1">{sub}</span>}
+    </button>
+  );
+}
+
+function ProjectPreview({ project }: { project: Project }) {
+  return (
+    <div className="p-6 max-w-2xl">
+      {project.cover_image && (
+        <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-lg mb-5 bg-black/10">
+          <Image src={project.cover_image} alt={project.title} fill sizes="640px" className="object-cover object-top" />
+        </div>
+      )}
+      <h2 className="text-xl font-semibold mb-1">{project.title}</h2>
+      {project.short_description && <p className="mac-text-muted leading-relaxed mb-4">{project.short_description}</p>}
+      {project.technologies?.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-5">
+          {project.technologies.map((t) => (
+            <span key={t} className="px-2 py-0.5 rounded-md mac-chip text-[11px]">{t}</span>
+          ))}
+        </div>
+      )}
+      <div className="flex flex-wrap gap-2">
+        <a href={`/projects/${project.slug}`} target="_blank" rel="noopener noreferrer" className="mac-btn-primary">
+          Read case study
+        </a>
+        {project.demo_url && (
+          <a href={project.demo_url} target="_blank" rel="noopener noreferrer" className="mac-btn inline-flex items-center gap-1.5">
+            <ExternalLink className="w-3.5 h-3.5" /> Live demo
+          </a>
+        )}
+        {project.repo_url && (
+          <a href={project.repo_url} target="_blank" rel="noopener noreferrer" className="mac-btn inline-flex items-center gap-1.5">
+            <Github className="w-3.5 h-3.5" /> Source
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}

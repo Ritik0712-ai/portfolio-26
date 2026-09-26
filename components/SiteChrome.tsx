@@ -9,7 +9,7 @@ import Footer from './Footer';
 // keeps its own chrome.
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  if (pathname?.startsWith('/admin')) return <>{children}</>;
+  if ((pathname?.startsWith('/admin') || pathname?.startsWith('/magic'))) return <>{children}</>;
   return (
     <>
       <NavBar />
