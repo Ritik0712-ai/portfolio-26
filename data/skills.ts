@@ -10,7 +10,7 @@ export const skillGroups = [
   },
   {
     title: 'Backend & Data',
-    skills: ['Node.js', 'Express', 'REST APIs', 'PostgreSQL', 'MongoDB', 'MySQL', 'Redis', 'Drizzle ORM'],
+    skills: ['Node.js', 'Express', 'Spring Boot', 'REST APIs', 'PostgreSQL', 'MongoDB', 'MySQL', 'Redis', 'Prisma', 'Drizzle ORM'],
   },
   {
     title: 'AI & Cloud',

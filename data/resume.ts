@@ -17,7 +17,7 @@ export const resume = {
   github: 'https://github.com/Ritik0712-ai',
   leetcode: 'https://leetcode.com/u/Ritik812800/',
   about:
-    'Full-stack developer and 3rd-year CS student who builds and deploys complete products — frontend, APIs, database and hosting — and writes up the decisions behind them. Currently a full-stack web development intern at Labmentix, practising DSA and system design on the side.',
+    'Full-stack developer and 3rd-year CS student who builds and deploys complete products — frontend, APIs, database and hosting — across TypeScript/Node and Java/Spring Boot. As a full-stack intern at Labmentix I have shipped four products, and I write up the decisions behind my work.',
   education: {
     school: 'Vellore Institute of Technology, Bhopal',
     degree: 'B.Tech in Computer Science & Engineering',
@@ -31,7 +31,14 @@ export const resume = {
       org: 'Labmentix',
       period: 'Jun 2026 – Present',
       points: [
-        'Building and shipping features across the frontend, APIs and database of a production web codebase.',
+        'SmartERP — multi-tenant billing, inventory and accounting ERP (Next.js, Express, Prisma, PostgreSQL): company-scoped data isolation, double-entry validation (debits = credits) inside database transactions, GST invoices with PDF export.',
+        'PDF Sign — document-signing app (React, Express, pdf-lib): drag-and-drop signature placement, per-signer signing links secured by random 256-bit tokens, signed-PDF generation, email notifications and an audit trail.',
+        'CloudVault — cloud file storage in Java Spring Boot + React: direct-to-storage uploads via signed URLs, viewer/editor sharing, password-protected expiring public links, and hashed refresh tokens in HttpOnly cookies.',
+      ],
+      links: [
+        { label: 'SmartERP', url: 'https://github.com/Ritik0712-ai/SmartERP' },
+        { label: 'PDF Sign', url: 'https://github.com/Ritik0712-ai/pdf-sign-app' },
+        { label: 'CloudVault', url: 'https://github.com/Ritik0712-ai/storeit' },
       ],
     },
     {
@@ -39,16 +46,16 @@ export const resume = {
       org: 'AIESEC in Bhopal',
       period: 'Feb 2026 – Present',
       points: [
-        'Promoted from Junior Marketing Manager (Feb 2026) to Senior Marketing Manager (Aug 2026) within six months.',
-        'Serve on the Governing Board of the marketing department.',
+        'Promoted from Junior to Senior Marketing Manager within six months (Feb → Aug 2026); serve on the Governing Board of the marketing department.',
       ],
+      links: [],
     },
   ],
   skills: [
     { label: 'Languages', items: ['TypeScript', 'JavaScript', 'Java', 'Python', 'C/C++', 'SQL'] },
     { label: 'Frontend', items: ['React', 'Next.js', 'Vite', 'Tailwind CSS'] },
-    { label: 'Backend', items: ['Node.js', 'Express', 'REST APIs', 'JWT Auth', 'Better Auth'] },
-    { label: 'Databases', items: ['PostgreSQL', 'MongoDB', 'MySQL', 'Redis', 'Drizzle ORM'] },
+    { label: 'Backend', items: ['Node.js', 'Express', 'Spring Boot', 'REST APIs', 'JWT Auth', 'Better Auth'] },
+    { label: 'Databases', items: ['PostgreSQL', 'MongoDB', 'MySQL', 'Redis', 'Prisma', 'Drizzle ORM'] },
     { label: 'Cloud & AI', items: ['Groq / Gemini APIs', 'Supabase', 'Neon', 'Vercel', 'Render', 'Cloudflare R2', 'Git & GitHub'] },
   ],
   projects: [
@@ -65,13 +72,12 @@ export const resume = {
       points: [
         'Generates day-by-day itineraries that respect opening hours, meal times, travel time between stops and a fixed budget; output is validated as structured JSON and stored as relational rows.',
         'Routed generation through an LLM provider chain (Groq, then Gemini) ordered by an environment variable, so a provider outage is a restart rather than a redeploy.',
-        'Fixed an "infinite recursion detected in policy" failure between two row-level-security policies by moving access control into one owner/editor/viewer check that every route calls.',
-        'Migrated mid-build from Supabase to Neon Postgres with Drizzle ORM and Better Auth without losing working features.',
+        'Fixed an "infinite recursion detected in policy" failure between two row-level-security policies by moving access control into one owner/editor/viewer check; later migrated from Supabase to Neon Postgres with Drizzle ORM.',
       ],
     },
     {
       name: 'Voxora',
-      tagline: 'Multilingual Text-to-Speech that Translates First',
+      tagline: 'Multilingual Text-to-Speech that Translates First (Labmentix internship)',
       stack: ['React', 'Vite', 'Node.js', 'Express', 'PostgreSQL', 'Neon', 'JWT Auth', 'Cloudflare R2'],
       demo: 'https://voxora-tau.vercel.app',
       repo: 'https://github.com/Ritik0712-ai/Voxora',
@@ -83,23 +89,6 @@ export const resume = {
         'Built a translate-then-synthesise pipeline so the chosen language is the one you hear — 30 neural voices across 15 languages including Hindi, Bengali and Tamil.',
         'Diagnosed a production-only failure: server-side translation was IP rate-limited (HTTP 429/403); moved translation to the browser so each visitor uses their own IP, keeping a server fallback.',
         'Moved generated audio from an ephemeral filesystem to Cloudflare R2 behind a storage interface; verified by deleting local files and confirming playback still returned HTTP 200.',
-        'Runs entirely on free tiers with no billing account; speech providers are swappable through one environment variable.',
-      ],
-    },
-    {
-      name: 'MindSpace',
-      tagline: 'Anonymous Mental-Wellness Platform',
-      stack: ['React', 'Node.js', 'MongoDB', 'NLP APIs'],
-      demo: 'https://mindspace-app-flame.vercel.app',
-      repo: 'https://github.com/Ritik0712-ai/mindspace-app',
-      stats: [
-        { value: 'E2E', label: 'encrypted entries' },
-        { value: 'Free', label: 'basic tier' },
-      ],
-      points: [
-        'Anonymous-first platform for people who cannot afford ₹1,500–3,000 therapy sessions: no real name needed and end-to-end encrypted journal entries.',
-        'Journaling and habit tracking feed an NLP sentiment-analysis layer that turns entries into personalised weekly insights.',
-        'Added an anonymous peer-support feed alongside secure authentication and real-time data sync.',
       ],
     },
   ],

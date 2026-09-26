@@ -170,6 +170,15 @@ export default function InteractiveResume({ scroll = true, className = '' }: { s
                   </p>
                   <span className="shrink-0 text-[11px] uppercase tracking-[0.2em] text-[#C9A85C]/80">{x.period}</span>
                 </div>
+                {x.links.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] tracking-wide">
+                    {x.links.map((l) => (
+                      <a key={l.label} href={l.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[#C9A85C] transition-colors hover:text-[#E6CF95]">
+                        {l.label} <ArrowUpRight className="h-3.5 w-3.5" />
+                      </a>
+                    ))}
+                  </div>
+                )}
                 <ul className="mt-2 space-y-1.5 text-[13.5px] leading-relaxed text-stone-300">
                   {x.points.map((pt) => (
                     <li key={pt} className="flex gap-3">

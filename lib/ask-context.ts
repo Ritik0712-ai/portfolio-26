@@ -11,7 +11,7 @@ const TTL = 10 * 60 * 1000;
 
 const PROFILE = `
 Name: Ritik Agarwal
-Currently: 3rd-year B.Tech Computer Science & Engineering student at VIT Bhopal (started Sep 2024, graduating 2028), based in India. Full-stack web development intern at Labmentix since June 2026 (ongoing).
+Currently: 3rd-year B.Tech Computer Science & Engineering student at VIT Bhopal (started Sep 2024, graduating 2028), based in India. Full-stack web development intern at Labmentix since June 2026 (ongoing), where he built SmartERP (multi-tenant billing, inventory and accounting ERP — Next.js, Express, Prisma, PostgreSQL; code: https://github.com/Ritik0712-ai/SmartERP), PDF Sign (document-signing app — React, Express, pdf-lib; code: https://github.com/Ritik0712-ai/pdf-sign-app), CloudVault (cloud file storage — Java Spring Boot + React; code: https://github.com/Ritik0712-ai/storeit) and Voxora.
 Positioning: Full-stack developer who builds dependable products from idea to production — clean architecture, thoughtful UX, maintainable code.
 Availability: Open to internships and projects.
 Other involvement: AIESEC in Bhopal — joined as Junior Marketing Manager (Feb 2026), promoted to Senior Marketing Manager (Aug 2026), on the Governing Board of the marketing department; has been involved with the Fintech Club at VIT.

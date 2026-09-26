@@ -4,7 +4,7 @@ export const nowData = {
   lastUpdated: 'September 2026',
   focus: 'Learn fast at my internship. Get consistent at DSA. Ship the next project.',
   currentlyBuilding: [
-    'Full-stack features as an intern at Labmentix',
+    'Full-stack products as an intern at Labmentix — SmartERP, PDF Sign, CloudVault and Voxora so far',
     'A self-hosted error monitoring + session replay platform (Sentry-style) — in planning',
     'A daily DSA practice routine — consistent progress over speed',
   ],

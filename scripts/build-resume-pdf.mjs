@@ -69,6 +69,7 @@ const html = `<!doctype html>
     .map(
       (x) => `<div class="item">
     <div class="row"><p><span class="title">${esc(x.role)}</span> — ${esc(x.org)}</p><span class="when">${esc(x.period)}</span></div>
+    ${x.links.length ? `<p class="stack"><b>Code:</b> ${x.links.map((l) => link(l.url, l.label)).join(' | ')}</p>` : ''}
     ${bullets(x.points)}
   </div>`,
     )

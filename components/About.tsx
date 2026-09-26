@@ -6,7 +6,7 @@ import { aboutParagraphs } from '@/data/about';
 import { Briefcase, Megaphone, Bug, BookOpen } from 'lucide-react';
 
 const personalityTraits = [
-  { icon: Briefcase, text: 'Full-stack intern at Labmentix — shipping features on a production codebase' },
+  { icon: Briefcase, text: 'Full-stack intern at Labmentix — shipped SmartERP, PDF Sign, CloudVault and Voxora' },
   { icon: Megaphone, text: 'Senior Marketing Manager at AIESEC — promoted from Junior within six months' },
   { icon: Bug, text: 'Debugs in production — my hardest bugs only showed up after deploy, and taught me the most' },
   { icon: BookOpen, text: 'Writes about Vedanta, philosophy and growing up — not just code' },
