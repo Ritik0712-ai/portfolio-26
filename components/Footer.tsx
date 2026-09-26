@@ -27,6 +27,7 @@ export default function Footer() {
                 { href: '/resume', label: 'Resume' },
                 { href: '/now', label: 'Now' },
                 { href: '/contact', label: 'Contact' },
+                { href: '/feedback', label: 'Leave a testimonial' },
               ].map((link) => (
                 <Link key={link.href} href={link.href} className="text-sm text-text-muted hover:text-text-primary font-body transition-colors">
                   {link.label}

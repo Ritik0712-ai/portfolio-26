@@ -32,6 +32,8 @@ const testimonialSchema = z.object({
   avatar: z.string().nullish(),
   content: z.string().min(1),
   rating: z.coerce.number().nullish(),
+  // true = "Approve & publish" (goes live immediately); false/absent = hidden draft.
+  approved: z.boolean().optional(),
 });
 
 export async function POST(request: NextRequest) {

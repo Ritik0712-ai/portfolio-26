@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Check, Trash2, Star, ArrowRight, CheckSquare, Square } from 'lucide-react';
+import { Check, Trash2, Star, ArrowRight, CheckSquare, Square, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
@@ -58,12 +58,14 @@ export default function FeedbackAdminPage() {
     else toast('Failed to update', 'error');
   };
 
-  const convertToTestimonial = async (f: Feedback) => {
+  // publish=true approves it straight onto the homepage; false creates a hidden
+  // draft in Testimonials so it can be edited before going live.
+  const convertToTestimonial = async (f: Feedback, publish = false) => {
     const res = await fetch('/api/admin/feedback', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ feedbackId: f.id, name: f.name, role: f.role, company: f.company, content: f.content, rating: f.rating, approved: false }),
+      body: JSON.stringify({ feedbackId: f.id, name: f.name, role: f.role, company: f.company, content: f.content, rating: f.rating, approved: publish }),
     });
-    if (res.ok) { toast('Converted to testimonial', 'success'); fetchFeedback(); }
+    if (res.ok) { toast(publish ? 'Published to the homepage' : 'Saved as draft testimonial', 'success'); fetchFeedback(); }
     else {
       // Surface the API's message — it names the offending field on a 400.
       const body = await res.json().catch(() => ({}));
@@ -217,14 +219,27 @@ export default function FeedbackAdminPage() {
                     <p className="text-sm text-text-secondary">{f.content}</p>
                     <p className="text-xs text-text-faint mt-2">{new Date(f.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   </div>
-                  <div className="flex flex-col gap-1.5 shrink-0">
+                  <div className="flex flex-col items-stretch gap-1.5 shrink-0 w-36">
                     {!f.reviewed && (
                       <>
-                        <button onClick={() => markReviewed(f)} className="p-1.5 text-text-muted hover:text-success transition-colors" title="Mark reviewed"><Check className="w-4 h-4" /></button>
-                        <button onClick={() => convertToTestimonial(f)} className="p-1.5 text-text-muted hover:text-accent transition-colors" title="Convert to testimonial"><ArrowRight className="w-4 h-4" /></button>
+                        {f.permission_display ? (
+                          <button onClick={() => convertToTestimonial(f, true)} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-body rounded bg-success/10 text-success hover:bg-success/20 transition-colors" title="Create an approved testimonial — shows on the homepage immediately">
+                            <Globe className="w-3.5 h-3.5" /> Approve &amp; publish
+                          </button>
+                        ) : (
+                          <p className="text-[11px] leading-snug text-text-faint px-1">No permission to display publicly</p>
+                        )}
+                        <button onClick={() => convertToTestimonial(f)} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-body rounded border border-border text-text-muted hover:text-text-primary transition-colors" title="Create a hidden testimonial you can edit, then approve in Testimonials">
+                          <ArrowRight className="w-3.5 h-3.5" /> Save as draft
+                        </button>
+                        <button onClick={() => markReviewed(f)} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-body rounded border border-border text-text-muted hover:text-text-primary transition-colors" title="Keep private, just mark as read">
+                          <Check className="w-3.5 h-3.5" /> Mark read
+                        </button>
                       </>
                     )}
-                    <button onClick={() => setDeleteId(f.id)} className="p-1.5 text-text-muted hover:text-error transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => setDeleteId(f.id)} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-body rounded text-text-muted hover:text-error transition-colors">
+                      <Trash2 className="w-3.5 h-3.5" /> Delete
+                    </button>
                   </div>
                 </div>
               </div>

@@ -39,10 +39,11 @@ export default function FeedbackPage() {
     <div className="min-h-screen pt-24 pb-16 px-4">
       <div className="max-w-xl mx-auto">
         <div className="mb-8">
-          <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2">Leave Feedback</p>
-          <h1 className="text-4xl font-display font-semibold text-text-primary mb-2">Share your experience</h1>
+          <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em] mb-2">Testimonial</p>
+          <h1 className="text-4xl font-display font-semibold text-text-primary mb-2">Leave a testimonial</h1>
           <p className="text-text-secondary font-body text-sm">
-            Worked with me? I&apos;d love to hear what you thought.
+            Worked with me on a project, at AIESEC, or in a hackathon? I&apos;d love to hear what it was like.
+            Every note is reviewed before it appears on the site.
           </p>
         </div>
 
@@ -52,7 +53,11 @@ export default function FeedbackPage() {
               <Star className="w-6 h-6 text-success" />
             </div>
             <h2 className="text-xl font-display font-semibold text-text-primary mb-2">Thank you!</h2>
-            <p className="text-text-muted font-body text-sm">Your feedback means a lot to me.</p>
+            <p className="text-text-muted font-body text-sm">
+              {form.permission_display
+                ? "It'll show up on the site once I've reviewed it."
+                : 'Your feedback means a lot to me.'}
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-lg p-6 space-y-4">
@@ -93,12 +98,12 @@ export default function FeedbackPage() {
             <label className="flex items-start gap-2 text-sm text-text-muted font-body cursor-pointer">
               <input type="checkbox" checked={form.permission_display} onChange={e => setForm({...form, permission_display: e.target.checked})}
                 className="mt-0.5 w-4 h-4 rounded border-border accent-accent" />
-              I give permission to display my feedback on this website (with my name and role)
+              Show this on the website with my name and role (after review)
             </label>
             <button type="submit" disabled={loading}
               className="w-full py-3 bg-accent text-white font-body font-medium rounded hover:bg-accent-warm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
               {loading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Send className="w-4 h-4" />}
-              Submit Feedback
+              Submit
             </button>
           </form>
         )}
