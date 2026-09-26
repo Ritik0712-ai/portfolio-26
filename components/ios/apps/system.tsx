@@ -1,6 +1,7 @@
 'use client';
 
 import StatsRow from '@/components/os/StatsRow';
+import { InstallButton } from '@/components/os/InstallRegistrar';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -159,6 +160,9 @@ export function SettingsApp({ theme, setTheme, wallpaper, setWallpaper, onClassi
         <ListSection>
           <button className="ios-row" onClick={() => setPane('wallpaper')}><span className="flex-1">Wallpaper</span><ChevronRight className="w-4 h-4 ios-secondary" /></button>
           <button className="ios-row" onClick={() => setPane('about')}><span className="flex-1">About</span><ChevronRight className="w-4 h-4 ios-secondary" /></button>
+        </ListSection>
+        <ListSection header="App" footer="Adds RitikOS to your Home Screen. It opens full-screen and works offline.">
+          <InstallButton className="ios-row ios-blue gap-2" label="Add RitikOS to Home Screen" />
         </ListSection>
         <ListSection header="RitikOS editions" footer="Same portfolio, different skins. The classic portfolio is the standard, scrolling version of this site.">
           <a className="ios-row ios-blue" href="/magic/android">Switch to Android Edition</a>

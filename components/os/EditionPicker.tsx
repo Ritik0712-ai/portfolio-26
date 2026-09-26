@@ -7,8 +7,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Laptop, Smartphone } from 'lucide-react';
 import { readPref, writePref } from '@/components/macos/settings';
 import { LiveCount } from './Live';
-import { useInstall } from './InstallRegistrar';
-import { Download, Share } from 'lucide-react';
+import { InstallButton, InstallSheet, useInstall } from './InstallRegistrar';
 
 type Edition = 'mac' | 'windows' | 'android';
 
@@ -60,7 +59,8 @@ export default function EditionPicker() {
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3 text-[13px]">
             <LiveCount edition="picker" label="people exploring RitikOS right now" showAlone={false} className="px-3 h-9 rounded-full bg-white/[0.06] border border-white/10 text-white/80" />
-            <InstallButton />
+            <InstallButton className="inline-flex items-center gap-2 px-4 h-9 rounded-full bg-white text-black font-medium hover:opacity-90" />
+            <AutoInstall />
           </div>
         </header>
 
@@ -188,29 +188,22 @@ function Preview({ id }: { id: Edition }) {
   );
 }
 
-function InstallButton() {
-  const { state, install } = useInstall();
-  const [iosHelp, setIosHelp] = useState(false);
-  if (state === 'prompt') {
-    return (
-      <button onClick={install} className="inline-flex items-center gap-2 px-4 h-9 rounded-full bg-white text-black font-medium hover:opacity-90">
-        <Download className="w-4 h-4" /> Install RitikOS as an app
-      </button>
-    );
-  }
-  if (state === 'ios') {
-    return (
-      <span className="relative">
-        <button onClick={() => setIosHelp((v) => !v)} className="inline-flex items-center gap-2 px-4 h-9 rounded-full bg-white/[0.06] border border-white/10 text-white/85">
-          <Download className="w-4 h-4" /> Add to Home Screen
-        </button>
-        {iosHelp && (
-          <span className="absolute left-0 top-11 z-10 w-72 p-3 rounded-xl bg-[#1d1b22] border border-white/10 text-white/80 text-[12px] leading-relaxed shadow-xl">
-            In Safari, tap <Share className="w-3.5 h-3.5 inline -mt-0.5" /> <strong>Share</strong>, then <strong>Add to Home Screen</strong>. RitikOS opens full-screen like an app and works offline.
-          </span>
-        )}
-      </span>
-    );
-  }
-  return null;
+
+/** /magic?install=1 (linked from the classic site) opens the install flow straight away. */
+function AutoInstall() {
+  const { state, install, browser } = useInstall();
+  const [sheet, setSheet] = useState(false);
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    if (done || state === 'loading' || !new URLSearchParams(location.search).has('install')) return;
+    setDone(true);
+    if (state !== 'installed') setSheet(true);
+  }, [state, done]);
+  return sheet ? (
+    <InstallSheet
+      browser={browser}
+      onClose={() => setSheet(false)}
+      onInstall={state === 'prompt' ? () => install().then((ok) => ok && setSheet(false)) : undefined}
+    />
+  ) : null;
 }

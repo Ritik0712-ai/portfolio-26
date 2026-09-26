@@ -32,6 +32,7 @@ export default function Footer() {
                 { href: '/changelog', label: "What's new", hi: 'नया क्या है' },
                 { href: '/contact', label: 'Contact', hi: 'संपर्क' },
                 { href: '/feedback', label: 'Leave a testimonial', hi: 'टेस्टिमोनियल दें' },
+                { href: '/magic?install=1', label: 'Get the app', hi: 'ऐप इंस्टॉल करें' },
               ].map((link) => (
                 <Link key={link.href} href={link.href} className="text-sm text-text-muted hover:text-text-primary font-body transition-colors">
                   <T en={link.label} hi={link.hi} />

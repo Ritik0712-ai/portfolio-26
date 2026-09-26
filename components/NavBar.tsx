@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Github, Linkedin, Menu, X, Search, Sparkles } from 'lucide-react';
+import { Github, Linkedin, Menu, X, Search, Sparkles, Download } from 'lucide-react';
 import { OPEN_PALETTE_EVENT } from './CommandPalette';
 import ThemeToggle from './ThemeToggle';
 import { T, LanguageToggle } from '@/lib/i18n';
@@ -117,6 +117,9 @@ export default function NavBar() {
             ))}
             <Link href="/magic" className="py-2 text-sm font-body text-text-primary inline-flex items-center gap-1.5">
               <Sparkles className="w-4 h-4" /> <T en="Magic — explore as an OS" hi="मैजिक — OS की तरह देखें" />
+            </Link>
+            <Link href="/magic?install=1" className="py-2 text-sm font-body text-text-primary inline-flex items-center gap-1.5">
+              <Download className="w-4 h-4" /> <T en="Get the app (free)" hi="ऐप इंस्टॉल करें (मुफ़्त)" />
             </Link>
             <div className="flex items-center gap-4 pt-3 border-t border-border mt-3">
               <a href="https://github.com/Ritik0712-ai" target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-text-primary">

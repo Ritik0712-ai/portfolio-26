@@ -6,6 +6,7 @@ import { useProjects, useTimeline, useCertifications, useBlogs, askAssistant, se
 import { BlogReader, ProjectReader } from '@/components/os/readers';
 import GitHubPanel from '@/components/os/GitHubPanel';
 import StatsRow from '@/components/os/StatsRow';
+import { InstallButton } from '@/components/os/InstallRegistrar';
 import DsaPanel from '@/components/os/DsaPanel';
 import NowPlayingBanner from '@/components/os/NowPlayingBanner';
 import Terminal from '@/components/macos/apps/Terminal';
@@ -498,6 +499,7 @@ export function SettingsApp({
               <p className="text-[13px] opacity-80 truncate">{PROFILE.role}</p>
             </div>
           </div>
+          <InstallButton className="mt-3 w-full h-12 rounded-full md-bg-primary inline-flex items-center justify-center gap-2 text-[15px] font-medium" label="Install RitikOS as an app" />
         </div>
         <Group>
           {rows.map((r) => (
