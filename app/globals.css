@@ -809,3 +809,119 @@ h1, h2, h3, h4, h5, h6 {
 .mac-root[data-wallpaper-tone='light'] .mac-widget { background: rgba(255, 255, 255, 0.45); }
 /* App content uses the system UI font, not the classic site's display serif. */
 .mac-root h1, .mac-root h2, .mac-root h3, .mac-root h4 { font-family: inherit; letter-spacing: -0.01em; }
+.mac-wallpaper-graphite {
+  background:
+    radial-gradient(70% 55% at 30% 25%, #5b6270 0%, transparent 65%),
+    radial-gradient(60% 50% at 80% 80%, #2d323b 0%, transparent 70%),
+    linear-gradient(160deg, #1b1e24 0%, #2a2f37 50%, #111317 100%);
+}
+.mac-wallpaper-lagoon {
+  background:
+    radial-gradient(60% 50% at 20% 30%, #37d0c5 0%, transparent 65%),
+    radial-gradient(55% 45% at 80% 70%, #1a73e8 0%, transparent 65%),
+    radial-gradient(50% 40% at 60% 20%, #7ee8fa 0%, transparent 60%),
+    linear-gradient(180deg, #06324a 0%, #0a4d6e 55%, #062a45 100%);
+}
+.mac-wallpaper-ember {
+  background:
+    radial-gradient(60% 50% at 25% 75%, #ff9f43 0%, transparent 65%),
+    radial-gradient(55% 45% at 75% 30%, #ee5253 0%, transparent 65%),
+    radial-gradient(60% 50% at 50% 10%, #5f27cd 0%, transparent 70%),
+    linear-gradient(180deg, #1e0b2e 0%, #3a0f2b 55%, #5c1a1b 100%);
+}
+/* Reader typography for RitikOS Safari / iOS apps */
+.os-prose { font-size: 16px; line-height: 1.65; color: var(--mac-text-muted); }
+.os-prose p { margin: 0 0 1em; }
+.os-prose h1, .os-prose h2, .os-prose h3 { color: var(--mac-text); font-weight: 700; margin: 1.4em 0 0.5em; line-height: 1.25; }
+.os-prose h2 { font-size: 21px; } .os-prose h3 { font-size: 18px; }
+.os-prose a { color: #0A84FF; text-decoration: underline; text-underline-offset: 2px; }
+.os-prose ul, .os-prose ol { padding-left: 1.3em; margin: 0 0 1em; }
+.os-prose ul { list-style: disc; } .os-prose ol { list-style: decimal; }
+.os-prose li { margin: 0.25em 0; }
+.os-prose blockquote { border-left: 3px solid #0A84FF; padding-left: 1em; font-style: italic; margin: 1em 0; }
+.os-prose code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; background: var(--mac-chip); padding: 0.1em 0.35em; border-radius: 4px; }
+.os-prose pre { background: var(--mac-chip); padding: 12px 14px; border-radius: 10px; overflow-x: auto; margin: 0 0 1em; }
+.os-prose pre code { background: none; padding: 0; }
+.os-prose img { border-radius: 10px; margin: 1em 0; }
+.os-prose table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 14px; }
+.os-prose th, .os-prose td { border: 1px solid var(--mac-divider); padding: 6px 8px; text-align: left; }
+.os-prose strong { color: var(--mac-text); }
+.mac-card { background: var(--mac-chip); border: 0.5px solid var(--mac-divider); }
+.mac-toolbar { background: var(--mac-titlebar); }
+.mac-urlbar { background: var(--mac-chip); }
+.mac-widget-card {
+  background: var(--mac-menu);
+  border: 0.5px solid var(--mac-divider);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+  backdrop-filter: blur(40px) saturate(1.8);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+}
+
+/* ============================================
+   RITIKOS iOS (phones) — HIG system colours & grouped lists.
+   Defines the same --mac-* variables so shared readers work unchanged.
+   ============================================ */
+.ios-root {
+  --ios-bg: #F2F2F7;            /* systemGroupedBackground */
+  --ios-cell: #FFFFFF;          /* secondarySystemGroupedBackground */
+  --ios-label: #000000;
+  --ios-secondary: rgba(60, 60, 67, 0.6);
+  --ios-tertiary: rgba(60, 60, 67, 0.3);
+  --ios-separator: rgba(60, 60, 67, 0.29);
+  --ios-fill: rgba(120, 120, 128, 0.12);
+  --ios-blue: #007AFF;
+  --ios-bar: rgba(249, 249, 249, 0.82);
+  --mac-text: var(--ios-label);
+  --mac-text-muted: rgba(60, 60, 67, 0.85);
+  --mac-text-faint: var(--ios-secondary);
+  --mac-divider: var(--ios-separator);
+  --mac-chip: var(--ios-fill);
+  --mac-hover: var(--ios-fill);
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+.ios-root[data-ios-theme='dark'] {
+  --ios-bg: #000000;
+  --ios-cell: #1C1C1E;
+  --ios-label: #FFFFFF;
+  --ios-secondary: rgba(235, 235, 245, 0.6);
+  --ios-tertiary: rgba(235, 235, 245, 0.3);
+  --ios-separator: rgba(84, 84, 88, 0.65);
+  --ios-fill: rgba(120, 120, 128, 0.24);
+  --ios-blue: #0A84FF;
+  --ios-bar: rgba(22, 22, 24, 0.82);
+  --mac-text-muted: rgba(235, 235, 245, 0.8);
+  color-scheme: dark;
+}
+.ios-root h1, .ios-root h2, .ios-root h3 { font-family: inherit; }
+.ios-screen { background: var(--ios-bg); color: var(--ios-label); }
+.ios-bar {
+  background: var(--ios-bar);
+  -webkit-backdrop-filter: saturate(1.8) blur(20px);
+  backdrop-filter: saturate(1.8) blur(20px);
+}
+.ios-large-title { font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: 0.37px; }
+.ios-list { background: var(--ios-cell); border-radius: 10px; overflow: hidden; }
+.ios-row { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 10px 16px; font-size: 17px; line-height: 22px; position: relative; width: 100%; text-align: left; }
+.ios-row + .ios-row::before { content: ''; position: absolute; top: 0; right: 0; left: var(--ios-inset, 16px); height: 0.5px; background: var(--ios-separator); }
+.ios-row:active { background: var(--ios-fill); }
+.ios-section-header { font-size: 13px; line-height: 18px; text-transform: uppercase; color: var(--ios-secondary); padding: 0 16px 7px; }
+.ios-secondary { color: var(--ios-secondary); }
+.ios-blue { color: var(--ios-blue); }
+.ios-cell { background: var(--ios-cell); }
+.ios-widget {
+  background: rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6);
+  backdrop-filter: blur(30px) saturate(1.6);
+  border-radius: 22px;
+  color: #fff;
+}
+.ios-dock {
+  background: rgba(255, 255, 255, 0.22);
+  -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  backdrop-filter: blur(30px) saturate(1.8);
+  border-radius: 32px;
+}
+.ios-root[data-ios-theme='dark'] .dark-home-indicator { background: #fff; }

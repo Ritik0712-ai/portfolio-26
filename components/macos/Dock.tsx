@@ -16,13 +16,13 @@ export interface DockEntry {
 const BASE = 50;
 const MAX = 78;
 
-function DockItem({ entry, mouseX }: { entry: DockEntry; mouseX: MotionValue<number> }) {
+function DockItem({ entry, mouseX, magnify }: { entry: DockEntry; mouseX: MotionValue<number>; magnify: boolean }) {
   const ref = useRef<HTMLButtonElement>(null);
   const distance = useTransform(mouseX, (v) => {
     const b = ref.current?.getBoundingClientRect();
     return b ? v - b.x - b.width / 2 : Infinity;
   });
-  const sizeRaw = useTransform(distance, [-150, 0, 150], [BASE, MAX, BASE], { clamp: true });
+  const sizeRaw = useTransform(distance, [-150, 0, 150], [BASE, magnify ? MAX : BASE, BASE], { clamp: true });
   const size = useSpring(sizeRaw, { mass: 0.1, stiffness: 170, damping: 14 });
   const scale = useTransform(size, (s) => s / BASE);
 
@@ -53,7 +53,7 @@ function DockItem({ entry, mouseX }: { entry: DockEntry; mouseX: MotionValue<num
   );
 }
 
-export default function Dock({ entries }: { entries: DockEntry[] }) {
+export default function Dock({ entries, magnify = true }: { entries: DockEntry[]; magnify?: boolean }) {
   const mouseX = useMotionValue(Infinity);
   return (
     <div className="fixed bottom-2 inset-x-0 z-[8000] flex justify-center pointer-events-none">
@@ -64,7 +64,7 @@ export default function Dock({ entries }: { entries: DockEntry[] }) {
         className="pointer-events-auto flex items-end gap-2 px-2.5 pt-2 pb-2.5 rounded-2xl mac-dock"
       >
         {entries.map((e) => (
-          <DockItem key={e.id} entry={e} mouseX={mouseX} />
+          <DockItem key={e.id} entry={e} mouseX={mouseX} magnify={magnify} />
         ))}
       </nav>
     </div>

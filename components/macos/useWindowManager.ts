@@ -87,6 +87,7 @@ export interface OpenOptions {
 
 export function useWindowManager() {
   const [state, dispatch] = useReducer(reducer, { windows: [], topZ: 10, focusedId: null });
+  // NOTE: z-index stays below the menu bar (9000) / overlays; 10 + one per focus is plenty.
 
   const open = useCallback((app: AppId, opts: OpenOptions) => {
     const vw = window.innerWidth;
