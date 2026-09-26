@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowUpRight, GitCommitHorizontal, Code2, BookOpen, Sparkles } from 'lucide-react';
 import { nowData } from '@/data/now';
 import type { GitHubActivity, LeetCodeStats } from '@/lib/activity';
+import { useLivePoll } from '@/lib/useLivePoll';
 
 interface LatestPost {
   title: string;
@@ -33,15 +34,19 @@ export default function NowBento() {
   const [post, setPost] = useState<LatestPost | null>(null);
   const [activityLoaded, setActivityLoaded] = useState(false);
 
-  useEffect(() => {
+  // GitHub + LeetCode refresh every minute while the tab is open.
+  useLivePoll(() => {
     fetch('/api/activity')
       .then((r) => r.json())
       .then((d) => {
-        setGithub(d.github ?? null);
-        setLeetcode(d.leetcode ?? null);
+        if (d.github) setGithub(d.github);
+        if (d.leetcode) setLeetcode(d.leetcode);
       })
       .catch(() => {})
       .finally(() => setActivityLoaded(true));
+  });
+
+  useEffect(() => {
     fetch('/api/blogs?limit=1')
       .then((r) => r.json())
       .then((d) => setPost((d.blogs || d.posts || [])[0] ?? null))
@@ -115,7 +120,7 @@ export default function NowBento() {
             )}
             {github && (
               <div className="mt-auto pt-5">
-                <div className="flex items-end gap-[3px] h-8" aria-label={`${github.pushesLast30Days} pushes over the last 30 days`} role="img">
+                <div className="flex items-end gap-[3px] h-8" aria-label={`${github.pushesLast30Days} ${github.unit} over the last 30 days`} role="img">
                   {github.daily.map((n, i) => (
                     <span
                       key={i}
@@ -125,7 +130,7 @@ export default function NowBento() {
                   ))}
                 </div>
                 <p className="text-xs text-text-faint font-mono mt-2">
-                  {github.pushesLast30Days} pushes · {github.activeDaysLast30} active days · last 30 days
+                  {github.pushesLast30Days} {github.unit} · {github.activeDaysLast30} active days · last 30 days
                 </p>
               </div>
             )}

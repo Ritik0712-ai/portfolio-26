@@ -13,7 +13,7 @@ export default function GitHubPage() {
             <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em]">GitHub Activity</p>
           </div>
           <h1 className="text-4xl font-display font-semibold text-text-primary">GitHub Tracker</h1>
-          <p className="text-text-secondary font-body text-sm mt-1">My open source activity, repositories, and contribution history. Updated hourly.</p>
+          <p className="text-text-secondary font-body text-sm mt-1">Live from GitHub — repositories, contributions and recent activity, refreshed every minute.</p>
         </div>
         <GitHubTracker />
       </div>

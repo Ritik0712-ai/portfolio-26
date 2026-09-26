@@ -1,15 +1,15 @@
-// Server-only helpers for the homepage activity cells. Both upstreams are
-// public and unauthenticated, so responses are cached (revalidate) to stay
-// well inside GitHub's 60 req/hour anonymous limit. Set GITHUB_TOKEN in
-// Vercel to raise that limit if it is ever hit.
+// Server-only helpers for the homepage activity cells. /api/activity caches
+// the combined result for 60 seconds. With GITHUB_TOKEN set, the 30-day bars
+// come from the contribution calendar (so private work counts too, as numbers
+// only); without it they are derived from public push events.
+import { GITHUB_USERNAME, githubHeaders, getGitHubOverview } from '@/lib/github';
 
-export const GITHUB_USERNAME = 'Ritik0712-ai';
+export { GITHUB_USERNAME };
 export const LEETCODE_USERNAME = 'Ritik812800';
-
-const REVALIDATE = 1800;
 
 export interface GitHubActivity {
   profileUrl: string;
+  unit: 'contributions' | 'pushes';
   pushesLast30Days: number;
   activeDaysLast30: number;
   daily: number[]; // 30 entries, oldest -> newest, pushes per day
@@ -30,20 +30,12 @@ export interface LeetCodeStats {
   hard: number;
 }
 
-function githubHeaders(): HeadersInit {
-  const headers: Record<string, string> = {
-    'User-Agent': 'ritikagarwal.me',
-    Accept: 'application/vnd.github+json',
-  };
-  if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-  return headers;
-}
 
 export async function getGitHubActivity(): Promise<GitHubActivity | null> {
   try {
     const res = await fetch(
       `https://api.github.com/users/${GITHUB_USERNAME}/events/public?per_page=100`,
-      { headers: githubHeaders(), next: { revalidate: REVALIDATE } }
+      { headers: githubHeaders(), next: { revalidate: 60 } }
     );
     if (!res.ok) return null;
     const events: Array<{ type: string; created_at: string; repo: { name: string } }> = await res.json();
@@ -71,7 +63,7 @@ export async function getGitHubActivity(): Promise<GitHubActivity | null> {
       try {
         const c = await fetch(`https://api.github.com/repos/${last.repo.name}/commits?per_page=1`, {
           headers: githubHeaders(),
-          next: { revalidate: REVALIDATE },
+          next: { revalidate: 60 },
         });
         if (c.ok) {
           const [commit] = await c.json();
@@ -90,11 +82,23 @@ export async function getGitHubActivity(): Promise<GitHubActivity | null> {
       };
     }
 
+    // Prefer the contribution calendar when a token is configured: it
+    // includes private work and matches the graph on github.com.
+    let unit: GitHubActivity['unit'] = 'pushes';
+    let series = daily;
+    const overview = process.env.GITHUB_TOKEN ? await getGitHubOverview() : null;
+    if (overview?.contributions) {
+      const days = overview.contributions.weeks.flat();
+      series = days.slice(-30).map((d) => d.count);
+      unit = 'contributions';
+    }
+
     return {
       profileUrl: `https://github.com/${GITHUB_USERNAME}`,
-      pushesLast30Days: daily.reduce((a, b) => a + b, 0),
-      activeDaysLast30: daily.filter(Boolean).length,
-      daily,
+      unit,
+      pushesLast30Days: series.reduce((a, b) => a + b, 0),
+      activeDaysLast30: series.filter(Boolean).length,
+      daily: series,
       latest,
     };
   } catch (err) {
@@ -113,7 +117,7 @@ export async function getLeetCodeStats(): Promise<LeetCodeStats | null> {
           'query($u:String!){matchedUser(username:$u){submitStatsGlobal{acSubmissionNum{difficulty count}}}}',
         variables: { u: LEETCODE_USERNAME },
       }),
-      next: { revalidate: REVALIDATE },
+      next: { revalidate: 60 },
     });
     if (!res.ok) return null;
     const json = await res.json();

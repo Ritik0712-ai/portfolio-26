@@ -1,235 +1,204 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Star, GitFork, ExternalLink, Users, BookOpen, Activity } from 'lucide-react'
+import { useEffect, useState } from 'react';
+import { Star, GitFork, ExternalLink, Lock } from 'lucide-react';
+import type { GitHubOverview } from '@/lib/github';
+import { useLivePoll } from '@/lib/useLivePoll';
 
-interface GitHubData {
-  profile: {
-    name: string
-    bio: string
-    avatar: string
-    htmlUrl: string
-    followers: number
-    following: number
-    publicRepos: number
-  }
-  repositories: {
-    id: number
-    name: string
-    description: string
-    htmlUrl: string
-    stars: number
-    forks: number
-    language: string
-  }[]
-  contributionCount: number
+function timeAgo(iso: string, now: number) {
+  const s = Math.max(0, Math.round((now - new Date(iso).getTime()) / 1000));
+  if (s < 60) return `${s}s ago`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.round(h / 24)}d ago`;
 }
 
+const LEVEL_CLASS = ['bg-bg-tertiary', 'bg-accent/30', 'bg-accent/55', 'bg-accent/80', 'bg-accent'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 export default function GitHubTracker() {
-  const [data, setData] = useState<GitHubData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [data, setData] = useState<GitHubOverview | null>(null);
+  const [error, setError] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
 
-  useEffect(() => {
+  useLivePoll(() => {
     fetch('/api/github')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error)
-        } else {
-          setData(data)
-        }
-        setLoading(false)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.error) throw new Error(d.error);
+        setData(d);
+        setError(false);
       })
-      .catch((err) => {
-        setError('Failed to load GitHub data')
-        setLoading(false)
-      })
-  }, [])
+      .catch(() => setError((prev) => prev || !data));
+  });
 
-  if (loading) {
+  // Ticks the "updated Xs ago" label.
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 15_000);
+    return () => clearInterval(t);
+  }, []);
+
+  if (!data && !error) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="space-y-6">
+        <div className="h-40 rounded-lg bg-bg-secondary animate-pulse" />
+        <div className="h-48 rounded-lg bg-bg-secondary animate-pulse" />
       </div>
-    )
+    );
   }
 
-  if (error || !data) {
+  if (!data) {
     return (
-      <div className="text-center py-8 text-text-muted">
-        Unable to load GitHub data. Please check back later.
+      <div className="text-center py-12 text-text-muted font-body">
+        GitHub is not responding right now.{' '}
+        <a href="https://github.com/Ritik0712-ai" target="_blank" rel="noopener noreferrer" className="underline">
+          View the profile directly
+        </a>
+        .
       </div>
-    )
+    );
   }
 
   const stats = [
-    { label: 'Repositories', value: data.profile.publicRepos, icon: BookOpen },
-    { label: 'Followers', value: data.profile.followers, icon: Users },
-    { label: 'Following', value: data.profile.following, icon: Users },
-    { label: 'Contributions', value: data.contributionCount, icon: Activity },
-  ]
+    { label: 'Repositories', value: data.repos.total },
+    { label: 'Public', value: data.repos.public },
+    ...(data.repos.private ? [{ label: 'Private', value: data.repos.private }] : []),
+    ...(data.contributions ? [{ label: 'Contributions (1y)', value: data.contributions.totalLastYear }] : []),
+    { label: 'Followers', value: data.profile.followers },
+  ];
 
-  const languageColors: Record<string, string> = {
-    JavaScript: '#F7DF1E',
-    TypeScript: '#3178C6',
-    Python: '#3572A5',
-    Java: '#B07219',
-    'C++': '#F34B7D',
-    Go: '#00ADD8',
-    Rust: '#DEA584',
-    Ruby: '#701516',
-    PHP: '#4F5D95',
-    Swift: '#F05138',
-    Kotlin: '#A97BFF',
-    Dart: '#00B4AB',
-  }
+  // Month labels above the first week that starts in each month.
+  const monthLabels = data.contributions?.weeks.map((week, i) => {
+    const first = new Date(week[0]?.date);
+    const prev = i > 0 ? new Date(data.contributions!.weeks[i - 1][0]?.date) : null;
+    return !prev || first.getMonth() !== prev.getMonth() ? MONTHS[first.getMonth()] : '';
+  });
 
   return (
-    <div className="space-y-8">
-      {/* Profile Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-card rounded-xl p-6 border border-primary/10"
-      >
-        <div className="flex items-start gap-6">
-          {/* Avatar */}
-          <a href={data.profile.htmlUrl} target="_blank" rel="noopener noreferrer">
-            <img
-              src={data.profile.avatar}
-              alt={data.profile.name || 'GitHub Profile'}
-              className="w-24 h-24 rounded-full border-2 border-primary/20 hover:border-primary transition-colors"
-            />
+    <div className="space-y-10">
+      {/* Profile + live status */}
+      <section className="bg-surface border border-border rounded-lg p-6">
+        <div className="flex items-start gap-5">
+          <a href={data.profile.url} target="_blank" rel="noopener noreferrer" className="shrink-0">
+            <img src={data.profile.avatar} alt="" className="w-16 h-16 rounded-full border border-border" />
           </a>
-
-          {/* Profile Info */}
-          <div className="flex-1">
-            <h3 className="text-2xl font-bold text-text-primary">
-              {data.profile.name || 'Ritik Agarwal'}
-            </h3>
-            <p className="text-text-muted mt-1">{data.profile.bio || 'CS Student | Building Products'}</p>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <h2 className="text-2xl font-display font-semibold text-text-primary">
+                {data.profile.name || 'Ritik Agarwal'}
+              </h2>
+              <span className="inline-flex items-center gap-1.5 text-xs font-mono text-text-faint">
+                <span className="relative flex w-2 h-2">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-success opacity-60 animate-ping" />
+                  <span className="relative inline-flex w-2 h-2 rounded-full bg-success" />
+                </span>
+                Live · updated {timeAgo(data.fetchedAt, now)}
+              </span>
+            </div>
+            {data.profile.bio && <p className="text-sm text-text-muted font-body mt-1">{data.profile.bio}</p>}
             <a
-              href={data.profile.htmlUrl}
+              href={data.profile.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 mt-3 text-primary hover:text-accent transition-colors"
+              className="inline-flex items-center gap-1.5 mt-2 text-sm font-body text-text-secondary hover:text-text-primary transition-colors"
             >
-              @{data.profile.htmlUrl.split('/').pop()}
-              <ExternalLink className="w-4 h-4" />
+              @{data.profile.login} <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-bg-primary rounded-lg p-4 text-center"
-            >
-              <stat.icon className="w-5 h-5 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-text-primary">{stat.value}</div>
-              <div className="text-xs text-text-muted">{stat.label}</div>
-            </motion.div>
+        <dl className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-6 pt-6 border-t border-border">
+          {stats.map((s) => (
+            <div key={s.label}>
+              <dd className="text-3xl font-display font-semibold text-text-primary">{s.value}</dd>
+              <dt className="text-xs text-text-muted font-body mt-0.5">{s.label}</dt>
+            </div>
           ))}
-        </div>
-      </motion.div>
+        </dl>
+      </section>
 
-      {/* Top Repositories */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <h3 className="text-xl font-bold text-text-primary mb-4">Top Repositories</h3>
+      {/* Contribution graph */}
+      {data.contributions && (
+        <section>
+          <div className="flex items-baseline justify-between mb-4">
+            <h3 className="text-xs font-mono text-text-faint uppercase tracking-widest">Contributions — last 12 months</h3>
+            <p className="text-sm font-body text-text-secondary">{data.contributions.totalLastYear} total</p>
+          </div>
+          <div className="bg-surface border border-border rounded-lg p-5 overflow-x-auto">
+            <div className="inline-flex flex-col gap-1 min-w-full">
+              <div className="flex gap-[3px] text-[10px] font-mono text-text-faint h-3">
+                {monthLabels?.map((m, i) => (
+                  <span key={i} className="w-[11px] shrink-0 overflow-visible whitespace-nowrap">{m}</span>
+                ))}
+              </div>
+              <div className="flex gap-[3px]" role="img" aria-label={`${data.contributions.totalLastYear} contributions in the last year`}>
+                {data.contributions.weeks.map((week, wi) => (
+                  <div key={wi} className="flex flex-col gap-[3px]">
+                    {week.map((day) => (
+                      <span
+                        key={day.date}
+                        title={`${day.count} contribution${day.count === 1 ? '' : 's'} on ${new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+                        className={`w-[11px] h-[11px] rounded-[2px] ${LEVEL_CLASS[day.level]}`}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-1.5 mt-3 text-[10px] font-mono text-text-faint">
+              Less
+              {LEVEL_CLASS.map((c) => (
+                <span key={c} className={`w-[11px] h-[11px] rounded-[2px] ${c}`} />
+              ))}
+              More
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Recently active public repositories */}
+      <section>
+        <h3 className="text-xs font-mono text-text-faint uppercase tracking-widest mb-4">Recently active repositories</h3>
         <div className="grid md:grid-cols-2 gap-4">
-          {data.repositories.slice(0, 6).map((repo) => (
-            <motion.a
+          {data.recentRepos.map((repo) => (
+            <a
               key={repo.id}
-              href={repo.htmlUrl}
+              href={repo.url}
               target="_blank"
               rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-card rounded-xl p-5 border border-primary/10 hover:border-primary/30 transition-all group"
+              className="group bg-surface border border-border rounded-lg p-5 hover:border-rule transition-colors flex flex-col"
             >
-              <div className="flex items-start justify-between mb-2">
-                <h4 className="font-semibold text-text-primary group-hover:text-primary transition-colors truncate flex-1">
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <h4 className="font-mono text-sm text-text-primary group-hover:text-accent transition-colors truncate">
                   {repo.name}
                 </h4>
-                <ExternalLink className="w-4 h-4 text-text-muted flex-shrink-0 ml-2" />
+                <ExternalLink className="w-3.5 h-3.5 text-text-faint shrink-0" />
               </div>
-              
-              <p className="text-sm text-text-muted line-clamp-2 mb-4">
-                {repo.description || 'No description available'}
+              <p className="text-sm text-text-muted font-body line-clamp-2 mb-4">
+                {repo.description || 'No description'}
               </p>
-
-              <div className="flex items-center gap-4 text-xs text-text-muted">
+              <div className="mt-auto flex items-center gap-4 text-xs font-body text-text-muted">
                 {repo.language && (
-                  <span className="flex items-center gap-1">
-                    <span 
-                      className="w-3 h-3 rounded-full" 
-                      style={{ backgroundColor: languageColors[repo.language] || '#6e7681' }}
-                    />
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: repo.languageColor || 'var(--color-text-faint)' }} />
                     {repo.language}
                   </span>
                 )}
-                <span className="flex items-center gap-1">
-                  <Star className="w-3 h-3" />
-                  {repo.stars}
-                </span>
-                <span className="flex items-center gap-1">
-                  <GitFork className="w-3 h-3" />
-                  {repo.forks}
-                </span>
+                <span className="inline-flex items-center gap-1"><Star className="w-3 h-3" />{repo.stars}</span>
+                <span className="inline-flex items-center gap-1"><GitFork className="w-3 h-3" />{repo.forks}</span>
+                <span className="ml-auto text-text-faint">pushed {timeAgo(repo.pushedAt, now)}</span>
               </div>
-            </motion.a>
+            </a>
           ))}
         </div>
-      </motion.div>
-
-      {/* Contribution Graph Placeholder */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="bg-card rounded-xl p-6 border border-primary/10"
-      >
-        <h3 className="text-xl font-bold text-text-primary mb-4">Contribution Activity</h3>
-        <div className="flex items-center gap-4 mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-text-muted">Less</span>
-            <div className="flex gap-1">
-              {[0.2, 0.4, 0.6, 0.8, 1].map((opacity) => (
-                <div
-                  key={opacity}
-                  className="w-3 h-3 rounded-sm"
-                  style={{ backgroundColor: `rgba(88, 166, 255, ${opacity})` }}
-                />
-              ))}
-            </div>
-            <span className="text-xs text-text-muted">More</span>
-          </div>
-        </div>
-        <div className="text-center py-8 text-text-muted">
-          <Activity className="w-12 h-12 mx-auto mb-2 text-primary/50" />
-          <p>{data.contributionCount}+ contributions in the last year</p>
-          <a
-            href={data.profile.htmlUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 mt-2 text-primary hover:text-accent transition-colors text-sm"
-          >
-            View full contribution history
-            <ExternalLink className="w-3 h-3" />
-          </a>
-        </div>
-      </motion.div>
+        {data.repos.private ? (
+          <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-text-faint font-body">
+            <Lock className="w-3 h-3" /> {data.repos.private} private repositories are counted above but not listed.
+          </p>
+        ) : null}
+      </section>
     </div>
-  )
+  );
 }
