@@ -11,9 +11,9 @@ export default function GitHubPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Github className="w-6 h-6 text-text-muted" />
-            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em]">GitHub Activity</p>
+            <p className="text-xs font-mono text-text-faint uppercase tracking-[0.3em]">Coding Activity</p>
           </div>
-          <h1 className="text-4xl font-display font-semibold text-text-primary">GitHub Tracker</h1>
+          <h1 className="text-4xl font-display font-semibold text-text-primary">GitHub &amp; LeetCode</h1>
           <p className="text-text-secondary font-body text-sm mt-1">Live from GitHub and LeetCode — repositories, contributions and problem-solving progress, refreshed every minute.</p>
         </div>
         <GitHubTracker />

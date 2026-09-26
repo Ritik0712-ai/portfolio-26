@@ -95,6 +95,7 @@ export default function CommandPalette() {
       { id: 'projects', label: 'Projects', group: 'Navigate', icon: FolderKanban, keywords: 'work portfolio', run: go('/projects') },
       { id: 'experience', label: 'Experience & certifications', group: 'Navigate', icon: Briefcase, keywords: 'timeline internship aiesec certificate', run: go('/#experience') },
       { id: 'blog', label: 'Blog', group: 'Navigate', icon: BookOpen, keywords: 'writing posts notes', run: go('/blog') },
+      { id: 'coding', label: 'GitHub & LeetCode', group: 'Navigate', icon: Github, keywords: 'contributions commits repositories leetcode dsa problems solved', run: go('/github') },
       { id: 'now', label: 'Now', group: 'Navigate', icon: Clock, keywords: 'currently doing', run: go('/now') },
       { id: 'uses', label: 'Uses', group: 'Navigate', icon: Wrench, keywords: 'setup tools gear stack', run: go('/uses') },
       { id: 'resume', label: 'Résumé', group: 'Navigate', icon: FileText, keywords: 'resume cv', run: go('/resume') },

@@ -3,7 +3,7 @@ import { pageMetadata } from '@/lib/metadata';
 
 // The page below is a client component, and Next.js disallows exporting
 // metadata from one. It lives here in the server layout instead.
-export const metadata: Metadata = pageMetadata({ title: 'GitHub', path: '/github' });
+export const metadata: Metadata = pageMetadata({ title: 'GitHub & LeetCode', path: '/github' });
 
 export default function GitHubLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;

@@ -11,7 +11,7 @@ const navLinks = [
   { href: '/#projects', label: 'Projects' },
   { href: '/#experience', label: 'Experience' },
   { href: '/blog', label: 'Blog' },
-  { href: '/github', label: 'GitHub' },
+  { href: '/github', label: 'GitHub & LeetCode' },
   { href: '/resume', label: 'Resume' },
   { href: '/now', label: 'Now' },
   { href: '/contact', label: 'Contact' },
@@ -43,12 +43,12 @@ export default function NavBar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-body text-text-muted hover:text-text-primary transition-colors"
+                className="text-sm font-body text-text-muted hover:text-text-primary transition-colors whitespace-nowrap"
               >
                 {link.label}
               </Link>
@@ -56,7 +56,7 @@ export default function NavBar() {
           </div>
 
           {/* Right: Social + Theme */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             <Link
               href="/magic"
               className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-body font-medium rounded-full text-bg bg-text-primary hover:opacity-90 transition-opacity"
@@ -84,14 +84,14 @@ export default function NavBar() {
           {/* Mobile: search + menu */}
           <button
             onClick={() => window.dispatchEvent(new Event(OPEN_PALETTE_EVENT))}
-            className="md:hidden ml-auto p-2 text-text-muted hover:text-text-primary transition-colors"
+            className="lg:hidden ml-auto p-2 text-text-muted hover:text-text-primary transition-colors"
             aria-label="Search"
           >
             <Search className="w-5 h-5" />
           </button>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-text-muted hover:text-text-primary transition-colors"
+            className="lg:hidden p-2 text-text-muted hover:text-text-primary transition-colors"
             aria-label="Toggle menu"
           >
             {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -101,7 +101,7 @@ export default function NavBar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden bg-surface border-t border-border">
+        <div className="lg:hidden bg-surface border-t border-border">
           <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
