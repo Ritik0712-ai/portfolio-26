@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence } from 'framer-motion';
-import { ChevronRight, ExternalLink, Download, Share } from 'lucide-react';
+import { ChevronRight, ExternalLink, Share } from 'lucide-react';
 import IOSPage, { ListSection } from '../IOSPage';
 import { useProjects, useTimeline, useCertifications, useBlogs, formatMonth, timeAgo, PROFILE } from '@/components/os/data';
 import { ProjectReader, BlogReader } from '@/components/os/readers';
 import { aboutHeadline, aboutParagraphs } from '@/data/about';
 import { nowData } from '@/data/now';
 import { uses } from '@/data/uses';
-import { resumeUpdated } from '@/data/resume';
+import InteractiveResume from '@/components/resume/InteractiveResume';
 
 export function ProjectsApp() {
   const { data: projects } = useProjects();
@@ -198,22 +198,9 @@ export function NotesApp() {
 }
 
 export function ResumeApp() {
-  const date = new Date(resumeUpdated).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
   return (
     <IOSPage title="Résumé">
-      <p className="text-[15px] ios-secondary mb-4">Last updated {date}</p>
-      <div className="rounded-2xl overflow-hidden shadow-lg bg-white aspect-[1/1.3] mb-4">
-        <iframe src="/resume.pdf#view=FitH" title="Résumé" className="w-full h-full" />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="h-12 rounded-xl ios-cell flex items-center justify-center gap-2 ios-blue font-semibold text-[17px]">
-          <ExternalLink className="w-4 h-4" /> Open
-        </a>
-        <a href="/resume.pdf" download="Ritik_Agarwal_Resume.pdf" className="h-12 rounded-xl bg-[var(--ios-blue)] text-white flex items-center justify-center gap-2 font-semibold text-[17px]">
-          <Download className="w-4 h-4" /> Download
-        </a>
-      </div>
-      <p className="text-[13px] ios-secondary mt-4 text-center">{PROFILE.name} · {PROFILE.role}</p>
+      <InteractiveResume scroll={false} className="rounded-2xl overflow-hidden" />
     </IOSPage>
   );
 }

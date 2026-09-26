@@ -98,7 +98,7 @@ export default function MacDesktop() {
       const meta = APPS[app];
       let title = meta.name;
       if (app === 'finder' && params?.folder) title = params.folder[0].toUpperCase() + params.folder.slice(1);
-      if (app === 'preview') title = 'Ritik_Agarwal_Resume.pdf';
+      if (app === 'preview') title = 'Ritik Agarwal — Resume';
       if (app === 'mail') title = 'New Message';
       if (app === 'terminal') title = 'ritik — rtksh — 80×24';
       wm.open(app, { title, params, w: meta.w, h: meta.h });
