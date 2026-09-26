@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowDownToLine, ChevronDown, Github, Linkedin, Mail, X } from 'lucide-react';
+import { ArrowDownToLine, ArrowUpRight, ChevronDown, Github, Linkedin, Mail, X } from 'lucide-react';
 import { resume, resumeUpdated } from '@/data/resume';
 
 // Single champagne-gold accent, matching the site's --color-accent-warm-light.
@@ -150,15 +150,42 @@ export default function InteractiveResume({ scroll = true, className = '' }: { s
             <p className="font-display text-[22px] leading-snug text-stone-50">{resume.education.degree}</p>
             <p className="mt-2 text-[13px] text-stone-400">{resume.education.school}</p>
             <div className="mt-6 space-y-2 border-t border-white/[0.06] pt-4 text-[12.5px]">
+              <div className="flex justify-between"><span className="text-stone-500">Period</span><span className="text-stone-200">{resume.education.period}</span></div>
               <div className="flex justify-between"><span className="text-stone-500">Year</span><span className="text-stone-200">{resume.education.year}</span></div>
               <div className="flex justify-between"><span className="text-stone-500">Graduation</span><span className="text-stone-200">{resume.education.graduation.replace('Expected Graduation: ', '')} <span className="text-stone-500">(expected)</span></span></div>
             </div>
           </Card>
         </div>
 
-        {/* Skills */}
+        {/* Experience */}
         <Card index={3} className={`mt-4 ${pad}`}>
-          <Label n="03">Technical Skills</Label>
+          <Label n="03">Experience</Label>
+          <ol className="relative space-y-7 border-l border-[#C9A85C]/25 pl-6">
+            {resume.experience.map((x) => (
+              <li key={x.org} className="relative">
+                <span className="absolute -left-[29px] top-2 h-2 w-2 rotate-45 border border-[#C9A85C] bg-[#0c0c0e]" />
+                <div className={`flex gap-x-4 ${wide ? 'items-baseline justify-between' : 'flex-col'}`}>
+                  <p className="font-display text-[22px] leading-snug text-stone-50">
+                    {x.role} <span className="italic text-stone-400">· {x.org}</span>
+                  </p>
+                  <span className="shrink-0 text-[11px] uppercase tracking-[0.2em] text-[#C9A85C]/80">{x.period}</span>
+                </div>
+                <ul className="mt-2 space-y-1.5 text-[13.5px] leading-relaxed text-stone-300">
+                  {x.points.map((pt) => (
+                    <li key={pt} className="flex gap-3">
+                      <span className="mt-[9px] h-px w-3 shrink-0 bg-[#C9A85C]/70" />
+                      <span>{pt}</span>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ol>
+        </Card>
+
+        {/* Skills */}
+        <Card index={4} className={`mt-4 ${pad}`}>
+          <Label n="04">Technical Skills</Label>
           <div className="-mx-1 mb-6 flex gap-5 overflow-x-auto border-b border-white/[0.06] px-1">
             {resume.skills.map((s, i) => (
               <button
@@ -211,7 +238,7 @@ export default function InteractiveResume({ scroll = true, className = '' }: { s
         {/* Projects */}
         <div className="mt-10">
           <div className="mb-4 flex min-h-[28px] items-center justify-between gap-3 px-1">
-            <Label n="04">Selected Projects</Label>
+            <Label n="05">Selected Projects</Label>
             <AnimatePresence>
               {focus && (
                 <motion.button
@@ -231,13 +258,28 @@ export default function InteractiveResume({ scroll = true, className = '' }: { s
               const matches = !focus || p.stack.includes(focus);
               const expanded = !!open[p.name];
               return (
-                <motion.div key={p.name} animate={{ opacity: matches ? 1 : 0.3 }} transition={{ duration: 0.4 }}>
-                  <Card index={4 + i} className={`h-full ${pad} ${focus && matches ? '!border-[#C9A85C]/40' : ''}`}>
+                <motion.div
+                  key={p.name}
+                  animate={{ opacity: matches ? 1 : 0.3 }}
+                  transition={{ duration: 0.4 }}
+                  className={xwide && i === resume.projects.length - 1 && resume.projects.length % 2 === 1 ? 'col-span-2' : ''}
+                >
+                  <Card index={5 + i} className={`h-full ${pad} ${focus && matches ? '!border-[#C9A85C]/40' : ''}`}>
                     <div className="flex items-baseline justify-between gap-3">
                       <p className="font-display text-[30px] font-medium leading-none text-stone-50">{p.name}</p>
                       <span className="font-display text-[15px] italic text-[#C9A85C]/80">No. {String(i + 1).padStart(2, '0')}</span>
                     </div>
                     <p className="mt-2 font-display text-[16px] italic text-stone-400">{p.tagline}</p>
+                    <div className="mt-3 flex gap-4 text-[12px] tracking-wide">
+                      {[
+                        { href: p.demo, label: 'Live demo' },
+                        { href: p.repo, label: 'Code' },
+                      ].map((l) => (
+                        <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[#C9A85C] transition-colors hover:text-[#E6CF95]">
+                          {l.label} <ArrowUpRight className="h-3.5 w-3.5" />
+                        </a>
+                      ))}
+                    </div>
 
                     <div className="mt-6 grid grid-cols-2 divide-x divide-white/[0.06] border-y border-white/[0.06] py-4">
                       {p.stats.map((s, j) => (
@@ -282,9 +324,21 @@ export default function InteractiveResume({ scroll = true, className = '' }: { s
           </div>
         </div>
 
-        {/* Coursework */}
-        <Card index={6} className={`mt-10 ${pad}`}>
-          <Label n="05">Relevant Coursework</Label>
+        {/* Certifications + Coursework */}
+        <Card index={8} className={`mt-10 ${pad}`}>
+          <Label n="06">Certifications</Label>
+          <ul className="mb-8 space-y-2">
+            {resume.certifications.map((c) => (
+              <li key={c.title} className={`flex gap-x-4 ${wide ? 'items-baseline justify-between' : 'flex-col'}`}>
+                <a href={c.url} target="_blank" rel="noopener noreferrer" className="group/cert inline-flex items-center gap-1.5 font-display text-[19px] text-stone-100 hover:text-[#E6CF95]">
+                  {c.title}
+                  <ArrowUpRight className="h-4 w-4 text-[#C9A85C] opacity-60 transition-opacity group-hover/cert:opacity-100" />
+                </a>
+                <span className="text-[12px] text-stone-500">{c.issuer} · {c.date}</span>
+              </li>
+            ))}
+          </ul>
+          <Label n="07">Relevant Coursework</Label>
           <ul className={`grid gap-x-8 ${wide ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {resume.coursework.map((c) => (
               <li key={c} className="flex items-center gap-3 border-b border-white/[0.05] py-2.5 text-[13.5px] text-stone-300 last:border-0">

@@ -1,19 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Clock } from 'lucide-react';
 import type { BlogPost } from '@/types';
 
-export default function BlogPreview() {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-
-  useEffect(() => {
-    fetch('/api/blogs?limit=3')
-      .then((r) => r.json())
-      .then((d) => setPosts(d.blogs || []))
-      .catch(() => {});
-  }, []);
+export default function BlogPreview({ posts }: { posts: BlogPost[] }) {
 
   if (posts.length === 0) return null;
 

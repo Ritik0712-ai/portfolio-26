@@ -155,7 +155,7 @@ export default function NowBento() {
             ) : (
               <>
                 <p className="text-sm text-text-primary font-body leading-relaxed">
-                  Just started my DSA streak — follow along as the count goes up.
+                  Practising DSA daily — see my progress on LeetCode.
                 </p>
                 <p className="mt-auto pt-4 text-xs font-mono text-text-faint">@Ritik812800</p>
               </>

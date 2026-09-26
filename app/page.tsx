@@ -9,8 +9,21 @@ import BlogPreview from '@/components/BlogPreview';
 import Contact from '@/components/Contact';
 import NewsletterSignup from '@/components/NewsletterSignup';
 import BackToTop from '@/components/BackToTop';
+import { getBlogs, getCertifications, getProjects, getTestimonials, getTimeline } from '@/lib/public-data';
 
-export default function Home() {
+// Content is rendered on the server (so crawlers and link previews see it)
+// and regenerated at most once a minute.
+export const revalidate = 60;
+
+export default async function Home() {
+  const [projects, events, certifications, testimonials, posts] = await Promise.all([
+    getProjects(true),
+    getTimeline(),
+    getCertifications(),
+    getTestimonials(),
+    getBlogs(3),
+  ]);
+
   return (
     <>
       <main id="main-content" className="min-h-screen">
@@ -18,10 +31,10 @@ export default function Home() {
         <NowBento />
         <About />
         <Skills />
-        <Projects />
-        <Experience />
-        <Testimonials />
-        <BlogPreview />
+        <Projects projects={projects} />
+        <Experience events={events} certifications={certifications} />
+        <Testimonials testimonials={testimonials} />
+        <BlogPreview posts={posts} />
         <Contact />
         <section aria-labelledby="newsletter-heading" className="pb-20">
           <div className="max-w-5xl mx-auto px-4">

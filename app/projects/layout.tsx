@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { pageMetadata } from '@/lib/metadata';
 
-// The page below is a client component, and Next.js disallows exporting
-// metadata from one. It lives here in the server layout instead.
+// Metadata for the list page. The list itself is a client component
+// (search and filters) fed with server-fetched data by page.tsx.
 export const metadata: Metadata = pageMetadata({ title: 'Projects', path: '/projects' });
 
 export default function ProjectsLayout({ children }: { children: React.ReactNode }) {

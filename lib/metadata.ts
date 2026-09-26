@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.ritikagarwal.me';
 export { siteUrl };
 const siteName = 'Ritik Agarwal Portfolio';
-const defaultTitle = 'Ritik Agarwal | Product-Minded Engineer';
+const defaultTitle = 'Ritik Agarwal | Full-Stack Developer';
 const defaultDescription =
   'I build dependable products from idea to production. Full-stack engineer focused on clean architecture and thoughtful UX.';
 
@@ -24,7 +24,7 @@ export const defaultMetadata: Metadata = {
     'developer',
     'full-stack',
     'portfolio',
-    'product engineer',
+    'full-stack developer',
     'Ritik Agarwal',
     'Next.js',
     'React',
@@ -43,7 +43,7 @@ export const defaultMetadata: Metadata = {
         url: '/og-default.png',
         width: 1200,
         height: 630,
-        alt: 'Ritik Agarwal - Product-Minded Engineer',
+        alt: 'Ritik Agarwal - Full-Stack Developer',
       },
     ],
   },
@@ -67,7 +67,7 @@ export function pageMetadata({
   description = defaultDescription,
   path = '/',
   ogImage = '/og-default.png',
-  ogImageAlt = 'Ritik Agarwal - Product-Minded Engineer',
+  ogImageAlt = 'Ritik Agarwal - Full-Stack Developer',
   publishedTime,
   modifiedTime,
   type = 'website',

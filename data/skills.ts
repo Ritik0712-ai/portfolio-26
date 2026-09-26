@@ -2,18 +2,18 @@
 export const skillGroups = [
   {
     title: 'Languages',
-    skills: ['TypeScript', 'JavaScript', 'Python', 'Java', 'SQL'],
+    skills: ['TypeScript', 'JavaScript', 'Java', 'Python', 'C/C++', 'SQL'],
   },
   {
     title: 'Frontend',
-    skills: ['React', 'Next.js', 'Tailwind CSS', 'React Native'],
+    skills: ['React', 'Next.js', 'Vite', 'Tailwind CSS'],
   },
   {
     title: 'Backend & Data',
-    skills: ['Node.js', 'Express', 'PostgreSQL', 'Supabase', 'MongoDB', 'Redis'],
+    skills: ['Node.js', 'Express', 'REST APIs', 'PostgreSQL', 'MongoDB', 'MySQL', 'Redis', 'Drizzle ORM'],
   },
   {
-    title: 'AI & Infra',
-    skills: ['OpenAI / Gemini / Groq APIs', 'Git', 'Docker', 'Vercel', 'Render', 'Cloudflare R2'],
+    title: 'AI & Cloud',
+    skills: ['Groq / Gemini APIs', 'Supabase', 'Neon', 'Git & GitHub', 'Vercel', 'Render', 'Cloudflare R2'],
   },
 ];

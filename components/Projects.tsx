@@ -1,21 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import TransitionLink from './TransitionLink';
 import Image from 'next/image';
 import type { Project } from '@/types';
 
-export default function Projects() {
-  const [projects, setProjects] = useState<Project[]>([]);
-
-  useEffect(() => {
-    fetch('/api/projects?featured=true')
-      .then((r) => r.json())
-      .then((d) => setProjects(d.projects || []))
-      .catch(() => {});
-  }, []);
+export default function Projects({ projects }: { projects: Project[] }) {
 
   // The homepage shows only featured work, so it skips the tech filter —
   // /projects has the full list with filtering.

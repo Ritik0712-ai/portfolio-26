@@ -1,15 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Award, ExternalLink } from 'lucide-react';
 import type { Certification } from '@/types';
 
-interface TimelineEvent {
-  id: string;
-  title: string;
-  description: string | null;
-  event_date: string;
-}
+import type { TimelineEvent } from '@/lib/public-data';
 
 // event_date is free text: ISO dates ("2024-09-05") become "Sep 2024",
 // anything else ("Present") is shown as-is.
@@ -22,20 +16,7 @@ function formatMonth(value: string) {
   return new Date(value).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
-export default function Experience() {
-  const [events, setEvents] = useState<TimelineEvent[]>([]);
-  const [certifications, setCertifications] = useState<Certification[]>([]);
-
-  useEffect(() => {
-    fetch('/api/timeline')
-      .then((r) => r.json())
-      .then((d) => setEvents(d.events || []))
-      .catch(() => {});
-    fetch('/api/certifications')
-      .then((r) => r.json())
-      .then((d) => setCertifications(d.certifications || []))
-      .catch(() => {});
-  }, []);
+export default function Experience({ events, certifications }: { events: TimelineEvent[]; certifications: Certification[] }) {
 
   if (events.length === 0 && certifications.length === 0) return null;
 

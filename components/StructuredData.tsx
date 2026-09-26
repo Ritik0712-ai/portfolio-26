@@ -14,7 +14,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           '@type': 'Person',
           name: data.name || 'Ritik Agarwal',
           url: data.url || siteUrl,
-          jobTitle: data.jobTitle || 'Product Engineer',
+          jobTitle: data.jobTitle || 'Full-Stack Developer',
           description: data.description || 'Full-stack engineer focused on clean architecture and thoughtful UX.',
           sameAs: data.sameAs || [],
         };

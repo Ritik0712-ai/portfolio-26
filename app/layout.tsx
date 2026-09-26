@@ -66,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             data={{
               name: 'Ritik Agarwal',
               url: siteUrl,
-              jobTitle: 'Product Engineer',
+              jobTitle: 'Full-Stack Developer',
               sameAs: [
                 'https://github.com/Ritik0712-ai',
                 'https://www.linkedin.com/in/ritik-agarwal-58ba012b4/',

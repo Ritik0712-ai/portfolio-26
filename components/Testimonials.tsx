@@ -1,21 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Star, Quote, ArrowRight, MessageSquarePlus } from 'lucide-react';
 import type { Testimonial } from '@/types';
 
-export default function Testimonials() {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/testimonials')
-      .then((r) => r.json())
-      .then((d) => setTestimonials(d.testimonials || []))
-      .catch(() => {})
-      .finally(() => setLoaded(true));
-  }, []);
+export default function Testimonials({ testimonials }: { testimonials: Testimonial[] }) {
 
   return (
     <section id="testimonials" className="py-20">
@@ -63,7 +52,7 @@ export default function Testimonials() {
         )}
 
         {/* Always-visible invite, so there is a way in even before the first testimonial is approved */}
-        {loaded && (
+
           <div className="bg-surface border border-dashed border-rule rounded-lg p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded bg-accent/15 flex items-center justify-center shrink-0">
@@ -87,7 +76,6 @@ export default function Testimonials() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-        )}
       </div>
     </section>
   );

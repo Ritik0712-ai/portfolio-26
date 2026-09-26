@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { aboutParagraphs } from '@/data/about';
-import { Coffee, Moon, Bug, Sparkles } from 'lucide-react';
+import { Briefcase, Megaphone, Bug, BookOpen } from 'lucide-react';
 
 const personalityTraits = [
-  { icon: Coffee, text: 'Coffee enthusiast — code doesn\'t compile without it' },
-  { icon: Moon, text: 'Sleep lover — debugs better after a night of rest' },
-  { icon: Bug, text: 'Bug hunter — every error is just a puzzle waiting to be solved' },
-  { icon: Sparkles, text: 'Learns in public — sharing the journey, not just the destination' },
+  { icon: Briefcase, text: 'Full-stack intern at Labmentix — shipping features on a production codebase' },
+  { icon: Megaphone, text: 'Senior Marketing Manager at AIESEC — promoted from Junior within six months' },
+  { icon: Bug, text: 'Debugs in production — my hardest bugs only showed up after deploy, and taught me the most' },
+  { icon: BookOpen, text: 'Writes about Vedanta, philosophy and growing up — not just code' },
 ];
 
 interface StatItem {
@@ -94,8 +94,8 @@ export default function About() {
                 {[
                   { label: 'Based in', value: 'India' },
                   { label: 'Education', value: 'B.Tech CSE, VIT Bhopal' },
-                  { label: 'Languages', value: 'Java, TS, Python' },
-                  { label: 'Focus', value: 'Product Engineering' },
+                  { label: 'Languages', value: 'TypeScript, Java, Python, C++' },
+                  { label: 'Focus', value: 'Full-Stack Development' },
                 ].map(f => (
                   <div key={f.label}>
                     <p className="text-xs text-text-faint font-body">{f.label}</p>

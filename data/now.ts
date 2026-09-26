@@ -2,11 +2,11 @@
 // bento block and the /now page. Update lastUpdated whenever you edit this.
 export const nowData = {
   lastUpdated: 'September 2026',
-  focus: 'Ship the portfolio. Document everything. Land an internship.',
+  focus: 'Learn fast at my internship. Get consistent at DSA. Ship the next project.',
   currentlyBuilding: [
-    'This portfolio — case-study pages, testimonials, and an AI assistant that answers questions about my work',
+    'Full-stack features as an intern at Labmentix',
     'A self-hosted error monitoring + session replay platform (Sentry-style) — in planning',
-    'DSA practice routine — consistent progress over speed',
+    'A daily DSA practice routine — consistent progress over speed',
   ],
   currentlyLearning: [
     'Data Structures & Algorithms — my main focus this semester',

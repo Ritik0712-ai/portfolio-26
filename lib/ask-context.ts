@@ -11,11 +11,11 @@ const TTL = 10 * 60 * 1000;
 
 const PROFILE = `
 Name: Ritik Agarwal
-Currently: B.Tech Computer Science & Engineering student at VIT Bhopal (started Sep 2024, graduating 2028), based in India.
+Currently: 3rd-year B.Tech Computer Science & Engineering student at VIT Bhopal (started Sep 2024, graduating 2028), based in India. Full-stack web development intern at Labmentix since June 2026 (ongoing).
 Positioning: Full-stack developer who builds dependable products from idea to production — clean architecture, thoughtful UX, maintainable code.
 Availability: Open to internships and projects.
-Other involvement: Governing Board member in the marketing department of AIESEC in Bhopal; has been involved with the Fintech Club at VIT.
-LeetCode: just started practising DSA on LeetCode (profile linked on the site).
+Other involvement: AIESEC in Bhopal — joined as Junior Marketing Manager (Feb 2026), promoted to Senior Marketing Manager (Aug 2026), on the Governing Board of the marketing department; has been involved with the Fintech Club at VIT.
+LeetCode: practises DSA regularly on LeetCode (profile linked on the site).
 Interests: Building tech products for the Indian market (fintech for financial literacy, mental-health access, developer tools); system design; DSA.
 Contact: email ritikagarwal2468@gmail.com, contact form at /contact, GitHub https://github.com/${GITHUB_USERNAME}, LinkedIn https://www.linkedin.com/in/ritik-agarwal-58ba012b4/, LeetCode https://leetcode.com/u/${LEETCODE_USERNAME}/
 Site pages: /projects (case studies), /blog, /now, /uses, /resume, /contact, /feedback (leave a testimonial).
