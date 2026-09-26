@@ -121,8 +121,14 @@ export async function getLeetCodeStats(): Promise<LeetCodeStats | null> {
     });
     if (!res.ok) return null;
     const json = await res.json();
-    const rows: Array<{ difficulty: string; count: number }> =
-      json?.data?.matchedUser?.submitStatsGlobal?.acSubmissionNum ?? [];
+    // A missing user (wrong username, or LeetCode blocking the request) must
+    // not masquerade as "0 solved" — report it as unavailable instead.
+    const user = json?.data?.matchedUser;
+    if (!user) {
+      console.error('LeetCode returned no user for', LEETCODE_USERNAME, json?.errors);
+      return null;
+    }
+    const rows: Array<{ difficulty: string; count: number }> = user.submitStatsGlobal?.acSubmissionNum ?? [];
     const get = (d: string) => rows.find((r) => r.difficulty === d)?.count ?? 0;
     return {
       profileUrl: `https://leetcode.com/u/${LEETCODE_USERNAME}/`,

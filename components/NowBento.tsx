@@ -142,22 +142,23 @@ export default function NowBento() {
               <Code2 className="w-3.5 h-3.5" /> LeetCode
               <ArrowUpRight className="w-3.5 h-3.5 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
             </p>
-            {leetcode && leetcode.solved > 0 ? (
+            {leetcode ? (
               <>
                 <p className="font-display text-4xl text-text-primary">{leetcode.solved}</p>
-                <p className="text-xs text-text-muted font-body">problems solved</p>
+                <p className="text-xs text-text-muted font-body">{leetcode.solved === 1 ? 'question' : 'questions'} solved</p>
                 <div className="mt-auto pt-4 flex gap-3 text-xs font-mono">
                   <span className="text-success">E {leetcode.easy}</span>
                   <span className="text-warning">M {leetcode.medium}</span>
                   <span className="text-error">H {leetcode.hard}</span>
                 </div>
+                <p className="pt-2 text-xs font-mono text-text-muted group-hover:text-text-primary transition-colors">View on LeetCode →</p>
               </>
             ) : (
               <>
                 <p className="text-sm text-text-primary font-body leading-relaxed">
-                  Practising DSA daily — see my progress on LeetCode.
+                  {activityLoaded ? 'Live count unavailable right now.' : 'Loading…'}
                 </p>
-                <p className="mt-auto pt-4 text-xs font-mono text-text-faint">@Ritik812800</p>
+                <p className="mt-auto pt-4 text-xs font-mono text-text-muted group-hover:text-text-primary transition-colors">View on LeetCode →</p>
               </>
             )}
           </a>
