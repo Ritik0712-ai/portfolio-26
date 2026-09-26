@@ -32,7 +32,8 @@ import SystemSettings from './apps/SystemSettings';
 import Trash from './apps/Trash';
 import GitHubPanel from '@/components/os/GitHubPanel';
 import MusicPlayer from '@/components/os/MusicPlayer';
-import { useAskEnabled } from '@/components/os/data';
+import StatsRow from '@/components/os/StatsRow';
+import { useAskEnabled, useContent } from '@/components/os/data';
 
 type Phase = 'boot' | 'login' | 'desktop' | 'off';
 type Overlay = null | 'spotlight' | 'launchpad' | 'notifications' | 'siri';
@@ -41,6 +42,7 @@ export default function MacDesktop() {
   const router = useRouter();
   const wm = useWindowManager();
   const askEnabled = useAskEnabled();
+  const has = useContent();
   const [phase, setPhase] = useState<Phase>('boot');
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [siriQuestion, setSiriQuestion] = useState<string | undefined>();
@@ -144,7 +146,7 @@ export default function MacDesktop() {
   const renderApp = (win: WindowState) => {
     switch (win.app) {
       case 'finder':
-        return <Finder initialFolder={(win.params?.folder as FinderFolder) ?? 'projects'} onOpenResume={() => launch('preview')} />;
+        return <Finder initialFolder={(win.params?.folder as FinderFolder) ?? (has.projects ? 'projects' : 'documents')} onOpenResume={() => launch('preview')} />;
       case 'notes':
         return <Notes initialNote={win.params?.note} />;
       case 'preview':
@@ -233,12 +235,13 @@ export default function MacDesktop() {
     {
       title: 'Go',
       items: [
-        { label: 'Projects', run: () => launch('finder', { folder: 'projects' }) },
-        { label: 'Experience', run: () => launch('finder', { folder: 'experience' }) },
-        { label: 'Certifications', run: () => launch('finder', { folder: 'certifications' }) },
+        ...(has.projects ? [{ label: 'Projects', run: () => launch('finder', { folder: 'projects' }) }] : []),
+        ...(has.experience ? [{ label: 'Experience', run: () => launch('finder', { folder: 'experience' }) }] : []),
+        ...(has.certifications ? [{ label: 'Certifications', run: () => launch('finder', { folder: 'certifications' }) }] : []),
+        ...(has.testimonials ? [{ label: 'Testimonials', run: () => launch('finder', { folder: 'testimonials' }) }] : []),
         { label: 'Résumé', run: () => launch('preview') },
         { divider: true, label: '' },
-        { label: 'Blog & case studies', run: () => launch('safari') },
+        ...(has.blog || has.projects ? [{ label: 'Blog & case studies', run: () => launch('safari') }] : []),
         { label: 'GitHub activity', run: () => launch('github') },
         { label: 'Music', run: () => launch('music') },
       ],
@@ -309,13 +312,15 @@ export default function MacDesktop() {
               <p className="text-[13px] opacity-85 leading-relaxed">
                 Full-stack developer and CS student at VIT Bhopal. Double-click a folder, open an app from the Dock, or press ⌘K to search.
               </p>
+              <StatsRow className="mt-4" labelClass="opacity-75" />
             </div>
 
             <DesktopIcons
               items={[
-                { id: 'projects', label: 'Projects', kind: 'folder', open: () => launch('finder', { folder: 'projects' }) },
-                { id: 'experience', label: 'Experience', kind: 'folder', open: () => launch('finder', { folder: 'experience' }) },
-                { id: 'certifications', label: 'Certifications', kind: 'folder', open: () => launch('finder', { folder: 'certifications' }) },
+                // Only folders with something in them; they appear live as content is published.
+                ...(['projects', 'experience', 'certifications', 'testimonials'] as const)
+                  .filter((f) => has[f])
+                  .map((f) => ({ id: f, label: f[0].toUpperCase() + f.slice(1), kind: 'folder' as const, open: () => launch('finder', { folder: f }) })),
                 { id: 'resume', label: 'Resume.pdf', kind: 'pdf', open: () => launch('preview') },
               ]}
             />

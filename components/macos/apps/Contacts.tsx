@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Mail, Github, Linkedin, Code2, Globe, MessageSquare } from 'lucide-react';
 import { PROFILE } from '@/components/os/data';
+import StatsRow from '@/components/os/StatsRow';
 
 export default function Contacts({ onMessage }: { onMessage: () => void }) {
   const rows = [
@@ -20,6 +21,7 @@ export default function Contacts({ onMessage }: { onMessage: () => void }) {
         </div>
         <p className="text-[22px] font-semibold">{PROFILE.name}</p>
         <p className="mac-text-faint">{PROFILE.role} · {PROFILE.school}</p>
+        <StatsRow className="justify-center text-center mt-4" />
         <div className="flex gap-3 mt-4">
           <button onClick={onMessage} className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl mac-card text-[#0A84FF]">
             <MessageSquare className="w-5 h-5" /><span className="text-[11px]">message</span>

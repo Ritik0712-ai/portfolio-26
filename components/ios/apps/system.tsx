@@ -1,5 +1,6 @@
 'use client';
 
+import StatsRow from '@/components/os/StatsRow';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -111,6 +112,7 @@ export function ContactsApp({ onMessage }: { onMessage: () => void }) {
         </div>
         <p className="text-[28px] font-bold">{PROFILE.name}</p>
         <p className="ios-secondary">{PROFILE.role}</p>
+        <StatsRow className="justify-center text-center mt-4" valueClass="text-[26px]" labelClass="ios-secondary" />
       </div>
       <div className="grid grid-cols-2 gap-2.5">
         <button onClick={onMessage} className="ios-list py-3 flex flex-col items-center gap-1 ios-blue"><MessageSquare className="w-5 h-5" /><span className="text-[12px]">message</span></button>

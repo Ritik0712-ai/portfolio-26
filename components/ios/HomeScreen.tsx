@@ -3,7 +3,8 @@
 import { motion } from 'framer-motion';
 import { Search, GitCommitHorizontal, Code2 } from 'lucide-react';
 import StatusBar from './StatusBar';
-import { IOS_APPS, HOME_GRID, HOME_DOCK, type IOSAppId } from './apps-meta';
+import { IOS_APPS, HOME_GRID, HOME_DOCK, CONTENT_APPS, type IOSAppId } from './apps-meta';
+import { useContent } from '@/components/os/data';
 import { nowData } from '@/data/now';
 import { useActivity, timeAgo } from '@/components/os/data';
 
@@ -16,6 +17,7 @@ export default function HomeScreen({
   hiddenApps: Set<IOSAppId>;
 }) {
   const activity = useActivity();
+  const has = useContent();
   const gh = activity?.github;
   const lc = activity?.leetcode;
   const max = Math.max(1, ...(gh?.daily ?? [1]));
@@ -72,7 +74,7 @@ export default function HomeScreen({
         </div>
 
         {/* App grid */}
-        <div className="grid grid-cols-4 gap-y-6 justify-items-center">{HOME_GRID.map((id) => icon(id))}</div>
+        <div className="grid grid-cols-4 gap-y-6 justify-items-center">{HOME_GRID.filter((id) => !CONTENT_APPS[id] || has[CONTENT_APPS[id]!]).map((id) => icon(id))}</div>
       </div>
 
       {/* Search pill */}

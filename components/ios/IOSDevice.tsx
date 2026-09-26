@@ -8,14 +8,15 @@ import LockScreen from './LockScreen';
 import HomeScreen from './HomeScreen';
 import AppShell from './AppShell';
 import StatusBar from './StatusBar';
-import { IOS_APPS, type IOSAppId } from './apps-meta';
+import { IOS_APPS, CONTENT_APPS, type IOSAppId } from './apps-meta';
+import TestimonialsPanel from '@/components/os/TestimonialsPanel';
 import { ProjectsApp, ExperienceApp, CertificationsApp, SafariApp, NotesApp, ResumeApp } from './apps/content';
 import { MailApp, PhotosApp, GitHubApp, ContactsApp, SettingsApp, AskApp } from './apps/system';
 import CalculatorApp from '@/components/macos/apps/CalculatorApp';
 import MusicPlayer from '@/components/os/MusicPlayer';
 import IOSPage from './IOSPage';
 import { readPref, writePref } from '@/components/macos/settings';
-import { useBlogs, useProjects, useAskEnabled } from '@/components/os/data';
+import { useBlogs, useProjects, useAskEnabled, useContent } from '@/components/os/data';
 
 type ThemePref = 'auto' | 'light' | 'dark';
 
@@ -63,6 +64,7 @@ export default function IOSDevice() {
       case 'projects': return <ProjectsApp />;
       case 'experience': return <ExperienceApp />;
       case 'certifications': return <CertificationsApp />;
+      case 'testimonials': return <IOSPage title="Testimonials"><div className="-mx-4"><TestimonialsPanel accent="#007AFF" columns={1} /></div></IOSPage>;
       case 'safari': return <SafariApp />;
       case 'notes': return <NotesApp />;
       case 'resume': return <ResumeApp />;
@@ -115,8 +117,12 @@ function IOSSearch({ onClose, onOpen }: { onClose: () => void; onOpen: (id: IOSA
   const [q, setQ] = useState('');
   const { data: projects } = useProjects();
   const { data: posts } = useBlogs();
+  const has = useContent();
   const t = q.trim().toLowerCase();
-  const apps = useMemo(() => (Object.keys(IOS_APPS) as IOSAppId[]).filter((id) => IOS_APPS[id].name.toLowerCase().includes(t)), [t]);
+  const apps = useMemo(
+    () => (Object.keys(IOS_APPS) as IOSAppId[]).filter((id) => (!CONTENT_APPS[id] || has[CONTENT_APPS[id]!]) && IOS_APPS[id].name.toLowerCase().includes(t)),
+    [t, has]
+  );
   const pr = t ? (projects ?? []).filter((p) => `${p.title} ${p.short_description ?? ''}`.toLowerCase().includes(t)) : [];
   const po = t ? (posts ?? []).filter((p) => p.title.toLowerCase().includes(t)) : [];
   return (

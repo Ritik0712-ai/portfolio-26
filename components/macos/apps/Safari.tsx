@@ -66,7 +66,7 @@ export default function Safari({ initial }: { initial?: Page }) {
               ))}
             </div>
 
-            <h2 className="text-[20px] font-bold mb-4">Case studies</h2>
+            {!!projects?.length && <h2 className="text-[20px] font-bold mb-4">Case studies</h2>}
             <div className="grid grid-cols-2 gap-4 mb-10">
               {(projects ?? []).map((p) => (
                 <button key={p.id} onClick={() => go({ kind: 'project', slug: p.slug })} className="text-left rounded-xl overflow-hidden mac-card hover:shadow-lg transition-shadow">
@@ -81,7 +81,7 @@ export default function Safari({ initial }: { initial?: Page }) {
               ))}
             </div>
 
-            <h2 className="text-[20px] font-bold mb-4">Reading list</h2>
+            {!!posts?.length && <h2 className="text-[20px] font-bold mb-4">Reading list</h2>}
             <div className="space-y-2">
               {(posts ?? []).map((b) => (
                 <button key={b.id} onClick={() => go({ kind: 'post', slug: b.slug })} className="w-full text-left p-3 rounded-xl mac-card hover:shadow-md transition-shadow">

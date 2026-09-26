@@ -134,7 +134,7 @@ export default function Browser({ initial }: { initial?: Page }) {
                 </a>
               ))}
             </div>
-            <h2 className="text-[16px] font-semibold mb-3">Case studies</h2>
+            {!!projects?.length && <h2 className="text-[16px] font-semibold mb-3">Case studies</h2>}
             <div className="grid grid-cols-2 gap-3 mb-8">
               {(projects ?? []).map((p) => (
                 <button key={p.id} onClick={() => go({ kind: 'project', slug: p.slug })} className="text-left rounded-lg overflow-hidden win-card win-hover">
@@ -149,7 +149,7 @@ export default function Browser({ initial }: { initial?: Page }) {
                 </button>
               ))}
             </div>
-            <h2 className="text-[16px] font-semibold mb-3">From the blog</h2>
+            {!!posts?.length && <h2 className="text-[16px] font-semibold mb-3">From the blog</h2>}
             <div className="space-y-2">
               {(posts ?? []).map((b) => (
                 <button key={b.id} onClick={() => go({ kind: 'post', slug: b.slug })} className="w-full text-left p-3 rounded-lg win-card win-hover">

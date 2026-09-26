@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUp, RotateCw, ChevronRight, Search, Plus, Scissors, Copy, Clipboard, Trash2, ArrowUpDown, LayoutGrid, List, MoreHorizontal, Home, Monitor, ExternalLink, PanelRight } from 'lucide-react';
-import { useProjects, useTimeline, useCertifications, useBlogs, formatMonth } from '@/components/os/data';
+import { useProjects, useTimeline, useCertifications, useBlogs, useTestimonials, useContent, formatMonth } from '@/components/os/data';
 import { Fluent, FolderGlyph, PdfGlyph } from '../meta';
+import TestimonialsPanel from '@/components/os/TestimonialsPanel';
 
-export type ExplorerFolder = 'home' | 'projects' | 'experience' | 'certifications' | 'documents' | 'desktop';
+export type ExplorerFolder = 'home' | 'projects' | 'experience' | 'certifications' | 'testimonials' | 'documents' | 'desktop';
 
 const NAV: { id: ExplorerFolder; label: string }[] = [
   { id: 'desktop', label: 'Desktop' },
@@ -13,9 +14,10 @@ const NAV: { id: ExplorerFolder; label: string }[] = [
   { id: 'projects', label: 'Projects' },
   { id: 'experience', label: 'Experience' },
   { id: 'certifications', label: 'Certifications' },
+  { id: 'testimonials', label: 'Testimonials' },
 ];
 
-const LABEL: Record<ExplorerFolder, string> = { home: 'Home', projects: 'Projects', experience: 'Experience', certifications: 'Certifications', documents: 'Documents', desktop: 'Desktop' };
+const LABEL: Record<ExplorerFolder, string> = { home: 'Home', projects: 'Projects', experience: 'Experience', certifications: 'Certifications', testimonials: 'Testimonials', documents: 'Documents', desktop: 'Desktop' };
 
 interface Item {
   key: string;
@@ -59,6 +61,10 @@ export default function Explorer({ initial = 'home', onOpenProject, onOpenPost, 
   const { data: timeline } = useTimeline();
   const { data: certs } = useCertifications();
   const { data: posts } = useBlogs();
+  const { data: testimonials } = useTestimonials();
+  const has = useContent();
+  // Folders with nothing in them are hidden; they appear live once content is published.
+  const visible = (f: ExplorerFolder) => !(f === 'projects' || f === 'experience' || f === 'certifications' || f === 'testimonials') || has[f];
 
   const folderItem = (f: ExplorerFolder, count?: number): Item => ({
     key: `f-${f}`,
@@ -79,8 +85,9 @@ export default function Explorer({ initial = 'home', onOpenProject, onOpenPost, 
           folderItem('projects', projects?.length),
           folderItem('experience', timeline?.length),
           folderItem('certifications', certs?.length),
+          folderItem('testimonials', testimonials?.length),
           folderItem('documents'),
-        ];
+        ].filter((i) => visible(i.key.slice(2) as ExplorerFolder));
       case 'documents':
         return [
           {
@@ -107,6 +114,13 @@ export default function Explorer({ initial = 'home', onOpenProject, onOpenPost, 
           icon: (s: number) => <Fluent name="briefcase_48_color" size={s} />, open: () => setSelected(e.id),
           details: [{ label: 'Date', value: formatMonth(e.event_date) }], description: e.description,
         }));
+      case 'testimonials':
+        return testimonials?.map((t) => ({
+          key: t.id, name: t.name, modified: new Date(t.created_at).toLocaleDateString('en-IN'), type: 'Testimonial',
+          size: t.rating ? `${t.rating}★` : '', icon: (s: number) => <Fluent name="chat_48_color" size={s} />, open: () => setSelected(t.id),
+          details: [...(t.role || t.company ? [{ label: 'Role', value: [t.role, t.company].filter(Boolean).join(' · ') }] : [])],
+          description: `“${t.content}”`,
+        }));
       case 'certifications':
         return certs?.map((c) => ({
           key: c.id, name: c.title, modified: c.issue_date ? formatMonth(c.issue_date) : '', type: c.issuer, size: '',
@@ -117,7 +131,7 @@ export default function Explorer({ initial = 'home', onOpenProject, onOpenPost, 
         }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [folder, projects, timeline, certs, posts]);
+  }, [folder, projects, timeline, certs, posts, testimonials, has.projects, has.experience, has.certifications, has.testimonials]);
 
   const shown = (items ?? []).filter((i) => !q.trim() || i.name.toLowerCase().includes(q.trim().toLowerCase()));
   const sel = shown.find((i) => i.key === selected);
@@ -171,7 +185,7 @@ export default function Explorer({ initial = 'home', onOpenProject, onOpenPost, 
           <NavRow active={folder === 'home'} onClick={() => go('home')} icon={<Fluent name="home_48_color" size={16} />}>Home</NavRow>
           <NavRow onClick={() => onOpenResume()} icon={<PdfGlyph size={16} />}>Resume.pdf</NavRow>
           <div className="my-2 border-t win-stroke" />
-          {NAV.map((n) => (
+          {NAV.filter((n) => visible(n.id)).map((n) => (
             <NavRow key={n.id} active={folder === n.id} onClick={() => go(n.id)} icon={<FolderGlyph size={16} />}>{n.label}</NavRow>
           ))}
           <div className="my-2 border-t win-stroke" />
@@ -183,7 +197,9 @@ export default function Explorer({ initial = 'home', onOpenProject, onOpenPost, 
           {folder === 'home' && (
             <p className="px-4 pt-3 pb-1 text-[12px] font-semibold">Quick access</p>
           )}
-          {!items ? (
+          {folder === 'testimonials' && !q ? (
+            <TestimonialsPanel accent="var(--win-accent)" />
+          ) : !items ? (
             <p className="p-4 win-text-2">Working on it…</p>
           ) : shown.length === 0 ? (
             <p className="p-6 text-center win-text-2">{q ? 'No items match your search.' : 'This folder is empty.'}</p>

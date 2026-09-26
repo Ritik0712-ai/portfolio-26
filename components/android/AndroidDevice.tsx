@@ -10,7 +10,7 @@ import { paletteVars } from './theme';
 import { StatusBar, LockScreen, HomeScreen, AppDrawer, Shade, GestureBar, type AndAppId } from './System';
 import {
   ProjectsApp, ExperienceApp, CertificatesApp, WebApp, MailApp, NotesApp, GalleryApp, GitHubApp, TerminalApp,
-  MusicApp, CalculatorApp, SettingsApp, ContactsApp, ResumeApp, AssistantApp,
+  MusicApp, CalculatorApp, SettingsApp, ContactsApp, ResumeApp, AssistantApp, TestimonialsApp,
 } from './Apps';
 
 const W = 412;
@@ -94,6 +94,7 @@ export default function AndroidDevice() {
       case 'projects': return <ProjectsApp onBack={back} initial={r.params?.project} />;
       case 'experience': return <ExperienceApp onBack={back} />;
       case 'certificates': return <CertificatesApp onBack={back} />;
+      case 'testimonials': return <TestimonialsApp onBack={back} />;
       case 'web': return <WebApp onBack={back} initialPost={r.params?.post} />;
       case 'mail': return <MailApp onBack={back} />;
       case 'notes': return <NotesApp onBack={back} />;

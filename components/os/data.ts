@@ -1,12 +1,11 @@
 'use client';
 
-// Shared data layer for RitikOS (macOS + iOS). Every hook reads the same
-// public APIs as the classic site, so content edited in the admin panel shows
-// up everywhere. Responses are cached per page load so reopening an app is
-// instant.
+// Shared data layer for every RitikOS edition (Mac, iPhone, Windows, Android).
+// Every hook reads the same public APIs as the classic site, so content edited
+// in the admin panel shows up everywhere — live, without a reload.
 
 import { useEffect, useState } from 'react';
-import type { BlogPost, Certification, Project } from '@/types';
+import type { BlogPost, Certification, Project, Stat, Testimonial } from '@/types';
 import type { GitHubOverview } from '@/lib/github';
 import type { GitHubActivity, LeetCodeStats } from '@/lib/activity';
 import { useLivePoll } from '@/lib/useLivePoll';
@@ -18,54 +17,153 @@ export interface TimelineEvent {
   event_date: string;
 }
 
-const cache = new Map<string, unknown>();
-const inflight = new Map<string, Promise<unknown>>();
+// ---------------------------------------------------------------------------
+// Live content store. Every hook subscribes to an API URL; the store keeps the
+// last good value (so reopening an app is instant) and refreshes it:
+//   • instantly when Supabase Realtime reports a change to the backing table,
+//   • every 30s while the tab is visible (catches unpublish/unapprove, which
+//     Realtime can't deliver to anonymous visitors because of RLS),
+//   • whenever the visitor comes back to the tab.
+// Components only re-render when the JSON actually changed.
+// ---------------------------------------------------------------------------
 
-function load<T>(url: string, pick: (json: any) => T): Promise<T> {
-  if (cache.has(url)) return Promise.resolve(cache.get(url) as T);
-  if (!inflight.has(url)) {
-    inflight.set(
-      url,
-      fetch(url)
-        .then((r) => r.json())
-        .then((j) => {
-          const v = pick(j);
-          cache.set(url, v);
-          inflight.delete(url);
-          return v;
-        })
-        .catch((e) => {
-          inflight.delete(url);
-          throw e;
-        })
-    );
-  }
-  return inflight.get(url) as Promise<T>;
+interface Entry {
+  value: unknown;
+  json: string | null;
+  error: boolean;
+  pick: (json: any) => unknown;
+  listeners: Set<() => void>;
+  inflight: Promise<void> | null;
 }
 
-function useCached<T>(url: string | null, pick: (json: any) => T): { data: T | undefined; error: boolean } {
-  const [data, setData] = useState<T | undefined>(() => (url ? (cache.get(url) as T | undefined) : undefined));
-  const [error, setError] = useState(false);
+const store = new Map<string, Entry>();
+
+/** Which API URLs each table feeds. */
+const TABLE_PREFIX: Record<string, string> = {
+  projects: '/api/projects',
+  blogs: '/api/blogs',
+  timeline_events: '/api/timeline',
+  certifications: '/api/certifications',
+  testimonials: '/api/testimonials',
+  stats: '/api/stats',
+};
+
+function refresh(url: string) {
+  const e = store.get(url);
+  if (!e || e.inflight) return;
+  e.inflight = fetch(url, { cache: 'no-store' })
+    .then((r) => {
+      if (!r.ok) throw new Error(String(r.status));
+      return r.json();
+    })
+    .then((j) => {
+      const v = e.pick(j);
+      const json = JSON.stringify(v);
+      if (json !== e.json || e.error) {
+        e.value = v;
+        e.json = json;
+        e.error = false;
+        e.listeners.forEach((l) => l());
+      }
+    })
+    .catch(() => {
+      if (e.json === null) {
+        e.error = true;
+        e.listeners.forEach((l) => l());
+      }
+    })
+    .finally(() => {
+      e.inflight = null;
+    });
+}
+
+function refreshAll(prefix?: string) {
+  store.forEach((e, url) => {
+    if (e.listeners.size && (!prefix || url.startsWith(prefix))) refresh(url);
+  });
+}
+
+let live = false;
+function startLive() {
+  if (live || typeof window === 'undefined') return;
+  live = true;
+
+  const onVisible = () => document.visibilityState === 'visible' && refreshAll();
+  document.addEventListener('visibilitychange', onVisible);
+  window.addEventListener('focus', onVisible);
+  setInterval(() => document.visibilityState === 'visible' && refreshAll(), 30_000);
+
+  // Realtime push — loaded lazily so the Supabase client isn't in the first paint.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
+  import('@/lib/supabase/client')
+    .then(({ createClient }) => {
+      const supabase = createClient();
+      const timers: Record<string, ReturnType<typeof setTimeout>> = {};
+      let channel = supabase.channel('ritikos-live');
+      for (const table of Object.keys(TABLE_PREFIX)) {
+        channel = channel.on('postgres_changes', { event: '*', schema: 'public', table }, () => {
+          // Debounce bursts (e.g. reordering several rows in the admin).
+          clearTimeout(timers[table]);
+          timers[table] = setTimeout(() => refreshAll(TABLE_PREFIX[table]), 400);
+        });
+      }
+      channel.subscribe();
+    })
+    .catch(() => {
+      /* polling still keeps things fresh */
+    });
+}
+
+function useLive<T>(url: string | null, pick: (json: any) => T): { data: T | undefined; error: boolean } {
+  const [, force] = useState(0);
   useEffect(() => {
     if (!url) return;
-    let alive = true;
-    load(url, pick)
-      .then((v) => alive && setData(v))
-      .catch(() => alive && setError(true));
+    let e = store.get(url);
+    if (!e) {
+      e = { value: undefined, json: null, error: false, pick, listeners: new Set(), inflight: null };
+      store.set(url, e);
+    }
+    const l = () => force((n) => n + 1);
+    e.listeners.add(l);
+    refresh(url);
+    startLive();
     return () => {
-      alive = false;
+      e!.listeners.delete(l);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
-  return { data, error };
+  const e = url ? store.get(url) : undefined;
+  return { data: e?.value as T | undefined, error: e?.error ?? false };
 }
 
-export const useProjects = () => useCached<Project[]>('/api/projects', (j) => j.projects || []);
-export const useTimeline = () => useCached<TimelineEvent[]>('/api/timeline', (j) => j.events || []);
-export const useCertifications = () => useCached<Certification[]>('/api/certifications', (j) => j.certifications || []);
-export const useBlogs = () => useCached<BlogPost[]>('/api/blogs', (j) => j.blogs || []);
+export const useProjects = () => useLive<Project[]>('/api/projects', (j) => j.projects || []);
+export const useTimeline = () => useLive<TimelineEvent[]>('/api/timeline', (j) => j.events || []);
+export const useCertifications = () => useLive<Certification[]>('/api/certifications', (j) => j.certifications || []);
+export const useBlogs = () => useLive<BlogPost[]>('/api/blogs', (j) => j.blogs || []);
+export const useTestimonials = () => useLive<Testimonial[]>('/api/testimonials', (j) => j.testimonials || []);
+export const useStats = () => useLive<Stat[]>('/api/stats', (j) => j.stats || []);
 export const useBlog = (slug: string | null) =>
-  useCached<BlogPost | null>(slug ? `/api/blogs?slug=${encodeURIComponent(slug)}` : null, (j) => j.blog ?? null);
+  useLive<BlogPost | null>(slug ? `/api/blogs?slug=${encodeURIComponent(slug)}` : null, (j) => j.blog ?? null);
+
+/**
+ * Which sections currently have something to show. A section is only true
+ * once it has loaded with at least one item, so empty sections never appear
+ * (and appear by themselves the moment the first item is published).
+ */
+export function useContent() {
+  const projects = useProjects().data;
+  const timeline = useTimeline().data;
+  const certifications = useCertifications().data;
+  const blogs = useBlogs().data;
+  const testimonials = useTestimonials().data;
+  return {
+    projects: !!projects?.length,
+    experience: !!timeline?.length,
+    certifications: !!certifications?.length,
+    blog: !!blogs?.length,
+    testimonials: !!testimonials?.length,
+  };
+}
 
 /** Live GitHub overview — refreshed every minute while visible. */
 export function useGitHub() {

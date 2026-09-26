@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useProjects, useTimeline, useCertifications, useBlogs, askAssistant, sendContact, formatMonth, timeAgo, PROFILE } from '@/components/os/data';
 import { BlogReader, ProjectReader } from '@/components/os/readers';
 import GitHubPanel from '@/components/os/GitHubPanel';
+import StatsRow from '@/components/os/StatsRow';
 import Terminal from '@/components/macos/apps/Terminal';
 import { usePhotoLibrary } from '@/components/macos/apps/Photos';
 import { musicPicks, spotifyEmbed, spotifyLink, type MusicItem } from '@/data/music';
@@ -14,6 +15,8 @@ import { skillGroups } from '@/data/skills';
 import InteractiveResume from '@/components/resume/InteractiveResume';
 import { Sym, AppIcon } from './System';
 import { ANDROID_WALLPAPERS } from './theme';
+import TestimonialsPanel from '@/components/os/TestimonialsPanel';
+import { uses, usesLastUpdated } from '@/data/uses';
 
 /* ------------------------------------------------------------ Scaffolding */
 
@@ -161,6 +164,16 @@ export function CertificatesApp({ onBack }: { onBack: () => void }) {
   );
 }
 
+/* ------------------------------------------------------------ Testimonials */
+
+export function TestimonialsApp({ onBack }: { onBack: () => void }) {
+  return (
+    <Screen title="Testimonials" onBack={onBack}>
+      <div className="-mt-2"><TestimonialsPanel accent="var(--md-primary)" columns={1} /></div>
+    </Screen>
+  );
+}
+
 /* --------------------------------------------------------------------- Web */
 
 export function WebApp({ onBack, initialPost }: { onBack: () => void; initialPost?: string }) {
@@ -255,6 +268,7 @@ const NOTES = [
   { id: 'about', title: aboutHeadline, body: aboutParagraphs.join('\n\n'), tone: 'md-primary-container' },
   { id: 'now', title: `Now · ${nowData.lastUpdated}`, body: [nowData.focus, '', 'Building:', ...nowData.currentlyBuilding.map((x) => `• ${x}`), '', 'Learning:', ...nowData.currentlyLearning.map((x) => `• ${x}`)].join('\n'), tone: 'md-secondary-container' },
   { id: 'skills', title: 'Skills', body: skillGroups.map((g) => `${g.title}\n${g.skills.join(', ')}`).join('\n\n'), tone: 'md-surface-highest' },
+  { id: 'uses', title: 'What I use', body: [`Updated ${usesLastUpdated}`, '', ...uses.map((g) => `${g.title}\n${g.items.map((i) => `• ${i.name}${i.note ? ` — ${i.note}` : ''}`).join('\n')}`)].join('\n\n'), tone: 'md-secondary-container' },
   { id: 'reading', title: 'Reading list', body: nowData.currentlyReading.map((x) => `• ${x}`).join('\n'), tone: 'md-surface-high' },
 ];
 
@@ -560,6 +574,7 @@ export function ContactsApp({ onBack, onMail }: { onBack: () => void; onMail: ()
         <img src={PROFILE.photo} alt="" className="w-36 h-36 rounded-full object-cover mb-4" />
         <p className="text-[28px]">{PROFILE.name}</p>
         <p className="md-variant">{PROFILE.role}</p>
+        <StatsRow className="justify-center text-center mt-5" valueClass="md-primary !font-medium" labelClass="md-variant" />
         <div className="flex gap-6 my-6">
           {[
             { label: 'Email', icon: 'mail', run: onMail },

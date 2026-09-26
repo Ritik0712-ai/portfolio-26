@@ -11,7 +11,7 @@ import Mail from '@/components/macos/apps/Mail';
 import Photos from '@/components/macos/apps/Photos';
 import GitHubPanel from '@/components/os/GitHubPanel';
 import MusicPlayer from '@/components/os/MusicPlayer';
-import { useAskEnabled } from '@/components/os/data';
+import { useAskEnabled, useContent } from '@/components/os/data';
 import WinWindow, { TASKBAR_H } from './WinWindow';
 import Taskbar from './Taskbar';
 import StartMenu, { type PowerAction } from './StartMenu';
@@ -26,12 +26,13 @@ import { Notepad, PdfViewer, WinSettings, About, RecycleBin, WinCalculator, Copi
 type Phase = 'boot' | 'lock' | 'desktop' | 'off' | 'shutting-down';
 type Overlay = null | 'start' | 'search' | 'widgets' | 'quick' | 'calendar' | 'copilot';
 
-const FOLDER_TITLE: Record<string, string> = { home: 'Home', projects: 'Projects', experience: 'Experience', certifications: 'Certifications', documents: 'Documents', desktop: 'Desktop' };
+const FOLDER_TITLE: Record<string, string> = { home: 'Home', projects: 'Projects', experience: 'Experience', certifications: 'Certifications', testimonials: 'Testimonials', documents: 'Documents', desktop: 'Desktop' };
 
 export default function WinDesktop() {
   const router = useRouter();
   const wm = useWindowManager<WinAppId>({ top: 0, bottom: TASKBAR_H + 20 });
   const askEnabled = useAskEnabled();
+  const has = useContent();
   const [phase, setPhase] = useState<Phase>('boot');
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [askQ, setAskQ] = useState<string | undefined>();
@@ -187,9 +188,10 @@ export default function WinDesktop() {
 
   const desktopIcons: { id: string; label: string; icon: React.ReactNode; open: () => void }[] = [
     { id: 'recycle', label: 'Recycle Bin', icon: WIN_APPS.recycle.icon(44), open: () => launch('recycle') },
-    { id: 'projects', label: 'Projects', icon: <FolderGlyph size={44} />, open: () => launch('explorer', { folder: 'projects' }) },
-    { id: 'experience', label: 'Experience', icon: <FolderGlyph size={44} />, open: () => launch('explorer', { folder: 'experience' }) },
-    { id: 'certifications', label: 'Certifications', icon: <FolderGlyph size={44} />, open: () => launch('explorer', { folder: 'certifications' }) },
+    // Content folders only appear once they have something in them (live).
+    ...(['projects', 'experience', 'certifications', 'testimonials'] as const)
+      .filter((f) => has[f])
+      .map((f) => ({ id: f, label: FOLDER_TITLE[f], icon: <FolderGlyph size={44} />, open: () => launch('explorer', { folder: f }) })),
     { id: 'resume', label: 'Resume.pdf', icon: WIN_APPS.resume.icon(44), open: () => launch('resume') },
     { id: 'terminal', label: 'Terminal', icon: WIN_APPS.terminal.icon(44), open: () => launch('terminal') },
   ];
@@ -278,6 +280,7 @@ export default function WinDesktop() {
               <Widgets
                 key="widgets"
                 onClose={() => setOverlay(null)}
+                onTestimonials={() => launch('explorer', { folder: 'testimonials' })}
                 onOpen={(w) => (typeof w === 'string' ? launch(w) : launch('browser', w as Record<string, string>))}
               />
             )}

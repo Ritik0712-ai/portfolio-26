@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
 import { motion } from 'framer-motion';
-import { useActivity, useBlogs, useProjects } from '@/components/os/data';
+import { useActivity, useBlogs, useProjects, useTestimonials, useContent } from '@/components/os/data';
 import { nowData } from '@/data/now';
 
 /* ------------------------------------------------------------------ Icons */
@@ -21,7 +21,7 @@ export function Sym({ name, size = 24, color = 'currentColor', className = '', s
 
 export type AndAppId =
   | 'projects' | 'experience' | 'certificates' | 'web' | 'mail' | 'notes' | 'gallery' | 'github'
-  | 'terminal' | 'music' | 'calculator' | 'settings' | 'contacts' | 'assistant' | 'resume';
+  | 'terminal' | 'music' | 'calculator' | 'settings' | 'contacts' | 'assistant' | 'resume' | 'testimonials';
 
 /** name, glyph, colourful-mode tint */
 export const AND_APPS: Record<AndAppId, { name: string; glyph: string; tint: [string, string] }> = {
@@ -40,7 +40,22 @@ export const AND_APPS: Record<AndAppId, { name: string; glyph: string; tint: [st
   contacts: { name: 'Contacts', glyph: 'contacts-fill', tint: ['#CDE5FF', '#00497D'] },
   assistant: { name: 'Ask Ritik', glyph: 'smart_toy-fill', tint: ['#E8DDFF', '#4F378B'] },
   resume: { name: 'Résumé', glyph: 'description-fill', tint: ['#FFDAD6', '#8C1D18'] },
+  testimonials: { name: 'Testimonials', glyph: 'reviews-fill', tint: ['#C8F0D2', '#1B6B35'] },
 };
+
+/** Apps backed by site content — hidden while their section is empty. */
+export const CONTENT_APPS: Partial<Record<AndAppId, 'projects' | 'experience' | 'certifications' | 'testimonials' | 'blog'>> = {
+  web: 'blog',
+  projects: 'projects',
+  experience: 'experience',
+  certificates: 'certifications',
+  testimonials: 'testimonials',
+};
+
+export function useVisibleApp() {
+  const has = useContent();
+  return (id: AndAppId) => !CONTENT_APPS[id] || has[CONTENT_APPS[id]!];
+}
 
 export function AppIcon({ id, size = 56, themed }: { id: AndAppId; size?: number; themed: boolean }) {
   const a = AND_APPS[id];
@@ -142,7 +157,7 @@ export function LockScreen({ wallpaper, onUnlock }: { wallpaper: string; onUnloc
 
 /* ----------------------------------------------------------- Home screen */
 
-export const HOME_GRID: AndAppId[] = ['projects', 'experience', 'certificates', 'resume', 'notes', 'gallery', 'github', 'music'];
+export const HOME_GRID: AndAppId[] = ['projects', 'experience', 'certificates', 'testimonials', 'resume', 'notes', 'gallery', 'github', 'music'];
 export const DOCK: AndAppId[] = ['mail', 'web', 'assistant', 'terminal'];
 
 export function HomeScreen({
@@ -160,6 +175,7 @@ export function HomeScreen({
   const { data: posts } = useBlogs();
   const swipe = useSwipe(onDrawer, onShade, 60);
   const latest = activity?.github?.latest;
+  const visible = useVisibleApp();
 
   return (
     <div className={`absolute inset-0 and-wallpaper-${wallpaper} select-none touch-none`} {...swipe}>
@@ -202,12 +218,12 @@ export function HomeScreen({
       {/* App grid + dock */}
       <div className="absolute inset-x-0 bottom-0 pb-7 px-4">
         <div className="grid grid-cols-4 gap-y-5 mb-7">
-          {HOME_GRID.map((id) => (
+          {HOME_GRID.filter(visible).slice(0, 8).map((id) => (
             <IconButton key={id} id={id} themed={themed} hidden={hidden.has(id)} onOpen={onOpen} label />
           ))}
         </div>
         <div className="grid grid-cols-4 mb-5">
-          {DOCK.map((id) => (
+          {DOCK.filter(visible).map((id) => (
             <IconButton key={id} id={id} themed={themed} hidden={hidden.has(id)} onOpen={onOpen} />
           ))}
         </div>
@@ -247,8 +263,9 @@ export function AppDrawer({ themed, onOpen, onClose, onOpenProject, onOpenPost }
   const [q, setQ] = useState('');
   const { data: projects } = useProjects();
   const { data: posts } = useBlogs();
+  const visible = useVisibleApp();
   const t = q.trim().toLowerCase();
-  const apps = (Object.keys(AND_APPS) as AndAppId[]).sort((a, b) => AND_APPS[a].name.localeCompare(AND_APPS[b].name)).filter((id) => AND_APPS[id].name.toLowerCase().includes(t));
+  const apps = (Object.keys(AND_APPS) as AndAppId[]).filter(visible).sort((a, b) => AND_APPS[a].name.localeCompare(AND_APPS[b].name)).filter((id) => AND_APPS[id].name.toLowerCase().includes(t));
   const pr = t ? (projects ?? []).filter((p) => `${p.title} ${p.short_description ?? ''}`.toLowerCase().includes(t)) : [];
   const po = t ? (posts ?? []).filter((p) => p.title.toLowerCase().includes(t)) : [];
   const swipe = useSwipe(undefined, () => !q && onClose(), 70);
@@ -320,6 +337,7 @@ export function Shade({
   const [plane, setPlane] = useState(false);
   const activity = useActivity();
   const { data: posts } = useBlogs();
+  const { data: testimonials } = useTestimonials();
   const swipe = useSwipe(onClose, undefined, 50);
 
   const tiles = [
@@ -336,9 +354,10 @@ export function Shade({
     const latest = activity?.github?.latest;
     if (latest) out.push({ key: 'gh', app: 'GitHub', icon: 'code_blocks', title: `Pushed to ${latest.repo}`, body: latest.message ?? 'New commits', run: () => onOpen({ app: 'github' }) });
     if (posts?.[0]) out.push({ key: 'post', app: 'Web', icon: 'public', title: 'New blog post', body: posts[0].title, run: () => onOpen({ app: 'web', post: posts[0].slug }) });
+    if (testimonials?.[0]) out.push({ key: 'quote', app: 'Testimonials', icon: 'reviews', title: `${testimonials[0].name} left a testimonial`, body: testimonials[0].content, run: () => onOpen({ app: 'testimonials' }) });
     out.push({ key: 'hi', app: 'RitikOS', icon: 'notifications', title: 'Welcome to the Android edition', body: 'Swipe up for all apps. Change the wallpaper in Settings and watch every colour follow it.', run: () => onSettings() });
     return out;
-  }, [activity, posts, onOpen, onSettings]);
+  }, [activity, posts, testimonials, onOpen, onSettings]);
 
   return (
     <motion.div

@@ -2,34 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { ChevronLeft, FolderClosed, Briefcase, Award, FileText, ExternalLink, Github } from 'lucide-react';
-import type { Certification, Project } from '@/types';
+import { ChevronLeft, FolderClosed, Briefcase, Award, FileText, ExternalLink, Github, MessageSquareQuote } from 'lucide-react';
+import { useProjects, useTimeline, useCertifications, useTestimonials, useContent, formatMonth } from '@/components/os/data';
+import TestimonialsPanel from '@/components/os/TestimonialsPanel';
+import type { Project } from '@/types';
 import { FolderIcon, DocIcon } from '../icons';
 
-export type FinderFolder = 'projects' | 'experience' | 'certifications' | 'documents';
-
-interface TimelineEvent {
-  id: string;
-  title: string;
-  description: string | null;
-  event_date: string;
-}
+export type FinderFolder = 'projects' | 'experience' | 'certifications' | 'testimonials' | 'documents';
 
 const SIDEBAR: { id: FinderFolder; label: string; icon: typeof FolderClosed }[] = [
   { id: 'projects', label: 'Projects', icon: FolderClosed },
   { id: 'experience', label: 'Experience', icon: Briefcase },
   { id: 'certifications', label: 'Certifications', icon: Award },
+  { id: 'testimonials', label: 'Testimonials', icon: MessageSquareQuote },
   { id: 'documents', label: 'Documents', icon: FileText },
 ];
-
-function fmt(value: string) {
-  return /^\d{4}-\d{2}/.test(value)
-    ? new Date(value).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-    : value;
-}
-
-// Module-level cache so reopening Finder is instant.
-const cache: { projects?: Project[]; timeline?: TimelineEvent[]; certs?: Certification[] } = {};
 
 export default function Finder({
   initialFolder = 'projects',
@@ -39,36 +26,37 @@ export default function Finder({
   onOpenResume: () => void;
 }) {
   const [folder, setFolder] = useState<FinderFolder>(initialFolder);
-  const [projects, setProjects] = useState<Project[] | undefined>(cache.projects);
-  const [timeline, setTimeline] = useState<TimelineEvent[] | undefined>(cache.timeline);
-  const [certs, setCerts] = useState<Certification[] | undefined>(cache.certs);
   const [selected, setSelected] = useState<string | null>(null);
   const [openProject, setOpenProject] = useState<Project | null>(null);
+  // Live data: new/edited content appears without reopening the window.
+  const { data: projects } = useProjects();
+  const { data: timeline } = useTimeline();
+  const { data: certs } = useCertifications();
+  const { data: testimonials } = useTestimonials();
+  const has = useContent();
+  // Sections with nothing in them are hidden (Documents always has the résumé).
+  const sidebar = SIDEBAR.filter((s) => s.id === 'documents' || has[s.id]);
 
   useEffect(() => setFolder(initialFolder), [initialFolder]);
   useEffect(() => {
     setSelected(null);
     setOpenProject(null);
   }, [folder]);
-
+  // Keep an open project in sync with edits made in the admin.
   useEffect(() => {
-    if (!cache.projects)
-      fetch('/api/projects').then((r) => r.json()).then((d) => { cache.projects = d.projects || []; setProjects(cache.projects); }).catch(() => setProjects([]));
-    if (!cache.timeline)
-      fetch('/api/timeline').then((r) => r.json()).then((d) => { cache.timeline = d.events || []; setTimeline(cache.timeline); }).catch(() => setTimeline([]));
-    if (!cache.certs)
-      fetch('/api/certifications').then((r) => r.json()).then((d) => { cache.certs = d.certifications || []; setCerts(cache.certs); }).catch(() => setCerts([]));
-  }, []);
+    if (openProject) setOpenProject(projects?.find((p) => p.id === openProject.id) ?? null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projects]);
 
   const count =
-    folder === 'projects' ? projects?.length : folder === 'experience' ? timeline?.length : folder === 'certifications' ? certs?.length : 1;
+    folder === 'projects' ? projects?.length : folder === 'experience' ? timeline?.length : folder === 'certifications' ? certs?.length : folder === 'testimonials' ? testimonials?.length : 1;
 
   return (
     <div className="flex h-full text-[13px] mac-text">
       {/* Sidebar */}
       <aside className="w-44 shrink-0 mac-sidebar px-2 py-3 overflow-y-auto">
         <p className="px-2 mb-1 text-[11px] font-semibold mac-text-faint">Favourites</p>
-        {SIDEBAR.map((s) => (
+        {sidebar.map((s) => (
           <button
             key={s.id}
             onClick={() => setFolder(s.id)}
@@ -130,7 +118,7 @@ export default function Finder({
                       <p className="font-medium">{t.title}</p>
                       {t.description && <p className="mac-text-faint text-[12px]">{t.description}</p>}
                     </td>
-                    <td className="px-4 py-2 mac-text-faint whitespace-nowrap align-top">{fmt(t.event_date)}</td>
+                    <td className="px-4 py-2 mac-text-faint whitespace-nowrap align-top">{formatMonth(t.event_date)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -155,6 +143,8 @@ export default function Finder({
                 />
               ))}
             </Grid>
+          ) : folder === 'testimonials' ? (
+            <TestimonialsPanel accent="#2E6BD9" />
           ) : (
             <Grid loading={false}>
               <Item
@@ -178,6 +168,7 @@ export default function Finder({
 
 function Grid({ loading, children }: { loading: boolean; children: React.ReactNode }) {
   if (loading) return <p className="p-6 mac-text-faint">Loading…</p>;
+  if (Array.isArray(children) && children.length === 0) return <p className="p-6 mac-text-faint">This folder is empty.</p>;
   return <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-2 p-4">{children}</div>;
 }
 

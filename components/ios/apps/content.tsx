@@ -117,22 +117,22 @@ export function SafariApp() {
         {!page && (
           <div className="px-4">
             <h1 className="ios-large-title pt-2">Start Page</h1>
-            <ListSection header="Case studies">
-              {(projects ?? []).map((p) => (
+            {!!projects?.length && <ListSection header="Case studies">
+              {projects.map((p) => (
                 <button key={p.id} className="ios-row" onClick={() => setPage({ kind: 'project', slug: p.slug })}>
                   <span className="flex-1 min-w-0"><span className="block truncate">{p.title}</span><span className="block text-[13px] ios-secondary truncate">{p.short_description}</span></span>
                   <ChevronRight className="w-4 h-4 ios-secondary" />
                 </button>
               ))}
-            </ListSection>
-            <ListSection header="Reading list">
-              {(posts ?? []).map((b) => (
+            </ListSection>}
+            {!!posts?.length && <ListSection header="Reading list">
+              {posts.map((b) => (
                 <button key={b.id} className="ios-row" onClick={() => setPage({ kind: 'post', slug: b.slug })}>
                   <span className="flex-1 min-w-0"><span className="block truncate">{b.title}</span><span className="block text-[13px] ios-secondary">{b.category} · {timeAgo(b.created_at)}</span></span>
                   <ChevronRight className="w-4 h-4 ios-secondary" />
                 </button>
               ))}
-            </ListSection>
+            </ListSection>}
           </div>
         )}
         {page?.kind === 'post' && <BlogReader slug={page.slug} />}

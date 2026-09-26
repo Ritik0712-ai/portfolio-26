@@ -1,18 +1,20 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useActivity, useBlogs, useGitHub, useProjects, PROFILE, timeAgo } from '@/components/os/data';
+import { useActivity, useBlogs, useGitHub, useProjects, useTestimonials, PROFILE, timeAgo } from '@/components/os/data';
 import { nowData } from '@/data/now';
 import { Fluent, FolderGlyph, WIN_APPS } from './meta';
 import { musicPicks } from '@/data/music';
 
 // Widgets board — slides in from the left like Windows 11's, but every card
 // is live portfolio data instead of news and weather.
-export default function Widgets({ onOpen, onClose }: { onOpen: (what: 'github' | 'notepad' | 'music' | { post: string } | { project: string }) => void; onClose: () => void }) {
+export default function Widgets({ onOpen, onClose, onTestimonials }: { onOpen: (what: 'github' | 'notepad' | 'music' | { post: string } | { project: string }) => void; onClose: () => void; onTestimonials: () => void }) {
   const gh = useGitHub();
   const activity = useActivity();
   const { data: posts } = useBlogs();
   const { data: projects } = useProjects();
+  const { data: testimonials } = useTestimonials();
+  const quote = testimonials?.[0];
   const now = new Date();
   const featured = (projects ?? []).find((p) => p.featured && p.cover_image) ?? (projects ?? []).find((p) => p.cover_image);
   const daily = activity?.github?.daily ?? [];
@@ -93,6 +95,16 @@ export default function Widgets({ onOpen, onClose }: { onOpen: (what: 'github' |
               <span className="block text-[16px] font-semibold mb-1">{featured.title}</span>
               <span className="block text-[12px] win-text-2 line-clamp-3">{featured.short_description}</span>
             </span>
+          </button>
+        )}
+
+        {quote && (
+          <button onClick={onTestimonials} className={`${card} col-span-2`}>
+            <p className="flex items-center gap-2 text-[12px] win-text-2 mb-2">
+              <Fluent name="chat_48_color" size={16} /> Testimonials{testimonials!.length > 1 ? ` · ${testimonials!.length}` : ''}
+            </p>
+            <p className="text-[14px] leading-relaxed line-clamp-3">&ldquo;{quote.content}&rdquo;</p>
+            <p className="text-[12px] win-text-2 mt-2">— {quote.name}{quote.role || quote.company ? `, ${[quote.role, quote.company].filter(Boolean).join(' · ')}` : ''}</p>
           </button>
         )}
 

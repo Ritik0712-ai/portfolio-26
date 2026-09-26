@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useProjects, useCertifications, useTimeline, askAssistant, formatMonth, PROFILE } from '@/components/os/data';
+import { useProjects, useCertifications, useTestimonials, useTimeline, askAssistant, formatMonth, PROFILE } from '@/components/os/data';
 import { skillGroups } from '@/data/skills';
 import { nowData } from '@/data/now';
 import { aboutParagraphs } from '@/data/about';
@@ -9,12 +9,12 @@ import { aboutParagraphs } from '@/data/about';
 interface Line { kind: 'in' | 'out' | 'err' | 'accent'; text: string }
 
 const DEFAULT_PROMPT = 'ritik@RitikOS ~ %';
-const COMMANDS = ['help', 'whoami', 'about', 'ls', 'open', 'projects', 'experience', 'certs', 'skills', 'now', 'resume', 'contact', 'socials', 'ask', 'neofetch', 'date', 'echo', 'history', 'clear', 'exit', 'sudo'];
+const COMMANDS = ['help', 'whoami', 'about', 'ls', 'open', 'projects', 'experience', 'certs', 'testimonials', 'skills', 'now', 'resume', 'contact', 'socials', 'ask', 'neofetch', 'date', 'echo', 'history', 'clear', 'exit', 'sudo'];
 
 const HELP = `Available commands:
   whoami            who is this?
   about             a short bio
-  ls [folder]       list projects | experience | certs
+  ls [folder]       list projects | experience | certs | testimonials
   open <project>    open a project's case study
   skills            what I work with
   now               what I'm doing right now
@@ -36,6 +36,7 @@ export default function Terminal({ onClose, onOpenResume, onOpenProject, onOpenM
   const PROMPT = prompt ?? DEFAULT_PROMPT;
   const { data: projects } = useProjects();
   const { data: certs } = useCertifications();
+  const { data: testimonials } = useTestimonials();
   const { data: timeline } = useTimeline();
   const [lines, setLines] = useState<Line[]>([
     variant === 'windows'
@@ -70,14 +71,16 @@ export default function Terminal({ onClose, onOpenResume, onOpenProject, onOpenM
       case 'about': return out(aboutParagraphs.join('\n\n'));
       case 'ls': {
         const what = (arg || 'projects').toLowerCase();
-        if (what.startsWith('proj')) return out((projects ?? []).map((p) => `${p.slug.padEnd(16)} ${p.short_description ?? ''}`).join('\n') || 'Loading…');
-        if (what.startsWith('exp')) return out((timeline ?? []).map((t) => `${formatMonth(t.event_date).padEnd(10)} ${t.title}`).join('\n') || 'Loading…');
+        if (what.startsWith('proj')) return out(!projects ? 'Loading…' : projects.map((p) => `${p.slug.padEnd(16)} ${p.short_description ?? ''}`).join('\n') || 'No projects yet.');
+        if (what.startsWith('exp')) return out(!timeline ? 'Loading…' : timeline.map((t) => `${formatMonth(t.event_date).padEnd(10)} ${t.title}`).join('\n') || 'Nothing here yet.');
+        if (what.startsWith('test')) return out(!testimonials ? 'Loading…' : testimonials.map((t) => `“${t.content}”\n  — ${t.name}${t.role || t.company ? `, ${[t.role, t.company].filter(Boolean).join(' · ')}` : ''}`).join('\n\n') || 'No testimonials yet. Leave one at /feedback');
         if (what.startsWith('cert')) return out((certs ?? []).map((c) => `${c.title} — ${c.issuer}`).join('\n') || 'No certifications yet.');
         return print({ kind: 'err', text: `ls: ${arg}: No such file or directory` });
       }
       case 'projects': return run('ls projects');
       case 'experience': return run('ls experience');
       case 'certs': return run('ls certs');
+      case 'testimonials': return run('ls testimonials');
       case 'open': {
         const p = projects?.find((x) => x.slug === arg.toLowerCase() || x.title.toLowerCase() === arg.toLowerCase());
         if (!p) return print({ kind: 'err', text: `open: ${arg || '(nothing)'}: project not found. Try 'ls projects'.` });

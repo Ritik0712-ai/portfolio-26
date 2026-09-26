@@ -7,7 +7,9 @@ import { aboutParagraphs, aboutHeadline } from '@/data/about';
 import { nowData } from '@/data/now';
 import { skillGroups } from '@/data/skills';
 import InteractiveResume from '@/components/resume/InteractiveResume';
+import { uses, usesLastUpdated } from '@/data/uses';
 import { askAssistant, PROFILE } from '@/components/os/data';
+import StatsRow from '@/components/os/StatsRow';
 import { WIN_WALLPAPERS, StartGlyph, BinGlyph, Fluent } from '../meta';
 
 /* ------------------------------------------------------------------ Notepad */
@@ -33,6 +35,7 @@ const FILES = [
       ].join('\r\n'),
   },
   { name: 'skills.txt', body: () => skillGroups.map((g) => `${g.title}\r\n  ${g.skills.join(', ')}`).join('\r\n\r\n') },
+  { name: 'uses.txt', body: () => [`What I use — updated ${usesLastUpdated}`, '', ...uses.map((g) => `${g.title}\r\n${g.items.map((i) => `  - ${i.name}${i.note ? ` — ${i.note}` : ''}`).join('\r\n')}`)].join('\r\n\r\n') },
 ];
 
 export function Notepad() {
@@ -257,6 +260,7 @@ export function WinSettings({
                 <a className="win-btn" href={PROFILE.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
                 <a className="win-btn" href={PROFILE.leetcode} target="_blank" rel="noopener noreferrer">LeetCode</a>
               </div>
+              <StatsRow className="mt-4" labelClass="win-text-2" />
             </div>
           </div>
         )}
