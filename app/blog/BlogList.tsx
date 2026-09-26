@@ -5,6 +5,7 @@ import { Clock, Calendar, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { BlogPost } from '@/types';
+import { formatReadingTime } from '@/lib/reading-time';
 
 
 const categories = ['All', 'Tech', 'DSA', 'Life', 'Reflections'];
@@ -93,7 +94,7 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
                     {post.reading_time && (
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {post.reading_time}
+                        {formatReadingTime(post.reading_time)}
                       </span>
                     )}
                     <span className="flex items-center gap-1">

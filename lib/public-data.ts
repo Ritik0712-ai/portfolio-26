@@ -59,3 +59,20 @@ export const getBlogs = (limit?: number) =>
     const q = db().from('blogs').select('*').eq('published', true).order('created_at', { ascending: false });
     return limit ? q.limit(limit) : q;
   });
+
+async function readOne<T>(label: string, run: () => PromiseLike<{ data: T | null; error: unknown }>): Promise<T | null> {
+  try {
+    const { data, error } = await run();
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error(`Failed to read ${label}:`, err);
+    return null;
+  }
+}
+
+export const getProjectBySlug = (slug: string) =>
+  readOne<Project>(`project ${slug}`, () => db().from('projects').select('*').eq('slug', slug).eq('published', true).maybeSingle());
+
+export const getBlogBySlug = (slug: string) =>
+  readOne<BlogPost>(`blog ${slug}`, () => db().from('blogs').select('*').eq('slug', slug).eq('published', true).maybeSingle());

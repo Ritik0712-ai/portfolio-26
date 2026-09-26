@@ -1,27 +1,21 @@
 import { Metadata } from 'next';
 import BlogPostClient from './BlogPostClient';
 import { siteUrl } from '@/lib/metadata';
-import { createClient } from '@/lib/supabase/server';
+import { cache } from 'react';
+import { getBlogBySlug, getBlogs } from '@/lib/public-data';
 
 type PageProps = { params: Promise<{ slug: string }> };
 
-// Same fix as the project detail page: a relative fetch has no origin to
-// resolve against on the server and throws ERR_INVALID_URL. Query Supabase
-// directly instead of the app calling its own API over the network.
-async function getBlogPost(slug: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('blogs')
-    .select('slug, title, excerpt, cover_image, created_at, updated_at, tags')
-    .eq('slug', slug)
-    .eq('published', true)
-    .maybeSingle();
+// The full post is fetched on the server so its text is in the initial HTML
+// (search engines and link previews see it), and the page is cached,
+// regenerated at most once a minute. cache() shares the query with metadata.
+export const revalidate = 60;
 
-  if (error) {
-    console.error('getBlogPost failed for slug', slug, error);
-    return null;
-  }
-  return data;
+const getBlogPost = cache(getBlogBySlug);
+
+// Pre-render every published post; new slugs render on first visit.
+export async function generateStaticParams() {
+  return (await getBlogs()).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -31,7 +25,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const canonical = `/blog/${post.slug}`;
   return {
-    title: post.title,
+    // absolute: the /blog layout sets a plain title, which stops the root
+    // '%s | Ritik Agarwal' template from applying here.
+    title: { absolute: `${post.title} | Ritik Agarwal` },
     description: post.excerpt || undefined,
     alternates: { canonical },
     openGraph: {
@@ -49,5 +45,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
-  return <BlogPostClient slug={slug} />;
+  return <BlogPostClient slug={slug} initialPost={await getBlogPost(slug)} />;
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, Clock } from 'lucide-react';
 import type { BlogPost } from '@/types';
+import { formatReadingTime } from '@/lib/reading-time';
 
 export default function BlogPreview({ posts }: { posts: BlogPost[] }) {
 
@@ -39,7 +40,7 @@ export default function BlogPreview({ posts }: { posts: BlogPost[] }) {
                 {post.reading_time && (
                   <span className="flex items-center gap-1 text-xs text-text-faint font-mono">
                     <Clock className="w-3 h-3" />
-                    {post.reading_time}
+                    {formatReadingTime(post.reading_time)}
                   </span>
                 )}
                 <Link href={`/blog/${post.slug}`} className="ml-auto text-xs text-accent hover:text-accent-warm font-body transition-colors">

@@ -13,26 +13,19 @@ import TableOfContents from '@/components/TableOfContents';
 import SocialShare from '@/components/SocialShare';
 import StructuredData from '@/components/StructuredData';
 import { siteUrl } from '@/lib/metadata';
+import { formatReadingTime } from '@/lib/reading-time';
+import type { BlogPost } from '@/types';
 
-interface BlogPost {
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  cover_image: string | null;
-  date: string;
-  reading_time: string;
-  tags: string[];
-  category: string;
-  created_at: string;
-}
 
-export default function BlogPostClient({ slug }: { slug: string }) {
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [loading, setLoading] = useState(true);
+// initialPost is fetched on the server; the client fetch is only a fallback
+// for when the server read failed.
+export default function BlogPostClient({ slug, initialPost }: { slug: string; initialPost?: BlogPost | null }) {
+  const [post, setPost] = useState<BlogPost | null>(initialPost ?? null);
+  const [loading, setLoading] = useState(!initialPost);
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    if (initialPost) return;
     fetchBlogPost();
   }, [slug]);
 
@@ -200,7 +193,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
               {post.reading_time && (
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4" />
-                  {post.reading_time}
+                  {formatReadingTime(post.reading_time)}
                 </span>
               )}
               <SocialShare title={post.title} url={`/blog/${post.slug}`} />

@@ -9,6 +9,7 @@ const nextConfig = {
     ],
   },
   transpilePackages: ['framer-motion'],
+  poweredByHeader: false,
 };
 
 module.exports = nextConfig;

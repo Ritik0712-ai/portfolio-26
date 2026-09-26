@@ -2,30 +2,21 @@ import type { Metadata } from 'next';
 import ProjectDetailClient from './ProjectDetailClient';
 import { siteUrl } from '@/lib/metadata';
 import { cache } from 'react';
-import { createClient } from '@/lib/supabase/server';
-import type { Project } from '@/types';
+import { getProjectBySlug, getProjects } from '@/lib/public-data';
 
 type PageProps = { params: Promise<{ slug: string }> };
 
-// Runs on the server, where a relative fetch('/api/...') has no origin to
-// resolve against and throws ERR_INVALID_URL. Querying Supabase directly is
-// also one network hop instead of two.
+// Rendered on the server with a cookieless client, so the page is cached
+// (regenerated at most once a minute) instead of rebuilt on every visit.
 // cache() dedupes the query between generateMetadata and the page render.
-const getProject = cache(async (slug: string): Promise<Project | null> => {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('slug', slug)
-    .eq('published', true)
-    .maybeSingle();
+export const revalidate = 60;
 
-  if (error) {
-    console.error('getProject failed for slug', slug, error);
-    return null;
-  }
-  return data as Project | null;
-});
+const getProject = cache(getProjectBySlug);
+
+// Pre-render every published project; new slugs render on first visit.
+export async function generateStaticParams() {
+  return (await getProjects()).map((p) => ({ slug: p.slug }));
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -34,7 +25,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const canonical = `/projects/${project.slug}`;
   return {
-    title: project.title,
+    // absolute: the /projects layout sets a plain title, which stops the root
+    // '%s | Ritik Agarwal' template from applying here.
+    title: { absolute: `${project.title} — Case Study | Ritik Agarwal` },
     description: project.short_description || undefined,
     alternates: { canonical },
     openGraph: {
