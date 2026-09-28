@@ -10,6 +10,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Components } from 'react-markdown';
 import TableOfContents from '@/components/TableOfContents';
+import { headingId, nodeText } from '@/lib/heading-id';
 import SocialShare from '@/components/SocialShare';
 import { AISummary, ListenBar } from '@/components/blog/PostTools';
 import StructuredData from '@/components/StructuredData';
@@ -76,33 +77,9 @@ export default function BlogPostClient({ slug, initialPost }: { slug: string; in
   const blogPostUrl = `${siteUrl}/blog/${post.slug}`;
 
   const markdownComponents: Components = {
-    h1: ({ children }) => <h1 className="font-display text-3xl font-semibold text-text-primary mt-10 mb-4">{children}</h1>,
-    h2: ({ children }) => {
-      const text = typeof children === 'string'
-        ? children
-        : typeof children === 'number'
-          ? String(children)
-          : '';
-      const id = text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .trim();
-      return <h2 id={id} className="font-display text-2xl font-semibold text-text-primary mt-8 mb-3">{children}</h2>;
-    },
-    h3: ({ children }) => {
-      const text = typeof children === 'string'
-        ? children
-        : typeof children === 'number'
-          ? String(children)
-          : '';
-      const id = text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .trim();
-      return <h3 id={id} className="font-display text-xl font-semibold text-text-primary mt-6 mb-2">{children}</h3>;
-    },
+    h1: ({ children }) => <h1 id={headingId(nodeText(children))} className="font-display text-3xl font-semibold text-text-primary mt-10 mb-4 scroll-mt-24">{children}</h1>,
+    h2: ({ children }) => <h2 id={headingId(nodeText(children))} className="font-display text-2xl font-semibold text-text-primary mt-8 mb-3 scroll-mt-24">{children}</h2>,
+    h3: ({ children }) => <h3 id={headingId(nodeText(children))} className="font-display text-xl font-semibold text-text-primary mt-6 mb-2 scroll-mt-24">{children}</h3>,
     p: ({ children }) => <p className="text-text-secondary leading-relaxed mb-4">{children}</p>,
     a: ({ href, children }) => (
       <a href={href} className="text-accent-warm hover:underline" target={href?.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer">
@@ -252,7 +229,7 @@ export default function BlogPostClient({ slug, initialPost }: { slug: string; in
         </article>
 
         {/* Sidebar: Table of Contents */}
-        <TableOfContents content={post.content} />
+        <TableOfContents content={post.content} title={post.title} />
       </div>
     </div>
   );

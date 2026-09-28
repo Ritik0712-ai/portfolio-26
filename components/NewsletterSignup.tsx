@@ -27,7 +27,7 @@ export default function NewsletterSignup({ variant = 'default' }: NewsletterSign
       const data = await res.json();
       if (data.success) {
         setStatus('success');
-        setMessage('Thanks for subscribing! Check your inbox to confirm.');
+        setMessage('Almost done! Check your inbox (and spam) for a confirmation email. Nothing after a few minutes? Double-check the address and try again.');
         setEmail('');
       } else {
         setStatus('error');
