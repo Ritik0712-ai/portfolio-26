@@ -22,7 +22,7 @@ export default function LeetCodeTracker() {
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
   useLivePoll(() => {
-    fetch('/api/activity')
+    fetch('/api/activity', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => {
         setStats(d.leetcode ?? null);

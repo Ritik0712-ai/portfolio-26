@@ -24,7 +24,7 @@ export default function GitHubTracker() {
   const [now, setNow] = useState(() => Date.now());
 
   useLivePoll(() => {
-    fetch('/api/github')
+    fetch('/api/github', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => {
         if (d.error) throw new Error(d.error);

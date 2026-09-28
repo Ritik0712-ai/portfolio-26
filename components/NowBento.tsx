@@ -38,7 +38,7 @@ export default function NowBento() {
 
   // GitHub + LeetCode refresh every minute while the tab is open.
   useLivePoll(() => {
-    fetch('/api/activity')
+    fetch('/api/activity', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => {
         if (d.github) setGithub(d.github);

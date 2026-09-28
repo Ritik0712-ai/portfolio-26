@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getGitHubActivity, getLeetCodeStats } from '@/lib/activity';
 
-// Rebuilt at most once a minute.
-export const revalidate = 60;
+// Always runs; the upstream GitHub/LeetCode calls are cached ~60s in lib/activity.
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const [github, leetcode] = await Promise.all([getGitHubActivity(), getLeetCodeStats()]);
   return NextResponse.json(
     { github, leetcode },
-    { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } }
+    { headers: { 'Cache-Control': 'no-store', 'CDN-Cache-Control': 'no-store' } }
   );
 }

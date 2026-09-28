@@ -173,7 +173,7 @@ export function useContent() {
 export function useGitHub() {
   const [data, setData] = useState<GitHubOverview | null>(null);
   useLivePoll(() => {
-    fetch('/api/github')
+    fetch('/api/github', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => !d.error && setData(d))
       .catch(() => {});
@@ -185,7 +185,7 @@ export function useGitHub() {
 export function useActivity() {
   const [data, setData] = useState<{ github: GitHubActivity | null; leetcode: LeetCodeStats | null } | null>(null);
   useLivePoll(() => {
-    fetch('/api/activity')
+    fetch('/api/activity', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => setData(d))
       .catch(() => {});

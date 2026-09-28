@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 // GitHub data for /github and the homepage activity tile.
 //
 // With GITHUB_TOKEN set (a fine-grained, read-only token), numbers come from
@@ -5,7 +6,7 @@
 // — as counts only; private repo names are never listed. Without a token it
 // falls back to the public REST API (public repos only, 60 requests/hour).
 //
-// Callers cache the result for 60 seconds (route-level revalidate), so the
+// Results are cached for 45 seconds (unstable_cache below), so the
 // site is at most a minute behind GitHub.
 
 export const GITHUB_USERNAME = 'Ritik0712-ai';
@@ -90,7 +91,7 @@ async function fromGraphQL(): Promise<GitHubOverview | null> {
     method: 'POST',
     headers: { ...githubHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: QUERY, variables: { login: GITHUB_USERNAME } }),
-    next: { revalidate: 60 },
+    cache: 'no-store',
   });
   if (!res.ok) {
     console.error('GitHub GraphQL failed', res.status, await res.text().catch(() => ''));
@@ -143,8 +144,8 @@ async function fromGraphQL(): Promise<GitHubOverview | null> {
 
 async function fromREST(): Promise<GitHubOverview | null> {
   const [userRes, reposRes] = await Promise.all([
-    fetch(`https://api.github.com/users/${GITHUB_USERNAME}`, { headers: githubHeaders(), next: { revalidate: 60 } }),
-    fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=pushed&per_page=6`, { headers: githubHeaders(), next: { revalidate: 60 } }),
+    fetch(`https://api.github.com/users/${GITHUB_USERNAME}`, { headers: githubHeaders(), cache: 'no-store' }),
+    fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=pushed&per_page=6`, { headers: githubHeaders(), cache: 'no-store' }),
   ]);
   if (!userRes.ok) {
     console.error('GitHub REST failed', userRes.status);
@@ -183,7 +184,7 @@ async function fromREST(): Promise<GitHubOverview | null> {
   };
 }
 
-export async function getGitHubOverview(): Promise<GitHubOverview | null> {
+async function loadOverview(): Promise<GitHubOverview | null> {
   try {
     if (process.env.GITHUB_TOKEN) {
       const viaGraphQL = await fromGraphQL();
@@ -192,6 +193,27 @@ export async function getGitHubOverview(): Promise<GitHubOverview | null> {
     return await fromREST();
   } catch (err) {
     console.error('getGitHubOverview failed', err);
+    return null;
+  }
+}
+
+// One GitHub round-trip per 45s per server, shared by every visitor. The
+// timestamp inside is when GitHub was actually asked, so "updated Xs ago"
+// on the page is honest. Failures aren't cached (the next request retries).
+const cachedOverview = unstable_cache(
+  async () => {
+    const data = await loadOverview();
+    if (!data) throw new Error('GitHub unavailable');
+    return data;
+  },
+  ['github-overview-v2'],
+  { revalidate: 45, tags: ['github'] },
+);
+
+export async function getGitHubOverview(): Promise<GitHubOverview | null> {
+  try {
+    return await cachedOverview();
+  } catch {
     return null;
   }
 }
