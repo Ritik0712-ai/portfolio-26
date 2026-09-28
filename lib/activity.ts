@@ -35,7 +35,7 @@ export async function getGitHubActivity(): Promise<GitHubActivity | null> {
   try {
     const res = await fetch(
       `https://api.github.com/users/${GITHUB_USERNAME}/events/public?per_page=100`,
-      { headers: githubHeaders(), next: { revalidate: 60 } }
+      { headers: githubHeaders(), next: { revalidate: 30 } }
     );
     if (!res.ok) return null;
     const events: Array<{ type: string; created_at: string; repo: { name: string } }> = await res.json();
@@ -82,6 +82,14 @@ export async function getGitHubActivity(): Promise<GitHubActivity | null> {
       };
     }
 
+    // With a token, read the real newest commit straight from each recently
+    // pushed repo (private ones included). The public events feed above can
+    // lag GitHub by hours and never sees private repos.
+    if (process.env.GITHUB_TOKEN) {
+      const fresh = await latestCommitViaGraphQL();
+      if (fresh) latest = fresh;
+    }
+
     // Prefer the contribution calendar when a token is configured: it
     // includes private work and matches the graph on github.com.
     let unit: GitHubActivity['unit'] = 'pushes';
@@ -103,6 +111,53 @@ export async function getGitHubActivity(): Promise<GitHubActivity | null> {
     };
   } catch (err) {
     console.error('GitHub activity failed', err);
+    return null;
+  }
+}
+
+const LATEST_QUERY = `
+query($login: String!) {
+  user(login: $login) {
+    repositories(ownerAffiliations: OWNER, first: 8, orderBy: { field: PUSHED_AT, direction: DESC }) {
+      nodes {
+        name url isPrivate
+        defaultBranchRef {
+          target {
+            ... on Commit { history(first: 1) { nodes { messageHeadline committedDate url } } }
+          }
+        }
+      }
+    }
+  }
+}`;
+
+async function latestCommitViaGraphQL(): Promise<GitHubActivity['latest']> {
+  try {
+    const res = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: { ...githubHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: LATEST_QUERY, variables: { login: GITHUB_USERNAME } }),
+      cache: 'no-store',
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    type Node = {
+      name: string; url: string; isPrivate: boolean;
+      defaultBranchRef: { target: { history?: { nodes: { messageHeadline: string; committedDate: string; url: string }[] } } } | null;
+    };
+    const nodes: Node[] = json?.data?.user?.repositories?.nodes ?? [];
+    let best: GitHubActivity['latest'] = null;
+    for (const r of nodes) {
+      const c = r.defaultBranchRef?.target?.history?.nodes?.[0];
+      if (!c) continue;
+      if (best && new Date(c.committedDate) <= new Date(best.at)) continue;
+      // Private repos count, but their names and messages stay private.
+      best = r.isPrivate
+        ? { repo: 'a private repo', repoUrl: `https://github.com/${GITHUB_USERNAME}`, message: null, url: null, at: c.committedDate }
+        : { repo: r.name, repoUrl: r.url, message: c.messageHeadline, url: c.url, at: c.committedDate };
+    }
+    return best;
+  } catch {
     return null;
   }
 }
